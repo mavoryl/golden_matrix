@@ -58,10 +58,13 @@ class ErrorCapture {
     final isLayoutWarning = _warningPatterns.any((pattern) => message.contains(pattern));
 
     if (isLayoutWarning) {
+      // Capture the warning but do not forward — the test framework would
+      // otherwise mark the test as failed for a recognized layout warning.
       warnings.add(message);
+      return;
     }
 
-    // Always forward to original handler to maintain framework state
+    // Forward unknown errors so the test framework can surface them.
     _originalHandler?.call(details);
   }
 }

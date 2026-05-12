@@ -1,3 +1,7 @@
+## 0.7.1
+
+- **Fix** — overflow warnings no longer fail the test. ErrorCapture was forwarding captured layout warnings to the default handler, which marked the test as failed.
+
 ## 0.7.0
 
 - **Console summary** — prints test counts, duration, and failed combinations in `tearDownAll`. Opt-out via `printSummary: false`.

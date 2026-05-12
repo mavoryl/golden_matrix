@@ -1,7 +1,7 @@
 {
   "name": "screenMatrixGolden: ProfileScreen",
-  "timestamp": "2026-04-09T16:24:56.917667",
-  "durationMs": 2854,
+  "timestamp": "2026-05-12T11:23:16.951047",
+  "durationMs": 2831,
   "total": 8,
   "passed": 8,
   "failed": 0,
@@ -16,7 +16,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/own_profile/dark_en_ltr_1_5x_phonesmall.png"
+      "goldenPath": "goldens/profilescreen/own_profile/dark_en_ltr_1_5x_phonesmall.png"
     },
     {
       "scenario": "own_profile",
@@ -26,7 +26,7 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/own_profile/dark_en_ltr_1_5x_phonelarge.png"
+      "goldenPath": "goldens/profilescreen/own_profile/dark_en_ltr_1_5x_phonelarge.png"
     },
     {
       "scenario": "own_profile",
@@ -36,7 +36,7 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/own_profile/dark_en_ltr_1_5x_tablet.png"
+      "goldenPath": "goldens/profilescreen/own_profile/dark_en_ltr_1_5x_tablet.png"
     },
     {
       "scenario": "own_profile",
@@ -46,7 +46,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/own_profile/light_en_ltr_1_5x_phonesmall.png"
+      "goldenPath": "goldens/profilescreen/own_profile/light_en_ltr_1_5x_phonesmall.png"
     },
     {
       "scenario": "own_profile",
@@ -56,7 +56,7 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/own_profile/light_en_ltr_1_5x_phonelarge.png"
+      "goldenPath": "goldens/profilescreen/own_profile/light_en_ltr_1_5x_phonelarge.png"
     },
     {
       "scenario": "other_profile",
@@ -66,7 +66,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/other_profile/dark_en_ltr_1_5x_phonesmall.png"
+      "goldenPath": "goldens/profilescreen/other_profile/dark_en_ltr_1_5x_phonesmall.png"
     },
     {
       "scenario": "other_profile",
@@ -76,7 +76,7 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/other_profile/dark_en_ltr_1_5x_phonelarge.png"
+      "goldenPath": "goldens/profilescreen/other_profile/dark_en_ltr_1_5x_phonelarge.png"
     },
     {
       "scenario": "other_profile",
@@ -86,7 +86,7 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/other_profile/dark_en_ltr_1_5x_tablet.png"
+      "goldenPath": "goldens/profilescreen/other_profile/dark_en_ltr_1_5x_tablet.png"
     }
   ]
 }

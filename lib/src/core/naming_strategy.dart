@@ -1,21 +1,32 @@
 import 'package:flutter/widgets.dart';
 
 import '../models/matrix_combination.dart';
+import 'slug.dart';
 
 /// Generates deterministic file paths for golden files.
 class NamingStrategy {
   /// Returns the golden file path for a given combination.
   ///
-  /// Format: `goldens/<scenario>/<theme>_<locale>_<direction>_<textScale>_<device>.png`
-  static String goldenPath(MatrixCombination combination) {
+  /// Format: `goldens/<test>/<scenario>/<theme>_<locale>_<direction>_<textScale>_<device>.png`
+  /// (when [testName] is provided)
+  ///
+  /// Without [testName]: `goldens/<scenario>/<theme>_<locale>_<direction>_<textScale>_<device>.png`
+  ///
+  /// The [testName] prevents collisions when two `matrixGolden` calls use
+  /// scenarios with the same name. Pass the first argument of `matrixGolden` here.
+  static String goldenPath(MatrixCombination combination, {String? testName}) {
     final scenario = combination.scenario.slug;
     final theme = combination.theme.slug;
     final locale = _formatLocale(combination.locale);
     final dir = combination.direction == TextDirection.ltr ? 'ltr' : 'rtl';
     final scale = formatTextScale(combination.textScale);
     final device = combination.device.slug;
+    final file = '${theme}_${locale}_${dir}_${scale}_$device.png';
 
-    return 'goldens/$scenario/${theme}_${locale}_${dir}_${scale}_$device.png';
+    if (testName != null) {
+      return 'goldens/${slugify(testName)}/$scenario/$file';
+    }
+    return 'goldens/$scenario/$file';
   }
 
   /// Formats a text scale value for use in file names.

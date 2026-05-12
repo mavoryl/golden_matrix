@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: SampleButton_WithTolerance",
-  "timestamp": "2026-04-09T16:24:57.148800",
-  "durationMs": 3084,
+  "timestamp": "2026-05-12T11:23:17.153134",
+  "durationMs": 3032,
   "total": 2,
   "passed": 2,
   "failed": 0,
@@ -16,7 +16,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/default/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withtolerance/default/light_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "default",
@@ -26,7 +26,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/default/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withtolerance/default/dark_en_ltr_1x_phonesmall.png"
     }
   ]
 }

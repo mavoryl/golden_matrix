@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: UserAvatar",
-  "timestamp": "2026-04-09T16:24:55.490735",
-  "durationMs": 1429,
+  "timestamp": "2026-05-12T11:23:15.550546",
+  "durationMs": 1433,
   "total": 12,
   "passed": 12,
   "failed": 0,
@@ -16,7 +16,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/small_offline/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "small_offline",
@@ -26,7 +26,7 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/small_offline/light_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x_androidmedium.png"
     },
     {
       "scenario": "small_offline",
@@ -36,7 +36,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/small_offline/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "small_offline",
@@ -46,7 +46,7 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/small_offline/dark_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x_androidmedium.png"
     },
     {
       "scenario": "medium_online",
@@ -56,7 +56,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/medium_online/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "medium_online",
@@ -66,7 +66,7 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/medium_online/light_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x_androidmedium.png"
     },
     {
       "scenario": "medium_online",
@@ -76,7 +76,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/medium_online/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "medium_online",
@@ -86,7 +86,7 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/medium_online/dark_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x_androidmedium.png"
     },
     {
       "scenario": "large_online",
@@ -96,7 +96,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/large_online/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "large_online",
@@ -106,7 +106,7 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/large_online/light_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x_androidmedium.png"
     },
     {
       "scenario": "large_online",
@@ -116,7 +116,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/large_online/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "large_online",
@@ -126,7 +126,7 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/large_online/dark_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x_androidmedium.png"
     }
   ]
 }

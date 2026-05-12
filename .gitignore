@@ -37,3 +37,4 @@ migrate_working_dir/
 # Internal docs
 /CLAUDE.md
 article_medium.md
+**/failures/

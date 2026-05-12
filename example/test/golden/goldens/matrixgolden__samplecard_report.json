@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: SampleCard",
-  "timestamp": "2026-04-09T16:24:55.285899",
-  "durationMs": 1225,
+  "timestamp": "2026-05-12T11:23:15.346312",
+  "durationMs": 1229,
   "total": 4,
   "passed": 4,
   "failed": 0,
@@ -16,7 +16,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/with_subtitle/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplecard/with_subtitle/light_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "with_subtitle",
@@ -26,7 +26,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/with_subtitle/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplecard/with_subtitle/dark_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "without_subtitle",
@@ -36,7 +36,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/without_subtitle/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplecard/without_subtitle/light_en_ltr_1x_phonesmall.png"
     },
     {
       "scenario": "without_subtitle",
@@ -46,7 +46,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/without_subtitle/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplecard/without_subtitle/dark_en_ltr_1x_phonesmall.png"
     }
   ]
 }

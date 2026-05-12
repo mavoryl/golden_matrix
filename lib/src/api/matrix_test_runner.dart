@@ -63,7 +63,7 @@ void runMatrixTests(
         for (final combination in entry.value) {
           final goldenPath = fileNameBuilder != null
               ? fileNameBuilder(combination)
-              : NamingStrategy.goldenPath(combination);
+              : NamingStrategy.goldenPath(combination, testName: _stripPrefix(name));
 
           if (skip && report) {
             _recordSkipped(results, combination, goldenPath);
@@ -275,6 +275,16 @@ String formatSummary(MatrixResult result) {
 }
 
 // -- Helpers --
+
+/// Strips the public API prefix ('matrixGolden: ' or 'screenMatrixGolden: ')
+/// from a test name to get just the user-provided identifier.
+String _stripPrefix(String name) {
+  const prefixes = ['matrixGolden: ', 'screenMatrixGolden: '];
+  for (final prefix in prefixes) {
+    if (name.startsWith(prefix)) return name.substring(prefix.length);
+  }
+  return name;
+}
 
 String _testDescription(MatrixCombination c) {
   final dir = c.direction == TextDirection.ltr ? 'ltr' : 'rtl';

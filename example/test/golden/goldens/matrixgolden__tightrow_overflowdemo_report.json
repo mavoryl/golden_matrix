@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: TightRow_OverflowDemo",
-  "timestamp": "2026-04-09T16:24:57.115649",
-  "durationMs": 3051,
+  "timestamp": "2026-05-12T11:23:17.123052",
+  "durationMs": 3002,
   "total": 4,
   "passed": 4,
   "failed": 0,
@@ -16,7 +16,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/default/light_en_ltr_1x_phonesmall.png",
+      "goldenPath": "goldens/tightrow_overflowdemo/default/light_en_ltr_1x_phonesmall.png",
       "warnings": [
         "A RenderFlex overflowed by 190 pixels on the right."
       ]
@@ -29,7 +29,7 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/default/light_en_ltr_1x_phonelarge.png",
+      "goldenPath": "goldens/tightrow_overflowdemo/default/light_en_ltr_1x_phonelarge.png",
       "warnings": [
         "A RenderFlex overflowed by 151 pixels on the right."
       ]
@@ -42,7 +42,7 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/default/light_en_ltr_2x_phonesmall.png",
+      "goldenPath": "goldens/tightrow_overflowdemo/default/light_en_ltr_2x_phonesmall.png",
       "warnings": [
         "A RenderFlex overflowed by 613 pixels on the right."
       ]
@@ -55,7 +55,7 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/default/light_en_ltr_2x_phonelarge.png",
+      "goldenPath": "goldens/tightrow_overflowdemo/default/light_en_ltr_2x_phonelarge.png",
       "warnings": [
         "A RenderFlex overflowed by 574 pixels on the right."
       ]

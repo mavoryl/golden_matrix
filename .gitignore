@@ -38,3 +38,4 @@ migrate_working_dir/
 /CLAUDE.md
 article_medium.md
 **/failures/
+CODE_REVIEW_*.md

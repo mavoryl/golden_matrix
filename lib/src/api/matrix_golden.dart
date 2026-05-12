@@ -49,7 +49,9 @@ import 'matrix_test_runner.dart';
 /// - [rules] — A list of [MatrixRule]s applied after the Cartesian
 ///   product. Exclude rules drop combinations; includeOnly rules keep
 ///   only matching combinations.
-/// - [tags] — Optional Flutter test tags applied to each generated test.
+/// - [scenarioTags] — When provided, only scenarios whose [MatrixScenario.tags]
+///   intersect this list are included. This filters [scenarios] before
+///   matrix generation; it is NOT passed to Flutter test as `tags`.
 /// - [fileNameBuilder] — Override the default golden file name derived
 ///   from the combination. Useful for custom naming conventions.
 /// - [extraLocalizationsDelegates] — Additional
@@ -106,7 +108,7 @@ void matrixGolden(
   MatrixSampling? sampling,
   int? maxCombinations,
   List<MatrixRule> rules = const [],
-  List<String>? tags,
+  List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
   Widget Function(Widget child)? wrapChild,
@@ -130,7 +132,7 @@ void matrixGolden(
     sampling: sampling,
     maxCombinations: maxCombinations,
     rules: rules,
-    tags: tags,
+    scenarioTags: scenarioTags,
     fileNameBuilder: fileNameBuilder,
     report: report,
     reportDir: reportDir,

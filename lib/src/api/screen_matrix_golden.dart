@@ -54,7 +54,8 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 ///   [MatrixSampling.priorityBased].
 /// - [rules] — [MatrixRule]s applied after the Cartesian product to
 ///   filter combinations.
-/// - [tags] — Flutter test tags applied to each generated test.
+/// - [scenarioTags] — When provided, filters [states] by their
+///   [MatrixScenario.tags]. Not a Flutter test tag.
 /// - [fileNameBuilder] — Override the default golden file name.
 /// - [report] — When `true` (default), writes JSON/HTML report output.
 /// - [reportDir] — Optional directory for the generated report.
@@ -107,7 +108,7 @@ void screenMatrixGolden(
   MatrixSampling? sampling,
   int? maxCombinations,
   List<MatrixRule> rules = const [],
-  List<String>? tags,
+  List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   bool report = true,
   String? reportDir,
@@ -126,7 +127,7 @@ void screenMatrixGolden(
     sampling: sampling,
     maxCombinations: maxCombinations,
     rules: rules,
-    tags: tags,
+    scenarioTags: scenarioTags,
     fileNameBuilder: fileNameBuilder,
     report: report,
     reportDir: reportDir,

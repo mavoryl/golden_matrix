@@ -1,4 +1,4 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
 
@@ -164,6 +164,55 @@ void main() {
       expect(combinations.length, 1);
       expect(combinations.first.scenario.name, 'a');
       expect(combinations.first.theme.name, 'dark');
+    });
+  });
+
+  group('MatrixGenerator pairwise + rules (regression)', () {
+    test('pairwise derives domain from filtered combinations', () {
+      // 3 themes but rule excludes one — pairwise should pair only the 2 remaining.
+      final brand = MatrixTheme.custom('brand', ThemeData.light());
+      final combinations = MatrixGenerator.generate(
+        scenarios: [MatrixScenario('test', builder: placeholder)],
+        axes: MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark, brand],
+          locales: const [Locale('en'), Locale('ar')],
+        ),
+        rules: [MatrixRule.exclude((c) => c.theme == brand)],
+        sampling: MatrixSampling.pairwise,
+      );
+
+      // No 'brand' should remain.
+      expect(combinations.any((c) => c.theme == brand), isFalse);
+
+      // All pairs of (theme, locale) over the feasible set should be covered.
+      final pairs = combinations.map((c) => '${c.theme.name}_${c.locale}').toSet();
+      expect(pairs, contains('light_en'));
+      expect(pairs, contains('light_ar'));
+      expect(pairs, contains('dark_en'));
+      expect(pairs, contains('dark_ar'));
+    });
+
+    test('pairwise after includeOnly covers reduced domain', () {
+      final combinations = MatrixGenerator.generate(
+        scenarios: [MatrixScenario('test', builder: placeholder)],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ru'), Locale('ar')],
+          devices: [MatrixDevice.phoneSmall, MatrixDevice.tablet],
+        ),
+        rules: [MatrixRule.includeOnly((c) => c.locale.languageCode != 'ru')],
+        sampling: MatrixSampling.pairwise,
+      );
+
+      // 'ru' must not appear after includeOnly.
+      expect(combinations.any((c) => c.locale.languageCode == 'ru'), isFalse);
+
+      // All pairs over remaining domain.
+      final tlPairs = combinations.map((c) => '${c.theme.name}_${c.locale}').toSet();
+      expect(tlPairs, contains('light_en'));
+      expect(tlPairs, contains('light_ar'));
+      expect(tlPairs, contains('dark_en'));
+      expect(tlPairs, contains('dark_ar'));
     });
   });
 }

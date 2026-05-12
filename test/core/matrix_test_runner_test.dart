@@ -55,18 +55,71 @@ void main() {
       expect(full.length, 4);
     });
 
-    test('filters scenarios by tags', () {
+    test('filters scenarios by scenarioTags', () {
       final result = resolveCombinations(
         scenarios: [
           MatrixScenario('a', builder: placeholder, tags: ['core']),
           MatrixScenario('b', builder: placeholder, tags: ['edge']),
           MatrixScenario('c', builder: placeholder, tags: ['core']),
         ],
-        tags: ['core'],
+        scenarioTags: ['core'],
       );
 
       expect(result.length, 2);
       expect(result.every((c) => c.scenario.name != 'b'), isTrue);
+    });
+
+    test('scenarioTags=null includes all scenarios', () {
+      final result = resolveCombinations(
+        scenarios: [
+          MatrixScenario('a', builder: placeholder, tags: ['core']),
+          MatrixScenario('b', builder: placeholder, tags: ['edge']),
+        ],
+      );
+      expect(result.length, 2);
+    });
+
+    test('maxCombinations caps full sampling', () {
+      final result = resolveCombinations(
+        scenarios: [MatrixScenario('test', builder: placeholder)],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ru'), Locale('ar')],
+          textScales: [1.0, 2.0],
+        ),
+        maxCombinations: 5,
+      );
+      // Full would be 12; capped to 5.
+      expect(result.length, 5);
+    });
+
+    test('maxCombinations caps pairwise sampling', () {
+      final result = resolveCombinations(
+        scenarios: [MatrixScenario('test', builder: placeholder)],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ru'), Locale('ar')],
+          textScales: [1.0, 2.0],
+          devices: [MatrixDevice.phoneSmall, MatrixDevice.tablet],
+        ),
+        sampling: MatrixSampling.pairwise,
+        maxCombinations: 3,
+      );
+      expect(result.length, 3);
+    });
+
+    test('maxCombinations caps smoke sampling', () {
+      final result = resolveCombinations(
+        scenarios: [MatrixScenario('test', builder: placeholder)],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ar')],
+          devices: [MatrixDevice.phoneSmall, MatrixDevice.tablet],
+        ),
+        sampling: MatrixSampling.smoke,
+        maxCombinations: 2,
+      );
+      expect(result.length, lessThanOrEqualTo(2));
     });
 
     test('merges preset rules with explicit rules', () {

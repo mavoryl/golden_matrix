@@ -32,7 +32,7 @@ void runMatrixTests(
   MatrixSampling? sampling,
   int? maxCombinations,
   List<MatrixRule> rules = const [],
-  List<String>? tags,
+  List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   bool report = true,
   String? reportDir,
@@ -46,7 +46,7 @@ void runMatrixTests(
     preset: preset,
     sampling: sampling,
     rules: rules,
-    tags: tags,
+    scenarioTags: scenarioTags,
     maxCombinations: maxCombinations,
   );
 
@@ -100,15 +100,15 @@ List<MatrixCombination> resolveCombinations({
   MatrixPreset? preset,
   MatrixSampling? sampling,
   List<MatrixRule> rules = const [],
-  List<String>? tags,
+  List<String>? scenarioTags,
   int? maxCombinations,
 }) {
   final effectiveAxes = axes ?? preset?.axes ?? const MatrixAxes();
   final effectiveSampling = sampling ?? preset?.sampling ?? MatrixSampling.full;
   final effectiveRules = [...?preset?.rules, ...rules];
 
-  final filteredScenarios = tags != null
-      ? scenarios.where((s) => s.tags.any((t) => tags.contains(t))).toList()
+  final filteredScenarios = scenarioTags != null
+      ? scenarios.where((s) => s.tags.any((t) => scenarioTags.contains(t))).toList()
       : scenarios;
 
   return MatrixGenerator.generate(
@@ -134,14 +134,23 @@ Map<String, List<MatrixCombination>> groupByScenario(List<MatrixCombination> com
 void _setupTolerance(double? tolerance) {
   if (tolerance == null) return;
 
+  if (tolerance < 0.0 || tolerance > 1.0) {
+    throw ArgumentError.value(tolerance, 'tolerance', 'must be in range 0.0..1.0');
+  }
+
   GoldenFileComparator? originalComparator;
 
   setUp(() {
     originalComparator = goldenFileComparator;
-    goldenFileComparator = _TolerantComparator(
-      goldenFileComparator as LocalFileComparator,
-      tolerance,
-    );
+    final current = goldenFileComparator;
+    if (current is! LocalFileComparator) {
+      throw StateError(
+        'golden_matrix: tolerance requires goldenFileComparator to be a '
+        'LocalFileComparator, but got ${current.runtimeType}. '
+        'Custom comparators are not supported with the tolerance parameter.',
+      );
+    }
+    goldenFileComparator = _TolerantComparator(current, tolerance);
   });
 
   tearDown(() {

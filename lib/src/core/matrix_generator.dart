@@ -80,6 +80,12 @@ class MatrixGenerator {
         combinations = _applyPairwiseSampling(combinations, axes);
     }
 
+    // 5. Apply maxCombinations as a global cap for any strategy.
+    // (priorityBased already truncates internally, but reapply for consistency.)
+    if (maxCombinations != null && combinations.length > maxCombinations) {
+      combinations = combinations.sublist(0, maxCombinations);
+    }
+
     return combinations;
   }
 
@@ -353,14 +359,6 @@ class MatrixGenerator {
       return scored.sublist(0, maxCombinations);
     }
 
-    if (maxCombinations == null && scored.length > 20) {
-      debugPrint(
-        'golden_matrix: priorityBased sampling without maxCombinations returns '
-        'all ${scored.length} combinations sorted by priority. '
-        'Pass maxCombinations to cap the test count.',
-      );
-    }
-
     return scored;
   }
 
@@ -380,41 +378,63 @@ class MatrixGenerator {
       (byScenario[c.scenario.name] ??= []).add(c);
     }
 
-    // Build parameter sizes from axes
-    final paramSizes = <int>[
-      axes.themes.length,
-      axes.locales.length,
-      axes.textScales.length,
-      axes.devices.length,
-    ];
-    if (axes.directions.isNotEmpty) {
-      paramSizes.add(axes.directions.length);
-    }
-
-    // Remove single-value parameters (no pairs to cover)
-    final activeParams = <int>[];
-    final activeParamSizes = <int>[];
-    for (var i = 0; i < paramSizes.length; i++) {
-      if (paramSizes[i] > 1) {
-        activeParams.add(i);
-        activeParamSizes.add(paramSizes[i]);
-      }
-    }
-
-    // If 0 or 1 multi-value params, pairwise = full (no pairs to optimize)
-    if (activeParamSizes.length <= 1) return combinations;
-
-    // Generate pairwise covering array
-    final testCases = PairwiseGenerator.generate(activeParamSizes);
-
     final result = <MatrixCombination>[];
 
-    for (final scenario in byScenario.entries) {
-      final scenarioCombos = scenario.value;
+    // Derive pairwise domain per scenario from feasible combinations
+    // (after rules), not from raw axes. This preserves pairwise coverage
+    // guarantees over the actual runnable set.
+    for (final entry in byScenario.entries) {
+      final scenarioCombos = entry.value;
       if (scenarioCombos.isEmpty) continue;
 
+      // Collect unique surviving values per axis from this scenario's combos
+      final themes = <MatrixTheme>[];
+      final locales = <Locale>[];
+      final textScales = <double>[];
+      final devices = <MatrixDevice>[];
+      final directions = <TextDirection>[];
+
+      for (final c in scenarioCombos) {
+        if (!themes.contains(c.theme)) themes.add(c.theme);
+        if (!locales.contains(c.locale)) locales.add(c.locale);
+        if (!textScales.contains(c.textScale)) textScales.add(c.textScale);
+        if (!devices.contains(c.device)) devices.add(c.device);
+        if (!directions.contains(c.direction)) directions.add(c.direction);
+      }
+
+      // Direction is treated as an independent pairwise parameter only when
+      // it was an explicit axis. Otherwise it is derived from locale and
+      // would generate infeasible (locale, direction) pairs.
+      final directionIsParam = axes.directions.isNotEmpty;
+
+      // Build parameter sizes from feasible domain
+      final paramSizes = [
+        themes.length,
+        locales.length,
+        textScales.length,
+        devices.length,
+        if (directionIsParam) directions.length else 1,
+      ];
+
+      // Remove single-value parameters (no pairs to cover)
+      final activeParams = <int>[];
+      final activeParamSizes = <int>[];
+      for (var i = 0; i < paramSizes.length; i++) {
+        if (paramSizes[i] > 1) {
+          activeParams.add(i);
+          activeParamSizes.add(paramSizes[i]);
+        }
+      }
+
+      // If 0 or 1 multi-value params, pairwise = full for this scenario
+      if (activeParamSizes.length <= 1) {
+        result.addAll(scenarioCombos);
+        continue;
+      }
+
+      final testCases = PairwiseGenerator.generate(activeParamSizes);
+
       for (final testCase in testCases) {
-        // Map active param indices back to full param values
         var themeIdx = 0;
         var localeIdx = 0;
         var textScaleIdx = 0;
@@ -436,14 +456,13 @@ class MatrixGenerator {
           }
         }
 
-        // Find matching combination from the full set
-        final theme = axes.themes[themeIdx];
-        final locale = axes.locales[localeIdx];
-        final textScale = axes.textScales[textScaleIdx];
-        final device = axes.devices[deviceIdx];
-        final direction = axes.directions.isNotEmpty
-            ? axes.directions[directionIdx]
-            : directionForLocale(locale);
+        final theme = themes[themeIdx];
+        final locale = locales[localeIdx];
+        final textScale = textScales[textScaleIdx];
+        final device = devices[deviceIdx];
+
+        // When direction is not a pairwise parameter, it's derived from locale.
+        final direction = directionIsParam ? directions[directionIdx] : directionForLocale(locale);
 
         final match = scenarioCombos.where(
           (c) =>

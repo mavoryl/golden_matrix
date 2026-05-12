@@ -7,19 +7,18 @@ import 'package:flutter/foundation.dart';
 ///
 /// ## Recognized patterns
 ///
-/// Messages matching any of the following substrings are captured as
-/// warnings rather than being forwarded to the original
-/// [FlutterError.onError] handler (which would fail the test):
+/// Only overflow-style messages are captured as warnings (i.e. downgraded
+/// from test failures). All other layout errors — including "RenderBox was
+/// not laid out", layout assertion violations, and unknown framework
+/// errors — are forwarded to the original [FlutterError.onError] so the
+/// test framework can fail the test. Overflow is treated specially because
+/// it represents visible-but-clipped UI that may still be a legitimate
+/// rendering for golden review.
 ///
 ///   * `RenderFlex overflowed` — Row/Column children exceed available space.
-///   * `RenderBox was not laid out` — a render object was painted
-///     without being laid out (usually a misuse of intrinsics).
 ///   * `A RenderFlex overflowed by` — verbose variant emitted by some
 ///     Flutter versions.
 ///   * `overflowing by` / `OVERFLOWING` — additional overflow patterns.
-///
-/// Any error that does not match a known pattern is forwarded to the
-/// original handler so the test framework can surface it as a failure.
 ///
 /// Usage:
 /// ```dart
@@ -39,10 +38,13 @@ class ErrorCapture {
   FlutterExceptionHandler? _originalHandler;
   bool _active = false;
 
-  /// Known error patterns to capture as warnings.
+  /// Overflow patterns captured as non-fatal warnings.
+  ///
+  /// Only true overflow messages are downgraded. Layout-contract failures
+  /// like "RenderBox was not laid out" are NOT in this list and will fail
+  /// the test, surfacing genuinely broken render trees.
   static const _warningPatterns = [
     'RenderFlex overflowed',
-    'RenderBox was not laid out',
     'A RenderFlex overflowed by',
     'overflowing by',
     'OVERFLOWING',

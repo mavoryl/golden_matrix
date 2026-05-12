@@ -1,3 +1,7 @@
+## 0.8.2
+
+- **Docs** — update install snippet version in README to current.
+
 ## 0.8.1
 
 - **Docs** — expanded dartdoc across the public API: per-parameter docs on `matrixGolden`/`screenMatrixGolden`, sampling strategy comparisons, preset descriptions, complex rule examples, device preset table, custom theme system pattern, error capture pattern list.

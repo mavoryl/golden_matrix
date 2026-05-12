@@ -233,8 +233,7 @@ void _setupReportWriting(
     await MatrixReportWriter.write(result, outputDir: reportDir);
     await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
     if (printSummary) {
-      // ignore: avoid_print
-      print(formatSummary(result));
+      debugPrint(formatSummary(result));
     }
   });
 }

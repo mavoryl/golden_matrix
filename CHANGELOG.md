@@ -1,3 +1,9 @@
+## 0.8.3
+
+- **Better failure messages** — warnings for `priorityBased` sampling without `maxCombinations` on large matrices, and when `loadAppFonts` cannot find Roboto.
+- **Validation** — asserts on empty `MatrixScenario`, `MatrixTheme.custom`, `MatrixDevice` names and non-positive `pixelRatio`.
+- **Switched to `debugPrint`** — replaces `print` in summary output and warnings.
+
 ## 0.8.2
 
 - **Docs** — update install snippet version in README to current.

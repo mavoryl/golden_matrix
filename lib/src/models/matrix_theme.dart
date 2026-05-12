@@ -67,8 +67,10 @@ class MatrixTheme {
   static const dark = MatrixTheme._('dark', null, null);
 
   /// Creates a custom theme with a [name], [ThemeData], and optional [data].
-  factory MatrixTheme.custom(String name, ThemeData themeData, {Object? data}) =>
-      MatrixTheme._(name, themeData, data);
+  factory MatrixTheme.custom(String name, ThemeData themeData, {Object? data}) {
+    assert(name != '', 'MatrixTheme name must not be empty');
+    return MatrixTheme._(name, themeData, data);
+  }
 
   /// Whether this is the built-in dark theme.
   bool get isDark => identical(this, dark) || (themeData?.brightness == Brightness.dark);

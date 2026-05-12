@@ -11,7 +11,8 @@ class MatrixScenario {
   final ScenarioBuilder builder;
   final List<String> tags;
 
-  const MatrixScenario(this.name, {required this.builder, this.tags = const []});
+  const MatrixScenario(this.name, {required this.builder, this.tags = const []})
+    : assert(name != '', 'MatrixScenario name must not be empty');
 
   String get slug => slugify(name);
 

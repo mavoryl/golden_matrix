@@ -353,6 +353,14 @@ class MatrixGenerator {
       return scored.sublist(0, maxCombinations);
     }
 
+    if (maxCombinations == null && scored.length > 20) {
+      debugPrint(
+        'golden_matrix: priorityBased sampling without maxCombinations returns '
+        'all ${scored.length} combinations sorted by priority. '
+        'Pass maxCombinations to cap the test count.',
+      );
+    }
+
     return scored;
   }
 

@@ -41,7 +41,8 @@ class MatrixDevice {
     required this.logicalSize,
     this.pixelRatio = 1.0,
     this.safeArea = EdgeInsets.zero,
-  });
+  }) : assert(name != '', 'MatrixDevice name must not be empty'),
+       assert(pixelRatio > 0, 'MatrixDevice pixelRatio must be > 0');
 
   // iOS devices
   static const phoneSmall = MatrixDevice(

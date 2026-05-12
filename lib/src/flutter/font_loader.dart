@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -62,23 +63,32 @@ Future<void> loadAppFonts() async {
 
   // Load Roboto from Flutter SDK if not already loaded from the manifest
   if (!loadedFamilies.contains('Roboto')) {
-    await _loadRobotoFromSdk();
+    final loaded = await _loadRobotoFromSdk();
+    if (!loaded) {
+      debugPrint(
+        'golden_matrix: Roboto not found in FontManifest.json or Flutter SDK. '
+        'Material text will render with the Ahem placeholder font (square boxes). '
+        'Set FLUTTER_ROOT or add Roboto to your pubspec.yaml fonts.',
+      );
+    }
   }
 }
 
 /// Attempts to load the Roboto font from the Flutter SDK's cached artifacts.
-Future<void> _loadRobotoFromSdk() async {
+/// Returns `true` if the font was loaded, `false` otherwise.
+Future<bool> _loadRobotoFromSdk() async {
   final flutterRoot = _findFlutterRoot();
-  if (flutterRoot == null) return;
+  if (flutterRoot == null) return false;
 
   final robotoFile = File('$flutterRoot/bin/cache/artifacts/material_fonts/Roboto-Regular.ttf');
 
-  if (!robotoFile.existsSync()) return;
+  if (!robotoFile.existsSync()) return false;
 
   final fontLoader = FontLoader('Roboto');
   final bytes = await robotoFile.readAsBytes();
   fontLoader.addFont(Future.value(ByteData.view(bytes.buffer)));
   await fontLoader.load();
+  return true;
 }
 
 /// Finds the Flutter SDK root by checking common indicators.

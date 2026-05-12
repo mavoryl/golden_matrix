@@ -44,6 +44,7 @@ void matrixGolden(
   String? reportDir,
   bool skip = false,
   double? tolerance,
+  bool printSummary = true,
 }) {
   runMatrixTests(
     'matrixGolden: $name',
@@ -65,5 +66,6 @@ void matrixGolden(
     reportDir: reportDir,
     skip: skip,
     tolerance: tolerance,
+    printSummary: printSummary,
   );
 }

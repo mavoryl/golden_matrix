@@ -38,6 +38,7 @@ void runMatrixTests(
   String? reportDir,
   bool skip = false,
   double? tolerance,
+  bool printSummary = true,
 }) {
   final combinations = resolveCombinations(
     scenarios: scenarios,
@@ -85,7 +86,7 @@ void runMatrixTests(
     }
 
     if (report) {
-      _setupReportWriting(name, results, stopwatch, reportDir);
+      _setupReportWriting(name, results, stopwatch, reportDir, printSummary);
     }
   });
 }
@@ -224,13 +225,53 @@ void _setupReportWriting(
   List<MatrixCombinationResult> results,
   Stopwatch stopwatch,
   String? reportDir,
+  bool printSummary,
 ) {
   tearDownAll(() async {
     stopwatch.stop();
     final result = MatrixResult(name: name, results: results, duration: stopwatch.elapsed);
     await MatrixReportWriter.write(result, outputDir: reportDir);
     await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
+    if (printSummary) {
+      // ignore: avoid_print
+      print(formatSummary(result));
+    }
   });
+}
+
+/// Formats a human-readable summary of a [MatrixResult] for console output.
+///
+/// Includes counts, duration, and a list of failed combinations.
+@visibleForTesting
+String formatSummary(MatrixResult result) {
+  final buf = StringBuffer();
+  buf.writeln(result.name);
+
+  final parts = <String>[
+    '${result.total} total',
+    '${result.passed} passed',
+    if (result.failed > 0) '${result.failed} failed',
+    if (result.skipped > 0) '${result.skipped} skipped',
+    if (result.warningCount > 0) '${result.warningCount} warnings',
+  ];
+  final duration = result.duration.inMilliseconds < 1000
+      ? '${result.duration.inMilliseconds}ms'
+      : '${result.duration.inSeconds}s';
+  buf.writeln('  ${parts.join(' | ')} ($duration)');
+
+  final failed = result.results.where((r) => r.status == MatrixResultStatus.failed);
+  if (failed.isNotEmpty) {
+    buf.writeln('  Failed:');
+    for (final f in failed) {
+      final c = f.combination;
+      final dir = c.direction == TextDirection.ltr ? 'ltr' : 'rtl';
+      buf.writeln(
+        '    - ${c.scenario.name} | ${c.theme.name} ${c.locale} $dir ${c.textScale}x ${c.device.name}',
+      );
+    }
+  }
+
+  return buf.toString().trimRight();
 }
 
 // -- Helpers --

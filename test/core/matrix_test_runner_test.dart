@@ -130,4 +130,115 @@ void main() {
       expect(grouped['only']!.length, 4);
     });
   });
+
+  group('formatSummary', () {
+    MatrixCombinationResult passed(String scenario) => MatrixCombinationResult(
+      combination: MatrixCombination(
+        scenario: MatrixScenario(scenario, builder: placeholder),
+        theme: MatrixTheme.light,
+        locale: const Locale('en'),
+        textScale: 1.0,
+        device: MatrixDevice.phoneSmall,
+        direction: TextDirection.ltr,
+      ),
+      status: MatrixResultStatus.passed,
+      goldenPath: 'goldens/$scenario/light_en_ltr_1x_phonesmall.png',
+    );
+
+    MatrixCombinationResult failedResult({
+      String scenario = 'default',
+      MatrixTheme theme = MatrixTheme.light,
+      Locale locale = const Locale('en'),
+      double textScale = 1.0,
+      MatrixDevice device = MatrixDevice.phoneSmall,
+    }) => MatrixCombinationResult(
+      combination: MatrixCombination(
+        scenario: MatrixScenario(scenario, builder: placeholder),
+        theme: theme,
+        locale: locale,
+        textScale: textScale,
+        device: device,
+        direction: TextDirection.ltr,
+      ),
+      status: MatrixResultStatus.failed,
+      goldenPath: 'goldens/$scenario/file.png',
+      errorMessage: 'mismatch',
+    );
+
+    test('includes name and counts', () {
+      final summary = formatSummary(
+        MatrixResult(
+          name: 'MyWidget',
+          results: [passed('a'), passed('b')],
+          duration: const Duration(milliseconds: 250),
+        ),
+      );
+
+      expect(summary, contains('MyWidget'));
+      expect(summary, contains('2 total'));
+      expect(summary, contains('2 passed'));
+    });
+
+    test('omits sections with zero counts', () {
+      final summary = formatSummary(
+        MatrixResult(
+          name: 'MyWidget',
+          results: [passed('a')],
+          duration: const Duration(milliseconds: 100),
+        ),
+      );
+
+      expect(summary, isNot(contains('failed')));
+      expect(summary, isNot(contains('skipped')));
+      expect(summary, isNot(contains('warnings')));
+    });
+
+    test('shows duration in ms when under 1 second', () {
+      final summary = formatSummary(
+        MatrixResult(
+          name: 'X',
+          results: [passed('a')],
+          duration: const Duration(milliseconds: 250),
+        ),
+      );
+
+      expect(summary, contains('(250ms)'));
+    });
+
+    test('shows duration in seconds when 1s or more', () {
+      final summary = formatSummary(
+        MatrixResult(name: 'X', results: [passed('a')], duration: const Duration(seconds: 3)),
+      );
+
+      expect(summary, contains('(3s)'));
+    });
+
+    test('lists failed combinations', () {
+      final summary = formatSummary(
+        MatrixResult(
+          name: 'X',
+          results: [
+            passed('a'),
+            failedResult(scenario: 'b', theme: MatrixTheme.dark),
+          ],
+          duration: const Duration(milliseconds: 100),
+        ),
+      );
+
+      expect(summary, contains('Failed:'));
+      expect(summary, contains('b | dark'));
+    });
+
+    test('does not show Failed: section when no failures', () {
+      final summary = formatSummary(
+        MatrixResult(
+          name: 'X',
+          results: [passed('a')],
+          duration: const Duration(milliseconds: 100),
+        ),
+      );
+
+      expect(summary, isNot(contains('Failed:')));
+    });
+  });
 }

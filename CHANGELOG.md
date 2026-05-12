@@ -1,3 +1,7 @@
+## 0.7.0
+
+- **Console summary** — prints test counts, duration, and failed combinations in `tearDownAll`. Opt-out via `printSummary: false`.
+
 ## 0.6.3
 
 - **Smaller package** — excluded example golden PNG files from the published package (~900 KB → much smaller). Reference outputs available in the GitHub repository.

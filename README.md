@@ -288,6 +288,8 @@ After tests run, golden_matrix generates self-contained HTML reports alongside g
 - Filter by scenario, theme, or status
 - Dark mode support via `prefers-color-scheme`
 
+See example reports and golden files in the [GitHub repository](https://github.com/Autocrab/golden_matrix/tree/main/example/test/golden/goldens).
+
 ## Golden File Structure
 
 ```

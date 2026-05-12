@@ -1,3 +1,7 @@
+## 0.6.3
+
+- **Smaller package** — excluded example golden PNG files from the published package (~900 KB → much smaller). Reference outputs available in the GitHub repository.
+
 ## 0.6.2
 
 - **Fix** — shorter description in pubspec.yaml (pub.dev recommends 60-180 characters)

@@ -4,5 +4,7 @@ docs/
 .claude/
 build/
 example/build/
+example/test/golden/goldens/
+example/test/goldens/
 *.iml
 CLAUDE.md

@@ -36,6 +36,5 @@ migrate_working_dir/
 
 # Internal docs
 /CLAUDE.md
-article_medium.md
 **/failures/
-CODE_REVIEW_*.md
+docs/

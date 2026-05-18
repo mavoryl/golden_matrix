@@ -1,0 +1,63 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  analyze-and-test:
+    name: analyze + unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: pub get
+        run: flutter pub get
+
+      - name: format check
+        run: dart format --line-length=100 --output=none --set-exit-if-changed lib/ test/
+
+      - name: analyze
+        run: dart analyze lib/ test/
+
+      - name: unit tests
+        run: flutter test
+
+  example-goldens:
+    name: example pixel goldens (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: pub get (root)
+        run: flutter pub get
+
+      - name: pub get (example)
+        working-directory: example
+        run: flutter pub get
+
+      - name: example tests with pixel goldens
+        working-directory: example
+        run: flutter test
+
+      - name: upload golden failures
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: failed-goldens
+          path: |
+            example/test/golden/failures/
+            example/test/goldens/failures/
+          if-no-files-found: ignore

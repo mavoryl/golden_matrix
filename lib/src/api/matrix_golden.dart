@@ -58,8 +58,17 @@ import 'matrix_test_runner.dart';
 ///   [LocalizationsDelegate]s appended to the auto-wrapped [MaterialApp]
 ///   (e.g. your app's generated `AppLocalizations.delegate`).
 /// - [wrapChild] — Optional builder that wraps the scenario widget before
-///   it is placed inside the [MaterialApp]. Useful for `Provider`,
-///   `Theme` overrides, or padding.
+///   it is placed inside the [MaterialApp]. Sits **inside**
+///   `MaterialApp.home` — useful for layout shells, themed scopes that
+///   work below MaterialApp, padding, or test-only decorations.
+/// - [wrapApp] — Optional builder that wraps the entire auto-built
+///   [MaterialApp] from the **outside**. This is the seam for dependency
+///   injection above MaterialApp: `ProviderScope` (Riverpod),
+///   `BlocProvider` / `MultiBlocProvider` (flutter_bloc), `MultiProvider`
+///   (provider), or custom root-level `InheritedWidget`s. The callback
+///   receives the current [MatrixCombination] so providers can vary per
+///   scenario (e.g. seed a different fake state per combination). When
+///   `null`, the widget tree is identical to previous versions.
 /// - [report] — When `true` (default), writes a JSON/HTML report to
 ///   [reportDir] (or the package default) summarizing pass/fail/warnings.
 /// - [reportDir] — Directory for the generated report. Defaults to the
@@ -90,6 +99,10 @@ import 'matrix_test_runner.dart';
 ///   ],
 ///   extraLocalizationsDelegates: const [AppLocalizations.delegate],
 ///   wrapChild: (child) => Padding(padding: const EdgeInsets.all(16), child: child),
+///   wrapApp: (app, combination) => ProviderScope(
+///     overrides: [apiClientProvider.overrideWithValue(MockApiClient())],
+///     child: app,
+///   ),
 ///   tolerance: 0.01,
 /// );
 /// ```
@@ -112,6 +125,7 @@ void matrixGolden(
   String Function(MatrixCombination)? fileNameBuilder,
   List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
   Widget Function(Widget child)? wrapChild,
+  Widget Function(Widget app, MatrixCombination combination)? wrapApp,
   bool report = true,
   String? reportDir,
   bool skip = false,
@@ -121,11 +135,11 @@ void matrixGolden(
   runMatrixTests(
     'matrixGolden: $name',
     scenarios: scenarios,
-    widgetBuilder: (combination) => MatrixWidgetWrapper(
+    widgetBuilder: (combination) => buildMatrixGoldenWidget(
       combination: combination,
       extraLocalizationsDelegates: extraLocalizationsDelegates,
       wrapChild: wrapChild,
-      child: combination.scenario.builder(),
+      wrapApp: wrapApp,
     ),
     axes: axes,
     preset: preset,
@@ -140,4 +154,27 @@ void matrixGolden(
     tolerance: tolerance,
     printSummary: printSummary,
   );
+}
+
+/// Builds the widget tree that `matrixGolden` pumps for a single
+/// [combination]. Exposed for unit tests of the `wrapApp` / `wrapChild`
+/// wiring without going through `matchesGoldenFile`.
+///
+/// The result is identical to what the public `matrixGolden` would
+/// produce internally — when [wrapApp] is `null`, no extra ancestors
+/// are introduced.
+@visibleForTesting
+Widget buildMatrixGoldenWidget({
+  required MatrixCombination combination,
+  List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
+  Widget Function(Widget child)? wrapChild,
+  Widget Function(Widget app, MatrixCombination combination)? wrapApp,
+}) {
+  final Widget app = MatrixWidgetWrapper(
+    combination: combination,
+    extraLocalizationsDelegates: extraLocalizationsDelegates,
+    wrapChild: wrapChild,
+    child: combination.scenario.builder(),
+  );
+  return wrapApp == null ? app : wrapApp(app, combination);
 }

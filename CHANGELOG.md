@@ -1,3 +1,7 @@
+## 0.11.0
+
+- **`wrapApp` — app-level decorator for `matrixGolden`.** New optional parameter that wraps the auto-built `MaterialApp` from the outside. This is the seam for dependency injection above MaterialApp: `ProviderScope` (Riverpod) with overrides, `BlocProvider` / `MultiBlocProvider`, `MultiProvider`, or any custom root-level `InheritedWidget` (e.g. brand themes that must sit above MaterialApp). The callback receives the current `MatrixCombination` so providers can vary per scenario. Pure additive — when `null`, the widget tree is byte-identical to previous versions, existing golden files unchanged.
+
 ## 0.10.0
 
 - **More device presets** — modern phones (`iphone15Pro`, `iphone16ProMax`, `pixel8`, `pixel8Pro`, `galaxyS24`), foldables (`galaxyZFoldFolded`, `galaxyZFoldUnfolded`), and full iPad lineup (`ipadMini`, `ipadAir`, `ipadPro11`, `ipadPro11Landscape`, `ipadPro13`, `ipadPro13Landscape`).

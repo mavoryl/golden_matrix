@@ -51,6 +51,7 @@ matrixGolden(
 - **Presets** — `MatrixPreset.componentSmoke`, `componentFull`, `screenSmoke` for quick setup
 - **Exclude/include rules** — `MatrixRule.exclude(...)`, `MatrixRule.includeOnly(...)` with predicates
 - **Screen-level testing** — `screenMatrixGolden()` with full control via `appBuilder`
+- **DI-friendly** — `wrapApp` hooks `ProviderScope` / `BlocProvider` / `MultiProvider` above the auto-built MaterialApp, with per-combination access
 - **Overflow detection** — captures `RenderFlex overflow` and layout errors as warnings in reports
 - **HTML reports** — self-contained HTML with thumbnails, scenario grouping, filters, dark mode
 - **Tolerance** — configurable pixel diff threshold for flaky-free CI
@@ -68,7 +69,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.10.0
+  golden_matrix: ^0.11.0
 ```
 
 ### 2. Set up font loading
@@ -221,7 +222,7 @@ matrixGolden(
 
 ### Custom Wrapper
 
-Override the default `Scaffold(body: Center(child:))` layout:
+Override the default `Scaffold(body: Center(child:))` layout. `wrapChild` runs **inside** the auto-built `MaterialApp.home`, so it's the right level for layout shells (padding, alignment), `Theme` overrides, or scoped providers that live below MaterialApp:
 
 ```dart
 matrixGolden(
@@ -231,6 +232,47 @@ matrixGolden(
   wrapChild: (child) => child, // no Scaffold, no Center
 );
 ```
+
+### App-level decorator (`wrapApp`)
+
+Wrap the auto-built `MaterialApp` from **outside**. This is the seam for DI providers that must sit above MaterialApp — `ProviderScope` (Riverpod), `BlocProvider` / `MultiBlocProvider`, `MultiProvider`, or any root-level `InheritedWidget` (e.g. brand theme scopes). The callback receives the current combination so providers can vary per scenario:
+
+```dart
+matrixGolden(
+  'ProfileCard',
+  scenarios: [...],
+  axes: axes,
+  // Riverpod
+  wrapApp: (app, combination) => ProviderScope(
+    overrides: [
+      userRepoProvider.overrideWithValue(FakeUserRepo()),
+    ],
+    child: app,
+  ),
+);
+
+matrixGolden(
+  'CounterCard',
+  scenarios: [
+    MatrixScenario('zero', builder: () => const CounterCard()),
+    MatrixScenario('high', builder: () => const CounterCard()),
+  ],
+  axes: axes,
+  // Bloc, varying state by scenario
+  wrapApp: (app, c) => BlocProvider<CounterBloc>.value(
+    value: FakeCounterBloc(c.scenario.name == 'high' ? 99 : 0),
+    child: app,
+  ),
+);
+```
+
+`wrapApp` is complementary to `wrapChild`:
+- `wrapApp` sits **above** MaterialApp (DI providers)
+- `wrapChild` sits **inside** MaterialApp.home (layout shells)
+
+Use them together when needed. When `wrapApp` is omitted, the widget tree is identical to previous versions — existing goldens unaffected.
+
+For full-screen tests where you want even more control, use `screenMatrixGolden` with its `appBuilder`.
 
 ### Dry-run preview
 

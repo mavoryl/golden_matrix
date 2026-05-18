@@ -46,6 +46,42 @@ void main() {
       expect(str, contains('light'));
       expect(str, contains('en'));
     });
+
+    test('copyWith with no args returns equivalent combination', () {
+      final combo = MatrixCombination(
+        scenario: MatrixScenario('s', builder: placeholder),
+        theme: MatrixTheme.light,
+        locale: const Locale('en'),
+        textScale: 1.0,
+        device: MatrixDevice.phoneSmall,
+        direction: TextDirection.ltr,
+      );
+      final copy = combo.copyWith();
+      expect(copy.scenario, combo.scenario);
+      expect(copy.theme, combo.theme);
+      expect(copy.locale, combo.locale);
+      expect(copy.textScale, combo.textScale);
+      expect(copy.device, combo.device);
+      expect(copy.direction, combo.direction);
+    });
+
+    test('copyWith overrides only specified fields', () {
+      final combo = MatrixCombination(
+        scenario: MatrixScenario('s', builder: placeholder),
+        theme: MatrixTheme.light,
+        locale: const Locale('en'),
+        textScale: 1.0,
+        device: MatrixDevice.phoneSmall,
+        direction: TextDirection.ltr,
+      );
+      final flipped = combo.copyWith(direction: TextDirection.rtl, device: MatrixDevice.ipadPro13);
+      expect(flipped.direction, TextDirection.rtl);
+      expect(flipped.device, MatrixDevice.ipadPro13);
+      expect(flipped.scenario, combo.scenario);
+      expect(flipped.theme, combo.theme);
+      expect(flipped.locale, combo.locale);
+      expect(flipped.textScale, combo.textScale);
+    });
   });
 
   group('MatrixScenario', () {

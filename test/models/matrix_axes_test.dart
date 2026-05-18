@@ -34,4 +34,38 @@ void main() {
       expect(axes.directions.length, 2);
     });
   });
+
+  group('MatrixAxes.copyWith', () {
+    test('no args returns equal-shaped axes', () {
+      const original = MatrixAxes(
+        themes: [MatrixTheme.light, MatrixTheme.dark],
+        locales: [Locale('en'), Locale('ru')],
+      );
+      final copy = original.copyWith();
+      expect(copy.themes, original.themes);
+      expect(copy.locales, original.locales);
+      expect(copy.textScales, original.textScales);
+      expect(copy.devices, original.devices);
+      expect(copy.directions, original.directions);
+    });
+
+    test('overrides only specified fields', () {
+      const original = MatrixAxes(
+        themes: [MatrixTheme.light, MatrixTheme.dark],
+        locales: [Locale('en')],
+      );
+      final copy = original.copyWith(devices: const [MatrixDevice.tablet, MatrixDevice.ipadPro13]);
+
+      expect(copy.themes, original.themes);
+      expect(copy.locales, original.locales);
+      expect(copy.devices, [MatrixDevice.tablet, MatrixDevice.ipadPro13]);
+    });
+
+    test('append-via-copyWith pattern works', () {
+      const original = MatrixAxes(devices: [MatrixDevice.phoneSmall]);
+      final extended = original.copyWith(devices: [...original.devices, MatrixDevice.ipadPro13]);
+      expect(extended.devices.length, 2);
+      expect(extended.devices.last, MatrixDevice.ipadPro13);
+    });
+  });
 }

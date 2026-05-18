@@ -1,6 +1,6 @@
 name: golden_matrix
 description: "Matrix-based golden testing for Flutter. Declare themes, locales, devices, text scales and get all combinations with sampling, HTML reports, overflow detection."
-version: 0.9.1
+version: 0.10.0
 homepage: https://github.com/Autocrab/golden_matrix
 repository: https://github.com/Autocrab/golden_matrix
 issue_tracker: https://github.com/Autocrab/golden_matrix/issues

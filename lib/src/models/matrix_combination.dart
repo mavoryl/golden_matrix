@@ -23,6 +23,28 @@ class MatrixCombination {
     required this.direction,
   });
 
+  /// Returns a copy of this combination with selected fields replaced.
+  ///
+  /// Handy in tests and tooling that need to fabricate a near-identical
+  /// combination — e.g. flip direction or swap device for a single assertion.
+  MatrixCombination copyWith({
+    MatrixScenario? scenario,
+    MatrixTheme? theme,
+    Locale? locale,
+    double? textScale,
+    MatrixDevice? device,
+    TextDirection? direction,
+  }) {
+    return MatrixCombination(
+      scenario: scenario ?? this.scenario,
+      theme: theme ?? this.theme,
+      locale: locale ?? this.locale,
+      textScale: textScale ?? this.textScale,
+      device: device ?? this.device,
+      direction: direction ?? this.direction,
+    );
+  }
+
   @override
   String toString() =>
       'MatrixCombination(${scenario.name}, ${theme.name}, $locale, ${textScale}x, ${device.name}, ${direction.name})';

@@ -1,3 +1,8 @@
+## 0.10.0
+
+- **More device presets** — modern phones (`iphone15Pro`, `iphone16ProMax`, `pixel8`, `pixel8Pro`, `galaxyS24`), foldables (`galaxyZFoldFolded`, `galaxyZFoldUnfolded`), and full iPad lineup (`ipadMini`, `ipadAir`, `ipadPro11`, `ipadPro11Landscape`, `ipadPro13`, `ipadPro13Landscape`).
+- **`copyWith()` on models** — `MatrixAxes.copyWith`, `MatrixDevice.copyWith`, `MatrixCombination.copyWith`. Tweak a preset axes set, rotate a device into landscape, or fabricate a near-identical combination without re-declaring every field.
+
 ## 0.9.1
 
 - **Dry-run preview** — new `previewMatrixGolden(...)` returns a `MatrixPreview` describing what the runner would do (combination counts before/after rules and sampling, golden paths, duplicate-path detection) without rendering widgets or writing files. Use it to sanity-check `scenarioTags`, estimate CI cost, or spot golden-path collisions before they overwrite each other.

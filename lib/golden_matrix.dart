@@ -24,5 +24,6 @@ export 'src/flutter/pump_helpers.dart';
 
 // API
 export 'src/api/matrix_golden.dart';
+export 'src/api/matrix_test_runner.dart' show MatrixSetupCallback;
 export 'src/api/preview_matrix_golden.dart';
 export 'src/api/screen_matrix_golden.dart';

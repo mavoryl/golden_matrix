@@ -9,6 +9,7 @@ import 'package:golden_matrix_example/widgets/notification_badge.dart';
 import 'package:golden_matrix_example/screens/login_screen.dart';
 import 'package:golden_matrix_example/screens/profile_screen.dart';
 import 'package:golden_matrix_example/widgets/tight_row.dart';
+import 'package:golden_matrix_example/widgets/shimmer_loader.dart';
 
 void main() {
   // ---------------------------------------------------------------------------
@@ -210,5 +211,36 @@ void main() {
       devices: const [MatrixDevice.phoneSmall],
     ),
     tolerance: 0.05 / 100, // 0.05% pixel diff allowed
+  );
+
+  // ---------------------------------------------------------------------------
+  // 10. freezeAnimations demo — infinite shimmer would hang pumpAndSettle
+  // without freezeAnimations: true. TickerMode(enabled: false) halts it,
+  // snapshot is taken at the deterministic initial frame.
+  // ---------------------------------------------------------------------------
+  matrixGolden(
+    'ShimmerLoader_Frozen',
+    scenarios: [MatrixScenario('loading', builder: () => const ShimmerLoader())],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light, MatrixTheme.dark],
+      devices: [MatrixDevice.phoneSmall],
+    ),
+    freezeAnimations: true,
+  );
+
+  // ---------------------------------------------------------------------------
+  // 11. captureAfter demo — same shimmer, but snapshot at a specific frame
+  // (750ms = halfway through the 1500ms cycle). Runner switches to
+  // deterministic-frame mode: pump(750ms) instead of pumpAndSettle. The
+  // gradient is locked mid-sweep on every run.
+  // ---------------------------------------------------------------------------
+  matrixGolden(
+    'ShimmerLoader_MidCycle',
+    scenarios: [MatrixScenario('mid_cycle', builder: () => const ShimmerLoader())],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light, MatrixTheme.dark],
+      devices: [MatrixDevice.phoneSmall],
+    ),
+    captureAfter: const Duration(milliseconds: 750),
   );
 }

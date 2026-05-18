@@ -22,6 +22,15 @@ typedef MatrixWidgetBuilder = Widget Function(MatrixCombination combination);
 /// Key used for the [RepaintBoundary] that wraps the golden capture target.
 const _goldenBoundaryKey = ValueKey('__golden_matrix_boundary__');
 
+/// Callback type for `matrixGolden`/`screenMatrixGolden` `setup:` parameter.
+///
+/// Runs after the widget has been pumped and settled, before the golden
+/// file is captured. Use to drive interactions like `tester.tap(...)`,
+/// `tester.enterText(...)`, or scrolling — anything needed to bring the
+/// widget into the visual state you want to snapshot.
+typedef MatrixSetupCallback =
+    Future<void> Function(WidgetTester tester, MatrixCombination combination);
+
 /// Internal test runner shared by [matrixGolden] and [screenMatrixGolden].
 void runMatrixTests(
   String name, {
@@ -39,6 +48,9 @@ void runMatrixTests(
   bool skip = false,
   double? tolerance,
   bool printSummary = true,
+  MatrixSetupCallback? setup,
+  bool freezeAnimations = false,
+  Duration? captureAfter,
 }) {
   final combinations = resolveCombinations(
     scenarios: scenarios,
@@ -79,6 +91,9 @@ void runMatrixTests(
               widgetBuilder: widgetBuilder,
               report: report,
               results: results,
+              setup: setup,
+              freezeAnimations: freezeAnimations,
+              captureAfter: captureAfter,
             ),
           );
         }
@@ -173,14 +188,38 @@ Future<void> _executeGoldenTest({
   required MatrixWidgetBuilder widgetBuilder,
   required bool report,
   required List<MatrixCombinationResult> results,
+  MatrixSetupCallback? setup,
+  bool freezeAnimations = false,
+  Duration? captureAfter,
 }) async {
   PumpHelpers.configureView(tester, combination.device);
   final capture = ErrorCapture()..start();
   try {
-    final widget = RepaintBoundary(key: _goldenBoundaryKey, child: widgetBuilder(combination));
+    final widget = RepaintBoundary(
+      key: _goldenBoundaryKey,
+      child: TickerMode(enabled: !freezeAnimations, child: widgetBuilder(combination)),
+    );
 
     await tester.pumpWidget(widget);
-    await tester.pumpAndSettle();
+
+    // Initial settle. When captureAfter is set, use pump(duration) instead
+    // of pumpAndSettle — pumpAndSettle would hang on infinite animations
+    // (the very use case captureAfter exists for).
+    if (captureAfter != null) {
+      await tester.pump(captureAfter);
+    } else {
+      await tester.pumpAndSettle();
+    }
+
+    if (setup != null) {
+      await setup(tester, combination);
+      if (captureAfter != null) {
+        await tester.pump(captureAfter);
+      } else {
+        await tester.pumpAndSettle();
+      }
+    }
+
     capture.stop();
 
     if (report) {

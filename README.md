@@ -69,7 +69,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.11.0
+  golden_matrix: ^0.12.0
 ```
 
 ### 2. Set up font loading
@@ -273,6 +273,70 @@ matrixGolden(
 Use them together when needed. When `wrapApp` is omitted, the widget tree is identical to previous versions — existing goldens unaffected.
 
 For full-screen tests where you want even more control, use `screenMatrixGolden` with its `appBuilder`.
+
+### Post-pump state: `setup`, `freezeAnimations`, `captureAfter`
+
+Three orthogonal parameters (available on both `matrixGolden` and `screenMatrixGolden`) for snapshotting non-initial states:
+
+#### `setup` — interact before capture
+
+```dart
+matrixGolden(
+  'LoginForm',
+  scenarios: [MatrixScenario('validation_error', builder: () => const LoginForm())],
+  axes: axes,
+  setup: (tester, combination) async {
+    await tester.enterText(find.byKey(emailKey), 'bad-email');
+    await tester.tap(find.byKey(submitKey));
+    await tester.pumpAndSettle();
+  },
+);
+```
+
+Runs after `pumpAndSettle`, before the golden is captured. Use to tap, scroll, enter text, expand menus — anything needed to bring the widget into the visual state you want to snapshot.
+
+#### `freezeAnimations` — kill infinite shimmer/skeletons
+
+```dart
+matrixGolden(
+  'UserCardSkeleton',
+  scenarios: [MatrixScenario('loading', builder: () => const UserCardSkeleton())],
+  axes: axes,
+  freezeAnimations: true, // halts Tickers below — snapshot is stable
+);
+```
+
+Wraps the widget tree in `TickerMode(enabled: false)`. Halts every `AnimationController` / `Ticker`, including shimmer, skeleton loaders, Lottie, breathing dots, marquee — all the things that otherwise make `pumpAndSettle` hang or produce non-deterministic frames.
+
+#### `captureAfter` — snapshot a specific frame
+
+```dart
+matrixGolden(
+  'SlideInDialog',
+  scenarios: [MatrixScenario('mid_slide', builder: () => const SlideInDialog())],
+  axes: axes,
+  captureAfter: const Duration(milliseconds: 150), // catch dialog half-open
+);
+```
+
+Pumps the test clock for the given duration after settling (and after `setup`), before capture. Use to catch a deterministic mid-animation frame.
+
+#### Composing them
+
+All three combine cleanly:
+
+```dart
+matrixGolden(
+  'FormAfterSubmit',
+  scenarios: [...],
+  axes: axes,
+  setup: (tester, _) async {
+    await tester.tap(submitButton);
+    await tester.pump(); // one frame so the loader appears
+  },
+  freezeAnimations: true,  // freeze the loader spinner
+);
+```
 
 ### Dry-run preview
 

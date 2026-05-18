@@ -1,3 +1,13 @@
+## 0.12.0
+
+Post-pump-state release. Three orthogonal additions that together unlock a huge class of previously impossible tests.
+
+- **`setup` callback** — `(WidgetTester tester, MatrixCombination combination) async {...}` runs after `pumpAndSettle` and before the golden is captured. Tap, scroll, enter text, open menus — snapshot the post-interaction state. Available on `matrixGolden` and `screenMatrixGolden`.
+- **`freezeAnimations: bool = false`** — wraps the widget tree in `TickerMode(enabled: false)`, halting every `AnimationController` / `Ticker`. Use for widgets with infinite shimmer / skeleton / loader animations that otherwise hang `pumpAndSettle`. Snapshot reflects the initial frame.
+- **`captureAfter: Duration?`** — pumps the test clock for the given duration *after* settling (and after `setup`), before capture. Pair with `freezeAnimations: false` to catch a specific mid-animation frame.
+
+Pure additive — all three default to no-op behavior. Existing 140 example goldens pass without `--update-goldens`.
+
 ## 0.11.0
 
 - **`wrapApp` — app-level decorator for `matrixGolden`.** New optional parameter that wraps the auto-built `MaterialApp` from the outside. This is the seam for dependency injection above MaterialApp: `ProviderScope` (Riverpod) with overrides, `BlocProvider` / `MultiBlocProvider`, `MultiProvider`, or any custom root-level `InheritedWidget` (e.g. brand themes that must sit above MaterialApp). The callback receives the current `MatrixCombination` so providers can vary per scenario. Pure additive — when `null`, the widget tree is byte-identical to previous versions, existing golden files unchanged.

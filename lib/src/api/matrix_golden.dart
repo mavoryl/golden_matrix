@@ -78,6 +78,25 @@ import 'matrix_test_runner.dart';
 ///   through to the underlying matcher. `null` uses the framework default.
 /// - [printSummary] — When `true` (default), prints a textual summary
 ///   line per test group at the end of the run.
+/// - [setup] — Optional async callback `(tester, combination) async {...}`
+///   that runs after the widget is pumped and settled, but before the
+///   golden file is captured. Use to drive interactions: `tester.tap(...)`,
+///   `tester.enterText(...)`, scrolling, opening menus — anything needed
+///   to bring the widget into the visual state you want to snapshot.
+///   A `pumpAndSettle` is performed after `setup` returns.
+/// - [freezeAnimations] — When `true`, wraps the widget tree in
+///   `TickerMode(enabled: false)`, freezing all `AnimationController`s
+///   and `Ticker`s. Use for widgets with infinite animations (shimmers,
+///   skeletons, loaders) that otherwise hang `pumpAndSettle`. Snapshot
+///   is taken at the initial frame.
+/// - [captureAfter] — Optional duration that switches the runner into
+///   "deterministic-frame mode": instead of `pumpAndSettle` (which
+///   hangs on infinite animations), the runner calls `pump(captureAfter)`
+///   before capture (and again after [setup] if set). Use to snapshot a
+///   specific mid-animation frame on widgets with shimmers / loaders /
+///   continuous animations. You pick the duration; the test takes
+///   responsibility for the widget having no async work that needs
+///   actual settling.
 ///
 /// ## Example
 ///
@@ -131,6 +150,9 @@ void matrixGolden(
   bool skip = false,
   double? tolerance,
   bool printSummary = true,
+  MatrixSetupCallback? setup,
+  bool freezeAnimations = false,
+  Duration? captureAfter,
 }) {
   runMatrixTests(
     'matrixGolden: $name',
@@ -153,6 +175,9 @@ void matrixGolden(
     skip: skip,
     tolerance: tolerance,
     printSummary: printSummary,
+    setup: setup,
+    freezeAnimations: freezeAnimations,
+    captureAfter: captureAfter,
   );
 }
 

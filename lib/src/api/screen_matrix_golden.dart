@@ -115,6 +115,9 @@ void screenMatrixGolden(
   bool skip = false,
   double? tolerance,
   bool printSummary = true,
+  MatrixSetupCallback? setup,
+  bool freezeAnimations = false,
+  Duration? captureAfter,
 }) {
   final scenarios = states ?? [MatrixScenario('default', builder: () => const SizedBox.shrink())];
 
@@ -134,5 +137,8 @@ void screenMatrixGolden(
     skip: skip,
     tolerance: tolerance,
     printSummary: printSummary,
+    setup: setup,
+    freezeAnimations: freezeAnimations,
+    captureAfter: captureAfter,
   );
 }

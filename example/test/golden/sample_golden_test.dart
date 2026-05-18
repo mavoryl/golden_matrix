@@ -205,7 +205,8 @@ void main() {
       textScales: const [1.0, 2.0],
       devices: const [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
     ),
-    tolerance: 0.01 / 100,
+    // Overflow stripes are AA-heavy and noisy across macOS versions.
+    tolerance: 0.02 / 100,
   );
 
   // ---------------------------------------------------------------------------

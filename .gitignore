@@ -38,3 +38,4 @@ migrate_working_dir/
 /CLAUDE.md
 **/failures/
 docs/
+example/pubspec.lock

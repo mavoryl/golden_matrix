@@ -97,6 +97,13 @@ import 'matrix_test_runner.dart';
 ///   continuous animations. You pick the duration; the test takes
 ///   responsibility for the widget having no async work that needs
 ///   actual settling.
+/// - [detectStaleGoldens] — When `true` (default), after the run the
+///   runner walks the test's golden subdirectory and reports any `.png`
+///   files that no combination produced (renamed scenarios, dropped
+///   axes, etc.). Stale paths appear in the console summary and in the
+///   JSON / HTML reports. Detection is automatically skipped when
+///   [fileNameBuilder] is supplied (paths are custom — we don't know
+///   where to look). Set to `false` to disable on a per-test basis.
 ///
 /// ## Example
 ///
@@ -153,6 +160,7 @@ void matrixGolden(
   MatrixSetupCallback? setup,
   bool freezeAnimations = false,
   Duration? captureAfter,
+  bool detectStaleGoldens = true,
 }) {
   runMatrixTests(
     'matrixGolden: $name',
@@ -178,6 +186,7 @@ void matrixGolden(
     setup: setup,
     freezeAnimations: freezeAnimations,
     captureAfter: captureAfter,
+    detectStaleGoldens: detectStaleGoldens,
   );
 }
 

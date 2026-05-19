@@ -53,6 +53,7 @@ matrixGolden(
 - **Screen-level testing** — `screenMatrixGolden()` with full control via `appBuilder`
 - **DI-friendly** — `wrapApp` hooks `ProviderScope` / `BlocProvider` / `MultiProvider` above the auto-built MaterialApp, with per-combination access
 - **Overflow detection** — captures `RenderFlex overflow` and layout errors as warnings in reports
+- **Stale golden detection** — automatically flags orphan PNG files left behind after renamed scenarios or dropped axes; no extra code, runs after every `flutter test`
 - **HTML reports** — self-contained HTML with thumbnails, scenario grouping, filters, dark mode
 - **Tolerance** — configurable pixel diff threshold for flaky-free CI
 - **Dry-run preview** — `previewMatrixGolden(...)` reports what the runner would do (counts, paths, collisions) without rendering anything
@@ -69,7 +70,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.13.0
+  golden_matrix: ^0.14.0
 ```
 
 ### 2. Set up font loading
@@ -463,6 +464,40 @@ final rtl = combination.copyWith(direction: TextDirection.rtl);
 ## Overflow Detection
 
 golden_matrix automatically captures `RenderFlex overflow` and layout errors during rendering. Warnings appear in JSON and HTML reports with orange badges — no configuration needed.
+
+## Stale Golden Detection
+
+After each `matrixGolden` / `screenMatrixGolden` run, the runner walks the test's golden subdirectory and reports any `*.png` files that no combination produced. Catches orphans left behind by:
+
+- Renamed scenarios (`'loading'` → `'pending'` leaves `goldens/<test>/loading/` behind)
+- Dropped axis values (removed a locale or theme — those PNGs become orphans)
+- Removed `matrixGolden` calls that share a partial path with a still-active one
+
+Output appears in three places:
+
+```
+matrixGolden: SampleButton
+  48 total | 48 passed | 1 stale (1.0s)
+  Stale (orphan goldens — not produced by any combination):
+    - goldens/samplebutton/old_scenario/light_en_ltr_1x_phonesmall.png
+```
+
+JSON reports gain a `staleGoldens` field; HTML reports get a `Stale` stat card and a collapsible list. Flutter's own `failures/` diff images are excluded.
+
+Detection is on by default. Opt out per call:
+
+```dart
+matrixGolden(
+  'Widget',
+  scenarios: [...],
+  axes: axes,
+  detectStaleGoldens: false, // turn off for this test
+);
+```
+
+It is also automatically skipped when `fileNameBuilder` is supplied (paths are custom, the default subdir assumption no longer holds).
+
+The runner never deletes any files — you decide what to do with the list (`git rm` or regenerate via `flutter test --update-goldens`).
 
 ## HTML Reports
 

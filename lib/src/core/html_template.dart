@@ -12,6 +12,7 @@ class HtmlTemplate {
     _writeHead(buf, result.name);
     buf.writeln('<body>');
     _writeSummary(buf, result);
+    _writeStaleSection(buf, result);
     _writeFilters(buf, result);
     _writeScenarios(buf, result);
     _writeScript(buf);
@@ -72,8 +73,31 @@ class HtmlTemplate {
         '<div class="stat stat-warning"><span class="stat-value">${result.warningCount}</span><span class="stat-label">Warnings</span></div>',
       );
     }
+    if (result.staleGoldens.isNotEmpty) {
+      buf.writeln(
+        '<div class="stat stat-warning"><span class="stat-value">${result.staleGoldens.length}</span><span class="stat-label">Stale</span></div>',
+      );
+    }
     buf.writeln('</div>');
     buf.writeln('</header>');
+  }
+
+  static void _writeStaleSection(StringBuffer buf, MatrixResult result) {
+    if (result.staleGoldens.isEmpty) return;
+    buf.writeln('<details class="stale-section" open>');
+    buf.writeln(
+      '<summary>'
+      '${result.staleGoldens.length} stale golden file'
+      '${result.staleGoldens.length == 1 ? '' : 's'} '
+      '(not produced by any combination in this run)'
+      '</summary>',
+    );
+    buf.writeln('<ul class="stale-list">');
+    for (final path in result.staleGoldens) {
+      buf.writeln('<li><code>${_esc(path)}</code></li>');
+    }
+    buf.writeln('</ul>');
+    buf.writeln('</details>');
   }
 
   static void _writeFilters(StringBuffer buf, MatrixResult result) {
@@ -293,6 +317,15 @@ summary { cursor: pointer; font-size: 1.1rem; font-weight: 600; padding: 8px 0; 
 .tag { font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; background: var(--tag-bg); color: var(--tag-text); }
 .error { padding: 8px; font-size: 0.75rem; color: var(--badge-fail-text); background: var(--badge-fail); border-top: 1px solid var(--border); word-break: break-all; max-height: 60px; overflow: auto; }
 .stat-warning { border-color: #e0a800; }
+.stale-section { background: #fff8e1; border: 1px solid #e0a800; border-radius: 4px; padding: 0.75rem 1rem; margin: 0 0 1rem; }
+.stale-section summary { font-weight: 600; cursor: pointer; color: #b45309; }
+.stale-list { margin: 0.5rem 0 0; padding-left: 1.25rem; }
+.stale-list li { margin: 0.15rem 0; }
+.stale-list code { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-size: 0.85rem; background: rgba(0, 0, 0, 0.05); padding: 0.05rem 0.3rem; border-radius: 3px; }
+@media (prefers-color-scheme: dark) {
+  .stale-section { background: rgba(224, 168, 0, 0.1); }
+  .stale-list code { background: rgba(255, 255, 255, 0.1); }
+}
 .stat-warning .stat-value { color: #e0a800; }
 .warning { padding: 8px; font-size: 0.75rem; color: #856404; background: #fff3cd; border-top: 1px solid var(--border); word-break: break-all; max-height: 60px; overflow: auto; }
 ''';

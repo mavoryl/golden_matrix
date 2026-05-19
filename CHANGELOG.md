@@ -1,3 +1,14 @@
+## 0.14.0
+
+- **Automatic stale-golden detection.** After every `matrixGolden` / `screenMatrixGolden` run, the runner walks the test's golden subdirectory on disk and reports any PNG files that no combination produced. Catches orphans from renamed scenarios, dropped axes, or removed locale/device coverage. Surfaced in three places:
+  - **Console summary**: a `Stale` count and full list under the existing test summary block.
+  - **JSON report**: new top-level `staleGoldens: [...]` field (only present when non-empty).
+  - **HTML report**: a `Stale` stat card next to Warnings, plus a collapsible orange section listing each orphan path.
+- Detection is **on by default**. Opt out per call with `detectStaleGoldens: false`.
+- Detection is **automatically skipped** when `fileNameBuilder` is supplied — paths are custom, the conventional `goldens/<test-slug>/` layout assumption breaks.
+- Flutter's own `failures/` diff outputs are correctly excluded from the orphan list.
+- Pure additive — no breaking changes. Existing tests on clean repos produce byte-identical reports.
+
 ## 0.13.0 — BREAKING (only if you used `tolerance:`)
 
 - **Fix: `tolerance:` was silently looking up goldens in the wrong directory.** The `_TolerantComparator` passed the delegate's `basedir` directly to `LocalFileComparator(Uri testFile)` — which interprets its argument as a test-file URI and applies `dirname()`, shifting the effective basedir one level up. As a result, tolerance-enabled goldens were generated and matched at a path one directory above where they should have been.

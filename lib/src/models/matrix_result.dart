@@ -85,11 +85,27 @@ class MatrixResult {
   /// Total wall-clock duration of the run.
   final Duration duration;
 
+  /// Golden file paths (relative, e.g. `goldens/mywidget/old/light.png`)
+  /// found in this test's golden subdirectory on disk but **not** produced
+  /// by any combination in the current matrix.
+  ///
+  /// Common causes: a scenario was renamed, an axis value was dropped, or
+  /// the entire matrix shape changed since the baselines were last
+  /// generated. Surfaced in the console summary and the HTML / JSON
+  /// reports so the user can clean them up safely.
+  ///
+  /// Detection is skipped (this list stays empty) when:
+  /// - the runner was invoked with `detectStaleGoldens: false`, or
+  /// - a custom `fileNameBuilder` is supplied (paths are not relative to
+  ///   the conventional `goldens/<test>/` subdir).
+  final List<String> staleGoldens;
+
   MatrixResult({
     required this.name,
     required this.results,
     DateTime? timestamp,
     this.duration = Duration.zero,
+    this.staleGoldens = const [],
   }) : timestamp = timestamp ?? DateTime.now();
 
   /// Total number of combinations rendered.
@@ -133,5 +149,6 @@ class MatrixResult {
     'skipped': skipped,
     'warnings': warningCount,
     'results': results.map((r) => r.toJson()).toList(),
+    if (staleGoldens.isNotEmpty) 'staleGoldens': staleGoldens,
   };
 }

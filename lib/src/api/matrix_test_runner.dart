@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
@@ -6,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../core/matrix_generator.dart';
 import '../core/matrix_report_writer.dart';
 import '../core/naming_strategy.dart';
+import '../core/slug.dart';
+import '../core/stale_detector.dart';
 import '../flutter/error_capture.dart';
 import '../flutter/pump_helpers.dart';
 import '../models/matrix_axes.dart';
@@ -51,6 +54,7 @@ void runMatrixTests(
   MatrixSetupCallback? setup,
   bool freezeAnimations = false,
   Duration? captureAfter,
+  bool detectStaleGoldens = true,
 }) {
   final combinations = resolveCombinations(
     scenarios: scenarios,
@@ -101,7 +105,14 @@ void runMatrixTests(
     }
 
     if (report) {
-      _setupReportWriting(name, results, stopwatch, reportDir, printSummary);
+      _setupReportWriting(
+        name,
+        results,
+        stopwatch,
+        reportDir,
+        printSummary,
+        detectStaleGoldens: detectStaleGoldens && fileNameBuilder == null,
+      );
     }
   });
 }
@@ -277,17 +288,50 @@ void _setupReportWriting(
   List<MatrixCombinationResult> results,
   Stopwatch stopwatch,
   String? reportDir,
-  bool printSummary,
-) {
+  bool printSummary, {
+  required bool detectStaleGoldens,
+}) {
   tearDownAll(() async {
     stopwatch.stop();
-    final result = MatrixResult(name: name, results: results, duration: stopwatch.elapsed);
+    final stale = detectStaleGoldens ? await _detectStaleGoldensSafe(name, results) : <String>[];
+    final result = MatrixResult(
+      name: name,
+      results: results,
+      duration: stopwatch.elapsed,
+      staleGoldens: stale,
+    );
     await MatrixReportWriter.write(result, outputDir: reportDir);
     await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
     if (printSummary) {
       debugPrint(formatSummary(result));
     }
   });
+}
+
+/// Detects stale goldens for this test's subdirectory, swallowing IO
+/// errors so a misbehaving filesystem can't break the test report.
+Future<List<String>> _detectStaleGoldensSafe(
+  String name,
+  List<MatrixCombinationResult> results,
+) async {
+  try {
+    final comparator = goldenFileComparator;
+    if (comparator is! LocalFileComparator) return const [];
+
+    final basedir = Directory.fromUri(comparator.basedir);
+    final goldensRoot = Directory('${basedir.path}${Platform.pathSeparator}goldens');
+    final testSlug = slugify(_stripPrefix(name));
+    final testSubdir = Directory('${goldensRoot.path}${Platform.pathSeparator}$testSlug');
+
+    final expected = results.map((r) => r.goldenPath).toSet();
+    return await findStaleGoldens(
+      expectedPaths: expected,
+      testSubdir: testSubdir,
+      goldensRoot: goldensRoot,
+    );
+  } catch (_) {
+    return const [];
+  }
 }
 
 /// Formats a human-readable summary of a [MatrixResult] for console output.
@@ -304,6 +348,7 @@ String formatSummary(MatrixResult result) {
     if (result.failed > 0) '${result.failed} failed',
     if (result.skipped > 0) '${result.skipped} skipped',
     if (result.warningCount > 0) '${result.warningCount} warnings',
+    if (result.staleGoldens.isNotEmpty) '${result.staleGoldens.length} stale',
   ];
   final duration = result.duration.inMilliseconds < 1000
       ? '${result.duration.inMilliseconds}ms'
@@ -319,6 +364,13 @@ String formatSummary(MatrixResult result) {
       buf.writeln(
         '    - ${c.scenario.name} | ${c.theme.name} ${c.locale} $dir ${c.textScale}x ${c.device.name}',
       );
+    }
+  }
+
+  if (result.staleGoldens.isNotEmpty) {
+    buf.writeln('  Stale (orphan goldens — not produced by any combination):');
+    for (final path in result.staleGoldens) {
+      buf.writeln('    - $path');
     }
   }
 

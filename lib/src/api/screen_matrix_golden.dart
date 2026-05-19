@@ -118,6 +118,7 @@ void screenMatrixGolden(
   MatrixSetupCallback? setup,
   bool freezeAnimations = false,
   Duration? captureAfter,
+  bool detectStaleGoldens = true,
 }) {
   final scenarios = states ?? [MatrixScenario('default', builder: () => const SizedBox.shrink())];
 
@@ -140,5 +141,6 @@ void screenMatrixGolden(
     setup: setup,
     freezeAnimations: freezeAnimations,
     captureAfter: captureAfter,
+    detectStaleGoldens: detectStaleGoldens,
   );
 }

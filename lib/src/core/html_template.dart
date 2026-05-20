@@ -212,14 +212,24 @@ class HtmlTemplate {
 
   /// Renders a 4-tile grid pointing at Flutter's auto-generated
   /// `failures/<base>_{masterImage,testImage,isolatedDiff,maskedDiff}.png`.
+  ///
+  /// `LocalFileComparator.generateFailureOutput()` writes these files to a
+  /// **single `failures/` directory at the comparator's basedir level**
+  /// (i.e. one level up from `goldens/`), NOT inside the per-scenario
+  /// subdirectory. Their filename is `<golden-basename>_<diffKey>.png`,
+  /// without any test/scenario prefix. Since the HTML report lives inside
+  /// `goldens/`, the relative reference is `../failures/<base>_<suffix>.png`.
+  ///
   /// Tiles `onerror`-hide themselves when the file doesn't exist (some
   /// failure modes — timeouts, pre-compare exceptions — never create
-  /// `failures/`).
+  /// `failures/`). Multiple matrixGolden calls with overlapping
+  /// `<theme>_<locale>_<dir>_<scale>_<device>` basenames will collide in
+  /// `failures/` (Flutter limitation, not ours): the last failing combo
+  /// wins. Acceptable trade-off for click-through diff thumbnails.
   static void _writeDiffThumbs(StringBuffer buf, String goldenPath) {
     final imgRelative = goldenPath.replaceFirst('goldens/', '');
     final lastSlash = imgRelative.lastIndexOf('/');
     if (lastSlash < 0) return;
-    final dir = imgRelative.substring(0, lastSlash);
     final base = imgRelative.substring(lastSlash + 1).replaceFirst(RegExp(r'\.png$'), '');
     final tiles = <({String label, String suffix})>[
       (label: 'expected', suffix: '_masterImage'),
@@ -229,7 +239,7 @@ class HtmlTemplate {
     ];
     buf.writeln('<div class="diff-thumbs">');
     for (final t in tiles) {
-      final src = '$dir/failures/$base${t.suffix}.png';
+      final src = '../failures/$base${t.suffix}.png';
       buf.writeln('<figure class="diff-tile">');
       buf.writeln('<a href="${_esc(src)}" target="_blank">');
       buf.writeln(

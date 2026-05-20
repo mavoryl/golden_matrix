@@ -1,11 +1,12 @@
 ## 0.15.0 — Review DX
 
-Two additive reporting upgrades. No breaking changes.
+Two additive reporting upgrades plus a long-standing failure-tracking bug fix. No breaking changes.
 
-- **Diff thumbnails in HTML report.** Every failed test now shows a 4-tile grid (expected · actual · diff · masked) inline next to the error message, pulling Flutter's own `failures/<name>_{masterImage,testImage,isolatedDiff,maskedDiff}.png` outputs. No image processing on our side — we just reference what Flutter already writes. Missing files hide gracefully via `onerror`. Passed and skipped tests are unaffected.
+- **Diff thumbnails in HTML report.** Every failed test now shows a 4-tile grid (expected · actual · diff · masked) inline next to the error message, pulling Flutter's own `failures/<base>_{masterImage,testImage,isolatedDiff,maskedDiff}.png` outputs. No image processing on our side — we just reference what Flutter already writes. Missing files hide gracefully via `onerror`. Passed and skipped tests are unaffected.
 - **Markdown summary sidecar.** A new `<slug>_report.md` is written alongside the existing JSON and HTML reports. Includes a summary list (counts + duration), an optional `## Failed` table, an optional `## Stale goldens` list, and a link to the HTML report. Drop-in for GitHub Actions step summary (`$GITHUB_STEP_SUMMARY`), PR-comment bots, and Slack notifications.
+- **Fix: failed-result tracking.** Golden mismatches were being recorded as `status: passed` in JSON / HTML / Markdown reports even though `flutter test` correctly marked the run as failed. Pixel-mismatch errors from the comparator are routed through `FlutterError.reportError` (via `runAsync`) rather than propagating through the matcher's await chain — so `await expectLater(...)` returned cleanly and we mistakenly recorded a pass. The runner now also consults `tester.binding.takeException()` after the matcher returns. Existing passing tests are unaffected.
 
-Both gated by the existing `report: true` parameter — no new public API.
+Reporting features are gated by the existing `report: true` parameter — no new public API.
 
 ## 0.14.0
 

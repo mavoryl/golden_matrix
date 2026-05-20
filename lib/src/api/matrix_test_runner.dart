@@ -234,28 +234,44 @@ Future<void> _executeGoldenTest({
     capture.stop();
 
     if (report) {
+      Object? capturedError;
       try {
         await expectLater(find.byKey(_goldenBoundaryKey), matchesGoldenFile(goldenPath));
-        results.add(
-          MatrixCombinationResult(
-            combination: combination,
-            status: MatrixResultStatus.passed,
-            goldenPath: goldenPath,
-            warnings: List.unmodifiable(capture.warnings),
-          ),
-        );
       } catch (e) {
+        capturedError = e;
+      }
+
+      // Pixel-mismatch failures from the golden comparator are routed
+      // through `runAsync` and reported via `FlutterError.reportError`
+      // rather than propagated through the matcher's await chain. The
+      // binding stashes them and `takeException()` pulls them out (and
+      // clears the slot). Without this check, `await expectLater(...)`
+      // returns cleanly and we'd mistakenly record `status: passed`
+      // even though flutter_test will later mark the test as failed.
+      // See: TestWidgetsFlutterBinding._reportExceptionNoticed.
+      capturedError ??= tester.binding.takeException();
+
+      if (capturedError != null) {
         results.add(
           MatrixCombinationResult(
             combination: combination,
             status: MatrixResultStatus.failed,
             goldenPath: goldenPath,
-            errorMessage: e.toString(),
+            errorMessage: capturedError.toString(),
             warnings: List.unmodifiable(capture.warnings),
           ),
         );
-        rethrow;
+        throw capturedError;
       }
+
+      results.add(
+        MatrixCombinationResult(
+          combination: combination,
+          status: MatrixResultStatus.passed,
+          goldenPath: goldenPath,
+          warnings: List.unmodifiable(capture.warnings),
+        ),
+      );
     } else {
       await expectLater(find.byKey(_goldenBoundaryKey), matchesGoldenFile(goldenPath));
     }

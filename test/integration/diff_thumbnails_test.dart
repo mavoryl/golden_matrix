@@ -65,8 +65,12 @@ void main() {
       final count = '<div class="diff-thumbs">'.allMatches(html).length;
       expect(count, 1);
 
-      // All four expected failure-PNG references
-      const base = 'widget/default/failures/light_en_ltr_1x_phonesmall';
+      // All four expected failure-PNG references.
+      // Flutter's LocalFileComparator writes failures to a single top-level
+      // `failures/` dir at the comparator basedir, not into the scenario
+      // subdirectory. HTML lives in `goldens/`, so the reference is
+      // `../failures/<base>_<suffix>.png`.
+      const base = '../failures/light_en_ltr_1x_phonesmall';
       expect(html, contains('${base}_masterImage.png'));
       expect(html, contains('${base}_testImage.png'));
       expect(html, contains('${base}_isolatedDiff.png'));

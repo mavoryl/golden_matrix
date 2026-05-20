@@ -3,6 +3,7 @@ import 'dart:io';
 
 import '../models/matrix_result.dart';
 import 'html_template.dart';
+import 'markdown_template.dart';
 import 'slug.dart';
 
 /// Writes [MatrixResult] as JSON and HTML report files.
@@ -29,6 +30,17 @@ class MatrixReportWriter {
     final file = File('$dir/${_slug(result.name)}_report.html');
     await file.parent.create(recursive: true);
     await file.writeAsString(html);
+  }
+
+  /// Writes the report as a Markdown summary file suitable for CI step
+  /// summaries (e.g. GitHub Actions `$GITHUB_STEP_SUMMARY`), PR comment
+  /// bots, and Slack notifications.
+  static Future<void> writeMarkdown(MatrixResult result, {String? outputDir}) async {
+    final dir = outputDir ?? _findGoldensDir(result);
+    final md = MarkdownTemplate.render(result);
+    final file = File('$dir/${_slug(result.name)}_report.md');
+    await file.parent.create(recursive: true);
+    await file.writeAsString(md);
   }
 
   /// Finds the actual goldens directory by scanning for existing golden files.

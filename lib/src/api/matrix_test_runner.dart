@@ -302,6 +302,7 @@ void _setupReportWriting(
     );
     await MatrixReportWriter.write(result, outputDir: reportDir);
     await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
+    await MatrixReportWriter.writeMarkdown(result, outputDir: reportDir);
     if (printSummary) {
       debugPrint(formatSummary(result));
     }

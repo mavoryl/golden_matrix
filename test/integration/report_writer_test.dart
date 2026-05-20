@@ -123,6 +123,28 @@ void main() {
 
       expect(File('$deepDir/widget_report.json').existsSync(), isTrue);
     });
+
+    test('writeMarkdown creates .md file at expected slug-derived path', () async {
+      final result = MatrixResult(name: 'matrixGolden: TestWidget', results: [makeResult()]);
+
+      await MatrixReportWriter.writeMarkdown(result, outputDir: tempDir.path);
+
+      final file = File('${tempDir.path}/matrixgolden__testwidget_report.md');
+      expect(file.existsSync(), isTrue);
+      final content = file.readAsStringSync();
+      expect(content, startsWith('# matrixGolden: TestWidget'));
+      expect(content, contains('## Summary'));
+      expect(content, contains('**Total:** 1'));
+    });
+
+    test('writeMarkdown with custom outputDir lands in that directory', () async {
+      final customDir = '${tempDir.path}/custom';
+      final result = MatrixResult(name: 'Widget', results: [makeResult()]);
+
+      await MatrixReportWriter.writeMarkdown(result, outputDir: customDir);
+
+      expect(File('$customDir/widget_report.md').existsSync(), isTrue);
+    });
   });
 
   group('HtmlTemplate integration', () {

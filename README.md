@@ -56,7 +56,8 @@ matrixGolden(
 - **DI-friendly** — `wrapApp` hooks `ProviderScope` / `BlocProvider` / `MultiProvider` above the auto-built MaterialApp, with per-combination access
 - **Overflow detection** — captures `RenderFlex overflow` and layout errors as warnings in reports
 - **Stale golden detection** — automatically flags orphan PNG files left behind after renamed scenarios or dropped axes; no extra code, runs after every `flutter test`
-- **HTML reports** — self-contained HTML with thumbnails, scenario grouping, filters, dark mode
+- **HTML reports** — self-contained HTML with thumbnails, scenario grouping, filters, dark mode, **inline diff thumbnails on failure** (expected/actual/diff/masked)
+- **Markdown summary** — sidecar `*_report.md` next to HTML, drop-in for GitHub Actions step summary or PR comments
 - **Tolerance** — configurable pixel diff threshold for flaky-free CI
 - **Dry-run preview** — `previewMatrixGolden(...)` reports what the runner would do (counts, paths, collisions) without rendering anything
 - **Custom themes** — `MatrixTheme.data` for attaching arbitrary context (custom theme systems, brand config)
@@ -72,7 +73,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.14.0
+  golden_matrix: ^0.15.0
 ```
 
 ### 2. Set up font loading
@@ -504,13 +505,32 @@ The runner never deletes any files — you decide what to do with the list (`git
 ## HTML Reports
 
 After tests run, golden_matrix generates self-contained HTML reports alongside golden files:
-- Summary with pass/fail/warning counts
+- Summary with pass/fail/warning/stale counts
 - Scenario grouping with collapsible sections
 - Thumbnail grid with clickable full-size images
+- **Diff thumbnails on failure** — each failed combination shows a 4-tile inline grid (expected · actual · diff · masked) pulled from Flutter's own `failures/` outputs. No extra setup, no flag.
 - Filter by scenario, theme, or status
 - Dark mode support via `prefers-color-scheme`
 
 See example reports and golden files in the [GitHub repository](https://github.com/Autocrab/golden_matrix/tree/main/example/test/golden/goldens).
+
+## Markdown Summary
+
+Each run also writes a `<slug>_report.md` next to the JSON and HTML reports. Contains a summary list, a `## Failed` table (when any), a `## Stale goldens` list (when any), and a link to the HTML.
+
+Drop-in for GitHub Actions step summary:
+
+```yaml
+- name: golden matrix step summary
+  if: always()
+  run: |
+    for f in $(find test -name '*_report.md' 2>/dev/null); do
+      cat "$f" >> "$GITHUB_STEP_SUMMARY"
+      echo >> "$GITHUB_STEP_SUMMARY"
+    done
+```
+
+Same file works for PR-comment bots, Slack/Discord notifiers, or any tool that takes Markdown.
 
 ## Golden File Structure
 

@@ -204,6 +204,42 @@ class HtmlTemplate {
     if (r.warnings.isNotEmpty) {
       buf.writeln('<div class="warning">${r.warnings.map((w) => _esc(w)).join('<br>')}</div>');
     }
+    if (r.status == MatrixResultStatus.failed) {
+      _writeDiffThumbs(buf, r.goldenPath);
+    }
+    buf.writeln('</div>');
+  }
+
+  /// Renders a 4-tile grid pointing at Flutter's auto-generated
+  /// `failures/<base>_{masterImage,testImage,isolatedDiff,maskedDiff}.png`.
+  /// Tiles `onerror`-hide themselves when the file doesn't exist (some
+  /// failure modes — timeouts, pre-compare exceptions — never create
+  /// `failures/`).
+  static void _writeDiffThumbs(StringBuffer buf, String goldenPath) {
+    final imgRelative = goldenPath.replaceFirst('goldens/', '');
+    final lastSlash = imgRelative.lastIndexOf('/');
+    if (lastSlash < 0) return;
+    final dir = imgRelative.substring(0, lastSlash);
+    final base = imgRelative.substring(lastSlash + 1).replaceFirst(RegExp(r'\.png$'), '');
+    final tiles = <({String label, String suffix})>[
+      (label: 'expected', suffix: '_masterImage'),
+      (label: 'actual', suffix: '_testImage'),
+      (label: 'diff', suffix: '_isolatedDiff'),
+      (label: 'masked', suffix: '_maskedDiff'),
+    ];
+    buf.writeln('<div class="diff-thumbs">');
+    for (final t in tiles) {
+      final src = '$dir/failures/$base${t.suffix}.png';
+      buf.writeln('<figure class="diff-tile">');
+      buf.writeln('<a href="${_esc(src)}" target="_blank">');
+      buf.writeln(
+        '<img src="${_esc(src)}" loading="lazy" alt="${t.label}" '
+        'onerror="this.closest(\'figure\').style.display=\'none\'">',
+      );
+      buf.writeln('</a>');
+      buf.writeln('<figcaption>${t.label}</figcaption>');
+      buf.writeln('</figure>');
+    }
     buf.writeln('</div>');
   }
 
@@ -328,5 +364,13 @@ summary { cursor: pointer; font-size: 1.1rem; font-weight: 600; padding: 8px 0; 
 }
 .stat-warning .stat-value { color: #e0a800; }
 .warning { padding: 8px; font-size: 0.75rem; color: #856404; background: #fff3cd; border-top: 1px solid var(--border); word-break: break-all; max-height: 60px; overflow: auto; }
+.diff-thumbs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0.4rem; padding: 8px; border-top: 1px solid var(--border); background: rgba(0, 0, 0, 0.02); }
+.diff-tile { margin: 0; text-align: center; }
+.diff-tile img { width: 100%; height: auto; display: block; border: 1px solid var(--border); border-radius: 3px; background: #fff; }
+.diff-tile figcaption { font-size: 0.65rem; color: var(--meta); margin-top: 0.2rem; text-transform: uppercase; letter-spacing: 0.05em; }
+@media (prefers-color-scheme: dark) {
+  .diff-thumbs { background: rgba(255, 255, 255, 0.03); }
+  .diff-tile img { background: #1a1a1a; }
+}
 ''';
 }

@@ -1,3 +1,12 @@
+## 0.15.0 — Review DX
+
+Two additive reporting upgrades. No breaking changes.
+
+- **Diff thumbnails in HTML report.** Every failed test now shows a 4-tile grid (expected · actual · diff · masked) inline next to the error message, pulling Flutter's own `failures/<name>_{masterImage,testImage,isolatedDiff,maskedDiff}.png` outputs. No image processing on our side — we just reference what Flutter already writes. Missing files hide gracefully via `onerror`. Passed and skipped tests are unaffected.
+- **Markdown summary sidecar.** A new `<slug>_report.md` is written alongside the existing JSON and HTML reports. Includes a summary list (counts + duration), an optional `## Failed` table, an optional `## Stale goldens` list, and a link to the HTML report. Drop-in for GitHub Actions step summary (`$GITHUB_STEP_SUMMARY`), PR-comment bots, and Slack notifications.
+
+Both gated by the existing `report: true` parameter — no new public API.
+
 ## 0.14.0
 
 - **Automatic stale-golden detection.** After every `matrixGolden` / `screenMatrixGolden` run, the runner walks the test's golden subdirectory on disk and reports any PNG files that no combination produced. Catches orphans from renamed scenarios, dropped axes, or removed locale/device coverage. Surfaced in three places:

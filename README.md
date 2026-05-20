@@ -1,6 +1,7 @@
 # golden_matrix
 
 [![pub package](https://img.shields.io/pub/v/golden_matrix.svg)](https://pub.dev/packages/golden_matrix)
+[![test](https://github.com/Autocrab/golden_matrix/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/Autocrab/golden_matrix/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/Autocrab/golden_matrix/branch/main/graph/badge.svg)](https://codecov.io/gh/Autocrab/golden_matrix)
 
 Matrix-based visual regression testing for Flutter widgets and screens.

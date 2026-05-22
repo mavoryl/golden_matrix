@@ -135,5 +135,102 @@ void main() {
       expect(xml, contains('stack frame 1'));
       expect(xml, contains('stack frame 2'));
     });
+
+    test('empty results — testsuites with tests=0, no testsuite children', () {
+      final result = MatrixResult(name: 'matrixGolden: Empty', results: const []);
+
+      final xml = JunitTemplate.render(result);
+      expect(xml, contains('tests="0"'));
+      expect(xml, contains('failures="0"'));
+      expect(xml, contains('skipped="0"'));
+      expect(xml, isNot(contains('<testsuite ')));
+    });
+
+    test('mixed pass + fail + skipped in same suite — counts add up', () {
+      final result = MatrixResult(
+        name: 'matrixGolden: Foo',
+        results: [
+          _passed(_combo()),
+          _failed(_combo(theme: MatrixTheme.dark), 'mismatch'),
+          _skipped(_combo(locale: const Locale('ru'))),
+        ],
+      );
+
+      final xml = JunitTemplate.render(result);
+      // Top-level counts
+      expect(xml, contains('tests="3"'));
+      expect(xml, contains('failures="1"'));
+      expect(xml, contains('skipped="1"'));
+      // Per-suite counts (single suite "default")
+      expect(
+        xml,
+        contains('<testsuite name="default" tests="3" failures="1" errors="0" skipped="1"'),
+      );
+    });
+
+    test('locale with country code appears in testcase name', () {
+      final result = MatrixResult(
+        name: 'matrixGolden: Foo',
+        results: [_passed(_combo(locale: const Locale('zh', 'CN')))],
+      );
+
+      final xml = JunitTemplate.render(result);
+      expect(xml, contains('name="light zh-CN ltr 1x phoneSmall"'));
+    });
+
+    test('fractional textScale renders without truncation', () {
+      final combo = MatrixCombination(
+        scenario: MatrixScenario('default', builder: () => const SizedBox.shrink()),
+        theme: MatrixTheme.light,
+        locale: const Locale('en'),
+        textScale: 1.5,
+        device: MatrixDevice.phoneSmall,
+        direction: TextDirection.ltr,
+      );
+      final result = MatrixResult(name: 'matrixGolden: Foo', results: [_passed(combo)]);
+
+      final xml = JunitTemplate.render(result);
+      expect(xml, contains('name="light en ltr 1.5x phoneSmall"'));
+    });
+
+    test('failed status with null errorMessage falls back to "failed"', () {
+      final combo = _combo();
+      final result = MatrixResult(
+        name: 'matrixGolden: Foo',
+        results: [
+          MatrixCombinationResult(
+            combination: combo,
+            status: MatrixResultStatus.failed,
+            goldenPath: 'goldens/x/default/x.png',
+            // errorMessage intentionally omitted
+          ),
+        ],
+      );
+
+      final xml = JunitTemplate.render(result);
+      expect(xml, contains('<failure'));
+      expect(xml, contains('message="failed"'));
+    });
+
+    test('RTL direction appears as "rtl" in testcase name', () {
+      final combo = MatrixCombination(
+        scenario: MatrixScenario('default', builder: () => const SizedBox.shrink()),
+        theme: MatrixTheme.light,
+        locale: const Locale('ar'),
+        textScale: 1.0,
+        device: MatrixDevice.phoneSmall,
+        direction: TextDirection.rtl,
+      );
+      final result = MatrixResult(name: 'matrixGolden: Foo', results: [_passed(combo)]);
+
+      final xml = JunitTemplate.render(result);
+      expect(xml, contains('name="light ar rtl 1x phoneSmall"'));
+    });
+
+    test('XML output ends with closing testsuites tag and a newline', () {
+      final result = MatrixResult(name: 'matrixGolden: Foo', results: [_passed(_combo())]);
+      final xml = JunitTemplate.render(result);
+      expect(xml.trim(), endsWith('</testsuites>'));
+    });
   });
 }

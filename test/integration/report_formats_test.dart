@@ -31,6 +31,7 @@ void main() {
   final legacyTrueDir = Directory.systemTemp.createTempSync('rf_legacy_true_');
   final legacyFalseDir = Directory.systemTemp.createTempSync('rf_legacy_false_');
   final reportWinsDir = Directory.systemTemp.createTempSync('rf_report_wins_');
+  final junitOnlyDir = Directory.systemTemp.createTempSync('rf_junit_');
 
   tearDownAll(() {
     for (final d in [
@@ -41,6 +42,7 @@ void main() {
       legacyTrueDir,
       legacyFalseDir,
       reportWinsDir,
+      junitOnlyDir,
     ]) {
       if (d.existsSync()) d.deleteSync(recursive: true);
     }
@@ -161,5 +163,27 @@ void main() {
   );
   test('legacy report:false overrides reportFormats (compat rule)', () {
     expect(fileExists(reportWinsDir, 'matrixgolden__rf_report_wins_report.md'), isFalse);
+  });
+
+  // 8. {junit} — only .xml is written; .json/.html/.md absent.
+  matrixGolden(
+    'rf_junit',
+    scenarios: [scenario()],
+    axes: const MatrixAxes(),
+    reportDir: junitOnlyDir.path,
+    reportFormats: const {MatrixReportFormat.junit},
+    detectStaleGoldens: false,
+    printSummary: false,
+  );
+  test('reportFormats: {junit} writes only the .xml file', () {
+    expect(fileExists(junitOnlyDir, 'matrixgolden__rf_junit_report.xml'), isTrue);
+    expect(fileExists(junitOnlyDir, 'matrixgolden__rf_junit_report.json'), isFalse);
+    expect(fileExists(junitOnlyDir, 'matrixgolden__rf_junit_report.html'), isFalse);
+    expect(fileExists(junitOnlyDir, 'matrixgolden__rf_junit_report.md'), isFalse);
+  });
+
+  // 9. default reportFormats does NOT include junit (opt-in).
+  test('default reportFormats omits junit', () {
+    expect(fileExists(defaultDir, 'matrixgolden__rf_default_report.xml'), isFalse);
   });
 }

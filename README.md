@@ -58,6 +58,7 @@ matrixGolden(
 - **Stale golden detection** — automatically flags orphan PNG files left behind after renamed scenarios or dropped axes; no extra code, runs after every `flutter test`
 - **HTML reports** — self-contained HTML with thumbnails, scenario grouping, filters, dark mode, **inline diff thumbnails on failure** (expected/actual/diff/masked)
 - **Markdown summary** — sidecar `*_report.md` next to HTML, drop-in for GitHub Actions step summary or PR comments
+- **JUnit XML** — opt-in `*_report.xml` consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, Azure DevOps test dashboards
 - **Tolerance** — configurable pixel diff threshold for flaky-free CI
 - **Dry-run preview** — `previewMatrixGolden(...)` reports what the runner would do (counts, paths, collisions) without rendering anything
 - **Custom themes** — `MatrixTheme.data` for attaching arbitrary context (custom theme systems, brand config)
@@ -73,7 +74,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.16.0
+  golden_matrix: ^0.17.0
 ```
 
 ### 2. Set up font loading
@@ -563,6 +564,63 @@ matrixGolden(
 ```
 
 `reportFormats: const {}` disables reports entirely (replaces the deprecated `report: false`). The legacy `report: bool` parameter still works for backward compatibility but emits a deprecation warning — when both are passed, `report:` wins.
+
+### JUnit XML for CI dashboards
+
+Opt in with `MatrixReportFormat.junit` to get a `<slug>_report.xml` next to the other reports. The XML follows the de-facto JUnit schema consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, Azure DevOps, and most CI dashboards. Each scenario becomes a `<testsuite>`, each combination a `<testcase>`; failures land as `<failure>` with the captured error message.
+
+```dart
+matrixGolden(
+  'ProfileCard',
+  scenarios: [...],
+  reportFormats: const {
+    MatrixReportFormat.html,
+    MatrixReportFormat.markdown,
+    MatrixReportFormat.junit, // ← opt-in
+  },
+);
+```
+
+GitHub Actions integration — one extra step in your workflow:
+
+```yaml
+- name: publish JUnit test results
+  if: always()
+  uses: dorny/test-reporter@v1
+  with:
+    name: Golden Matrix
+    path: '**/test/golden/goldens/*_report.xml'
+    reporter: java-junit
+    fail-on-error: false
+```
+
+The job needs `permissions: { checks: write, contents: read }` for the action to create the check run.
+
+Result in the GitHub UI: a "Golden Matrix" check that lists every test → scenario → combination as a tree, with failures annotated next to the changed code in PR diffs.
+
+### Multi-module / monorepo
+
+Each `matrixGolden` call produces one XML in the calling test's golden directory. In a melos / multi-package monorepo the files scatter across `packages/*/test/golden/goldens/`. Aggregate them in a single CI step via path glob:
+
+```yaml
+- uses: dorny/test-reporter@v1
+  with:
+    name: Golden Matrix (all modules)
+    path: 'packages/**/test/golden/goldens/*_report.xml'
+    reporter: java-junit
+```
+
+The result is one tree grouped by `matrixGolden` test name. To avoid two modules colliding on the same test name in the tree, prefix the test name with the module:
+
+```dart
+// packages/feature_wallet/test/...
+matrixGolden('wallet/Button', scenarios: [...]);
+
+// packages/feature_marketing/test/...
+matrixGolden('marketing/Button', scenarios: [...]);
+```
+
+Cross-module `MatrixGoldenRegistry` (orphan detection) is process-local — each `flutter test` invocation per module gets a fresh registry, so `reportOrphanGoldenSubdirs()` in each module's `flutter_test_config.dart` works independently without cross-contamination.
 
 ### `isCiEnvironment` helper
 

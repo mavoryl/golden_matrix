@@ -18,7 +18,6 @@ class SampleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return ElevatedButton(
       onPressed: enabled && !loading ? (onPressed ?? () {}) : null,
-      style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
       child: loading
           ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2))
           : Text(label),

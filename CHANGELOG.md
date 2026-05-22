@@ -1,3 +1,37 @@
+## 0.17.0
+
+- **JUnit XML report (`MatrixReportFormat.junit`).** New opt-in report format consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, Azure DevOps, and most CI dashboards. Each scenario becomes a `<testsuite>`, each combination becomes a `<testcase>`; failures emit `<failure>` with the captured error message; skipped combinations emit `<skipped/>`. Output file is `<slug>_report.xml` alongside the other reports.
+
+  ```dart
+  matrixGolden(
+    'ProfileCard',
+    scenarios: [...],
+    reportFormats: const {
+      MatrixReportFormat.html,
+      MatrixReportFormat.markdown,
+      MatrixReportFormat.junit, // ← opt-in
+    },
+  );
+  ```
+
+  GitHub Actions integration (one extra step):
+
+  ```yaml
+  - name: publish JUnit test results
+    if: always()
+    uses: dorny/test-reporter@v1
+    with:
+      name: Golden Matrix
+      path: '**/test/golden/goldens/*_report.xml'
+      reporter: java-junit
+  ```
+
+  Pure additive — `defaultReportFormats` deliberately omits `junit` so existing behaviour is unchanged.
+
+- **Monorepo / melos friendly.** Multi-module setups aggregate XMLs via path glob — no special API needed. Documented in README. Recommendation: prefix `matrixGolden` test names with the module name (`'wallet/Button'`) to avoid tree collisions between modules.
+
+- Coverage stayed at **92.2%** (was 91.6%). New `junit_template.dart` at 100%.
+
 ## 0.16.0
 
 Three additive items, one deprecation. No breaking changes.

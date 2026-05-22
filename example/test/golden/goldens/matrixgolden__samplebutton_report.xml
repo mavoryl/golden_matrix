@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites name="matrixGolden: SampleButton" tests="48" failures="0" errors="0" skipped="0" time="1.003" timestamp="2026-05-22T12:04:37.853508Z">
+  <testsuite name="default" tests="16" failures="0" errors="0" skipped="0">
+    <testcase classname="matrixGolden: SampleButton.default" name="light en ltr 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="light en ltr 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="light en ltr 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="light en ltr 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="light ar rtl 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="light ar rtl 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="light ar rtl 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="light ar rtl 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark en ltr 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark en ltr 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark en ltr 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark en ltr 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark ar rtl 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark ar rtl 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark ar rtl 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.default" name="dark ar rtl 2x phoneLarge" time="0"/>
+  </testsuite>
+  <testsuite name="disabled" tests="16" failures="0" errors="0" skipped="0">
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light en ltr 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light en ltr 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light en ltr 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light en ltr 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light ar rtl 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light ar rtl 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light ar rtl 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="light ar rtl 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark en ltr 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark en ltr 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark en ltr 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark en ltr 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark ar rtl 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark ar rtl 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark ar rtl 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.disabled" name="dark ar rtl 2x phoneLarge" time="0"/>
+  </testsuite>
+  <testsuite name="long_text" tests="16" failures="0" errors="0" skipped="0">
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light en ltr 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light en ltr 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light en ltr 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light en ltr 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light ar rtl 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light ar rtl 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light ar rtl 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="light ar rtl 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark en ltr 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark en ltr 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark en ltr 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark en ltr 2x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark ar rtl 1x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark ar rtl 1x phoneLarge" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark ar rtl 2x phoneSmall" time="0"/>
+    <testcase classname="matrixGolden: SampleButton.long_text" name="dark ar rtl 2x phoneLarge" time="0"/>
+  </testsuite>
+</testsuites>

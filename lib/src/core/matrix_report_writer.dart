@@ -3,6 +3,7 @@ import 'dart:io';
 
 import '../models/matrix_result.dart';
 import 'html_template.dart';
+import 'junit_template.dart';
 import 'markdown_template.dart';
 import 'slug.dart';
 
@@ -41,6 +42,17 @@ class MatrixReportWriter {
     final file = File('$dir/${_slug(result.name)}_report.md');
     await file.parent.create(recursive: true);
     await file.writeAsString(md);
+  }
+
+  /// Writes the report as a JUnit XML file consumed natively by GitHub
+  /// Actions, GitLab CI, CircleCI, Jenkins, Buildkite, and most CI
+  /// dashboards. Each matrix combination becomes a `<testcase>` element.
+  static Future<void> writeJunit(MatrixResult result, {String? outputDir}) async {
+    final dir = outputDir ?? _findGoldensDir(result);
+    final xml = JunitTemplate.render(result);
+    final file = File('$dir/${_slug(result.name)}_report.xml');
+    await file.parent.create(recursive: true);
+    await file.writeAsString(xml);
   }
 
   /// Finds the actual goldens directory by scanning for existing golden files.

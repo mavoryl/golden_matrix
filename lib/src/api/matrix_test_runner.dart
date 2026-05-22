@@ -342,6 +342,9 @@ void _setupReportWriting(
     if (formats.contains(MatrixReportFormat.markdown)) {
       await MatrixReportWriter.writeMarkdown(result, outputDir: reportDir);
     }
+    if (formats.contains(MatrixReportFormat.junit)) {
+      await MatrixReportWriter.writeJunit(result, outputDir: reportDir);
+    }
     if (printSummary) {
       debugPrint(formatSummary(result));
     }

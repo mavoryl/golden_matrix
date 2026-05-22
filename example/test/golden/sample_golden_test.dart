@@ -41,6 +41,14 @@ void main() {
       devices: const [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
     ),
     tolerance: 0.01 / 100, // absorb cross-macOS AA noise on CI
+    // Spike: emit JUnit XML alongside the default JSON/HTML/MD reports
+    // so GitHub Actions can render this matrix as a test tree.
+    reportFormats: const {
+      MatrixReportFormat.json,
+      MatrixReportFormat.html,
+      MatrixReportFormat.markdown,
+      MatrixReportFormat.junit,
+    },
   );
 
   // ---------------------------------------------------------------------------

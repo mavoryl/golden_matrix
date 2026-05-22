@@ -60,6 +60,15 @@ jobs:
         working-directory: example
         run: flutter test
 
+      - name: publish JUnit test results
+        if: always()
+        uses: dorny/test-reporter@v1
+        with:
+          name: Golden Matrix (example)
+          path: 'example/test/golden/goldens/*_report.xml'
+          reporter: java-junit
+          fail-on-error: false
+
       - name: upload golden failures
         if: failure()
         uses: actions/upload-artifact@v4

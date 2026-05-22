@@ -126,7 +126,7 @@ void main() {
       detectStaleGoldens: true,
       // No fileNameBuilder, so detection is enabled.
       printSummary: false,
-      report: false, // skip writing files; we only assert pipeline runs
+      reportFormats: const {}, // skip writing files; we only assert pipeline runs
     );
 
     test('detectStaleGoldens: true does not throw when subdir is empty', () {
@@ -142,7 +142,7 @@ void main() {
       axes: const MatrixAxes(),
       detectStaleGoldens: false,
       printSummary: false,
-      report: false,
+      reportFormats: const {},
     );
 
     test('detectStaleGoldens: false also wires through without error', () {

@@ -51,7 +51,7 @@ Future<void> loadAppFonts() async {
 
   for (final dynamic font in fontManifest) {
     final fontMap = font as Map<String, dynamic>;
-    final family = _derivedFontFamily(fontMap);
+    final family = derivedFontFamily(fontMap);
     loadedFamilies.add(family);
     final fontLoader = FontLoader(family);
     for (final dynamic fontType in fontMap['fonts'] as Iterable<dynamic>) {
@@ -123,7 +123,8 @@ String? _findFlutterRoot() {
 /// Fonts from packages are prefixed with `packages/<package_name>/` in
 /// the asset path. This function detects that and applies the correct
 /// qualified name so Flutter can match the font at runtime.
-String _derivedFontFamily(Map<String, dynamic> fontDefinition) {
+@visibleForTesting
+String derivedFontFamily(Map<String, dynamic> fontDefinition) {
   if (!fontDefinition.containsKey('family')) {
     return '';
   }

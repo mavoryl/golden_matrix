@@ -11,10 +11,13 @@ export 'src/models/matrix_preset.dart';
 export 'src/models/matrix_preview.dart';
 
 // Core
+export 'src/core/ci_detection.dart' show isCiEnvironment;
 export 'src/core/matrix_generator.dart';
 export 'src/core/matrix_report_writer.dart';
 export 'src/core/naming_strategy.dart';
+export 'src/core/orphan_registry.dart' show MatrixGoldenRegistry, reportOrphanGoldenSubdirs;
 export 'src/core/pairwise_generator.dart';
+export 'src/core/report_format.dart' show MatrixReportFormat, defaultReportFormats;
 
 // Flutter
 export 'src/flutter/error_capture.dart';

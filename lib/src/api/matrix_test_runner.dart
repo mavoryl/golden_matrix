@@ -7,6 +7,8 @@ import 'package:flutter_test/flutter_test.dart';
 import '../core/matrix_generator.dart';
 import '../core/matrix_report_writer.dart';
 import '../core/naming_strategy.dart';
+import '../core/orphan_registry.dart';
+import '../core/report_format.dart';
 import '../core/slug.dart';
 import '../core/stale_detector.dart';
 import '../flutter/error_capture.dart';
@@ -46,7 +48,12 @@ void runMatrixTests(
   List<MatrixRule> rules = const [],
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
-  bool report = true,
+  Set<MatrixReportFormat> reportFormats = defaultReportFormats,
+  @Deprecated(
+    'Use reportFormats instead. report:true → all formats, report:false → empty set. '
+    'When both are passed, report: wins for backwards compatibility.',
+  )
+  bool? report,
   String? reportDir,
   bool skip = false,
   double? tolerance,
@@ -56,6 +63,8 @@ void runMatrixTests(
   Duration? captureAfter,
   bool detectStaleGoldens = true,
 }) {
+  final effectiveFormats = resolveReportFormats(reportFormats: reportFormats, report: report);
+  final writeReports = effectiveFormats.isNotEmpty;
   final combinations = resolveCombinations(
     scenarios: scenarios,
     axes: axes,
@@ -72,6 +81,12 @@ void runMatrixTests(
   final stopwatch = Stopwatch()..start();
 
   group(name, () {
+    // Register this test's subdir slug so cross-test orphan detection
+    // (via reportOrphanGoldenSubdirs, opt-in from flutter_test_config.dart)
+    // doesn't flag this directory as orphaned. We use the same slug
+    // computation as NamingStrategy.goldenPath so disk paths match.
+    MatrixGoldenRegistry.recordTouched(slugify(_stripPrefix(name)));
+
     _setupTolerance(tolerance);
 
     for (final entry in byScenario.entries) {
@@ -81,7 +96,7 @@ void runMatrixTests(
               ? fileNameBuilder(combination)
               : NamingStrategy.goldenPath(combination, testName: _stripPrefix(name));
 
-          if (skip && report) {
+          if (skip && writeReports) {
             _recordSkipped(results, combination, goldenPath);
           }
 
@@ -93,7 +108,7 @@ void runMatrixTests(
               combination: combination,
               goldenPath: goldenPath,
               widgetBuilder: widgetBuilder,
-              report: report,
+              report: writeReports,
               results: results,
               setup: setup,
               freezeAnimations: freezeAnimations,
@@ -104,13 +119,14 @@ void runMatrixTests(
       });
     }
 
-    if (report) {
+    if (writeReports) {
       _setupReportWriting(
         name,
         results,
         stopwatch,
         reportDir,
         printSummary,
+        formats: effectiveFormats,
         detectStaleGoldens: detectStaleGoldens && fileNameBuilder == null,
       );
     }
@@ -305,6 +321,7 @@ void _setupReportWriting(
   Stopwatch stopwatch,
   String? reportDir,
   bool printSummary, {
+  required Set<MatrixReportFormat> formats,
   required bool detectStaleGoldens,
 }) {
   tearDownAll(() async {
@@ -316,9 +333,15 @@ void _setupReportWriting(
       duration: stopwatch.elapsed,
       staleGoldens: stale,
     );
-    await MatrixReportWriter.write(result, outputDir: reportDir);
-    await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
-    await MatrixReportWriter.writeMarkdown(result, outputDir: reportDir);
+    if (formats.contains(MatrixReportFormat.json)) {
+      await MatrixReportWriter.write(result, outputDir: reportDir);
+    }
+    if (formats.contains(MatrixReportFormat.html)) {
+      await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
+    }
+    if (formats.contains(MatrixReportFormat.markdown)) {
+      await MatrixReportWriter.writeMarkdown(result, outputDir: reportDir);
+    }
     if (printSummary) {
       debugPrint(formatSummary(result));
     }

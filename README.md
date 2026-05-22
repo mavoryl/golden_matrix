@@ -73,7 +73,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.15.0
+  golden_matrix: ^0.16.0
 ```
 
 ### 2. Set up font loading
@@ -547,6 +547,50 @@ goldens/
 Naming: `goldens/<test>/<scenario>/<theme>_<locale>_<direction>_<textScale>_<device>.png`
 
 The `<test>` prefix prevents collisions when two `matrixGolden` calls use scenarios with the same name.
+
+## CI Configuration
+
+### Per-format report toggle
+
+By default each matrix run writes JSON + HTML + Markdown reports. Use `reportFormats` to write only what your pipeline needs:
+
+```dart
+matrixGolden(
+  'ProfileCard',
+  scenarios: [...],
+  reportFormats: const {MatrixReportFormat.markdown}, // step summary only
+);
+```
+
+`reportFormats: const {}` disables reports entirely (replaces the deprecated `report: false`). The legacy `report: bool` parameter still works for backward compatibility but emits a deprecation warning — when both are passed, `report:` wins.
+
+### `isCiEnvironment` helper
+
+```dart
+matrixGolden(
+  'ProfileCard',
+  scenarios: [...],
+  reportFormats: isCiEnvironment
+      ? const {MatrixReportFormat.markdown} // CI: only step summary
+      : const {MatrixReportFormat.html},    // local: visual review
+);
+```
+
+Detection is best-effort and recognises `CI=true|1` (GitHub Actions, GitLab CI, CircleCI, Travis, Buildkite, Drone, Netlify) plus vendor env-vars: `GITHUB_ACTIONS`, `GITLAB_CI`, `CIRCLECI`, `BUILDKITE`, `TF_BUILD` (Azure Pipelines), `BITBUCKET_COMMIT`, `CM_BUILD_ID` (Codemagic), `JENKINS_URL`, `TEAMCITY_VERSION`, `bamboo_planKey`. Force-enable on any other CI by setting `CI=true` in your pipeline.
+
+### Cross-test orphan-subdir detection
+
+Add one line to `flutter_test_config.dart` to fail the build when entire `matrixGolden` subdirs become orphaned (after a test was renamed or deleted):
+
+```dart
+Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+  await loadAppFonts();
+  await testMain();
+  await reportOrphanGoldenSubdirs(fail: isCiEnvironment);
+}
+```
+
+This complements per-test stale detection (which only sees orphans *inside* an active test's subdir).
 
 ## Requirements
 

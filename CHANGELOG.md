@@ -1,3 +1,42 @@
+## 0.16.0
+
+Three additive items, one deprecation. No breaking changes.
+
+- **`reportFormats: Set<MatrixReportFormat>` parameter** on `matrixGolden` and `screenMatrixGolden`. Per-format toggle for `MatrixReportFormat.json` / `.html` / `.markdown`. Default is all three (matches previous behaviour). Pass an empty set to skip reporting entirely (`reportFormats: const {}`). Stale detection now gated by `formats.isNotEmpty`; console summary stays controlled by `printSummary`.
+
+  ```dart
+  matrixGolden(
+    'ProfileCard',
+    scenarios: [...],
+    reportFormats: const {MatrixReportFormat.markdown}, // CI: only the MD sidecar
+  );
+  ```
+
+- **`isCiEnvironment` exported getter.** Best-effort CI detection so users can branch their `reportFormats` without rolling their own env-var check. Detects via `CI=true|1` (GitHub Actions, GitLab CI, CircleCI, Travis, Buildkite, Drone, Netlify) plus vendor-specific env-var presence: GitHub Actions, GitLab CI, CircleCI, Buildkite, Azure Pipelines, Bitbucket Pipelines, Codemagic, Jenkins, TeamCity, Bamboo.
+
+  ```dart
+  matrixGolden(
+    ...,
+    reportFormats: isCiEnvironment
+        ? const {MatrixReportFormat.markdown}
+        : const {MatrixReportFormat.html},
+  );
+  ```
+
+- **Cross-test orphan-subdir detection** completes pain #6 from 0.14.0. Each `matrixGolden` / `screenMatrixGolden` call automatically records its slug in a process-global `MatrixGoldenRegistry`. New exported `reportOrphanGoldenSubdirs({String? goldensRoot, bool fail = false})` walks the goldens root and lists top-level subdirs not touched by any test — catches whole renamed/deleted `matrixGolden` calls that per-test stale detection can't see. Opt-in via one line in `flutter_test_config.dart`:
+
+  ```dart
+  Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+    await loadAppFonts();
+    await testMain();
+    await reportOrphanGoldenSubdirs(fail: isCiEnvironment);
+  }
+  ```
+
+- **Deprecated: `report: bool` parameter.** Use `reportFormats` instead. `report: true` resolves to all three formats; `report: false` resolves to the empty set. When both are passed, `report:` wins (backwards-compat). Will be removed in a future minor release. Existing code is unaffected — only triggers an analyzer info-level deprecation warning.
+
+- **Coverage push.** Line coverage from ~87% to **91.6%**. New tests in `screen_matrix_golden_test.dart`, `font_loader_test.dart`, `ci_detection_test.dart`, `orphan_registry_test.dart`, plus extensions to `matrix_combination_test.dart` covering equality/hashCode/toString/assertions on `MatrixScenario` / `MatrixTheme` / `MatrixDevice`.
+
 ## 0.15.0 — Review DX
 
 Two additive reporting upgrades plus a long-standing failure-tracking bug fix. No breaking changes.

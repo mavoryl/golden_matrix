@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/report_format.dart';
 import '../flutter/matrix_widget_wrapper.dart';
 import '../models/matrix_axes.dart';
 import '../models/matrix_combination.dart';
@@ -69,8 +70,13 @@ import 'matrix_test_runner.dart';
 ///   receives the current [MatrixCombination] so providers can vary per
 ///   scenario (e.g. seed a different fake state per combination). When
 ///   `null`, the widget tree is identical to previous versions.
-/// - [report] — When `true` (default), writes a JSON/HTML report to
-///   [reportDir] (or the package default) summarizing pass/fail/warnings.
+/// - [reportFormats] — Set of report formats to write after the run.
+///   Defaults to all three (`json`, `html`, `markdown`). Pass an empty
+///   set to skip reporting entirely; pass a singleton like
+///   `{MatrixReportFormat.markdown}` for CI-only Markdown summaries.
+/// - `report` — **Deprecated.** Legacy bool toggle for all formats at
+///   once. Use [reportFormats] instead. When both are passed, `report`
+///   wins for backward compatibility.
 /// - [reportDir] — Directory for the generated report. Defaults to the
 ///   package's standard `goldens` report location.
 /// - [skip] — When `true`, all generated tests are skipped.
@@ -152,7 +158,12 @@ void matrixGolden(
   List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
   Widget Function(Widget child)? wrapChild,
   Widget Function(Widget app, MatrixCombination combination)? wrapApp,
-  bool report = true,
+  Set<MatrixReportFormat> reportFormats = defaultReportFormats,
+  @Deprecated(
+    'Use reportFormats instead. report:true → all formats, report:false → empty set. '
+    'When both are passed, report: wins for backwards compatibility.',
+  )
+  bool? report,
   String? reportDir,
   bool skip = false,
   double? tolerance,
@@ -178,6 +189,8 @@ void matrixGolden(
     rules: rules,
     scenarioTags: scenarioTags,
     fileNameBuilder: fileNameBuilder,
+    reportFormats: reportFormats,
+    // ignore: deprecated_member_use_from_same_package
     report: report,
     reportDir: reportDir,
     skip: skip,

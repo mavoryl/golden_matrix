@@ -94,6 +94,24 @@ void main() {
       final scenario = MatrixScenario('test', builder: placeholder, tags: ['error', 'network']);
       expect(scenario.tags, ['error', 'network']);
     });
+
+    test('equality by name; identical names → equal hashCode', () {
+      final a = MatrixScenario('foo', builder: placeholder);
+      final b = MatrixScenario('foo', builder: placeholder);
+      final c = MatrixScenario('bar', builder: placeholder);
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(a, isNot(c));
+      expect(a, a); // identity branch
+    });
+
+    test('toString contains the scenario name', () {
+      expect(MatrixScenario('checkout', builder: placeholder).toString(), contains('checkout'));
+    });
+
+    test('empty name fails the assertion', () {
+      expect(() => MatrixScenario('', builder: placeholder), throwsA(isA<AssertionError>()));
+    });
   });
 
   group('MatrixTheme', () {
@@ -131,6 +149,31 @@ void main() {
       final theme = MatrixTheme.custom('My Theme!', ThemeData.light());
       expect(theme.slug, 'my_theme_');
     });
+
+    test('equality by name; identical names → equal hashCode', () {
+      final a = MatrixTheme.custom('brand', ThemeData.light());
+      final b = MatrixTheme.custom('brand', ThemeData.dark());
+      final c = MatrixTheme.custom('other', ThemeData.light());
+      expect(a, b);
+      expect(a.hashCode, b.hashCode);
+      expect(a, isNot(c));
+      expect(MatrixTheme.light, MatrixTheme.light); // identity branch
+    });
+
+    test('toString contains the theme name', () {
+      expect(MatrixTheme.custom('brand', ThemeData.light()).toString(), contains('brand'));
+    });
+
+    test('isDark via ThemeData brightness', () {
+      final custom = MatrixTheme.custom('whatever', ThemeData.dark());
+      expect(custom.isDark, isTrue);
+      final light = MatrixTheme.custom('whatever', ThemeData.light());
+      expect(light.isDark, isFalse);
+    });
+
+    test('empty custom name fails the assertion', () {
+      expect(() => MatrixTheme.custom('', ThemeData.light()), throwsA(isA<AssertionError>()));
+    });
   });
 
   group('MatrixDevice', () {
@@ -143,6 +186,40 @@ void main() {
     test('slug is lowercased', () {
       expect(MatrixDevice.phoneSmall.slug, 'phonesmall');
       expect(MatrixDevice.androidMedium.slug, 'androidmedium');
+    });
+
+    test('equality by name; identical names → equal hashCode', () {
+      const a = MatrixDevice(name: 'custom', logicalSize: Size(100, 200), pixelRatio: 2);
+      const b = MatrixDevice(name: 'custom', logicalSize: Size(400, 800), pixelRatio: 3);
+      expect(a, b); // name-based equality even if other fields differ
+      expect(a.hashCode, b.hashCode);
+      expect(a, isNot(MatrixDevice.phoneSmall));
+      expect(MatrixDevice.phoneSmall, MatrixDevice.phoneSmall); // identity branch
+    });
+
+    test('toString includes name and logical size', () {
+      final str = MatrixDevice.phoneSmall.toString();
+      expect(str, contains('phoneSmall'));
+      expect(str, contains('375'));
+      expect(str, contains('667'));
+    });
+
+    test('empty name fails the assertion', () {
+      expect(
+        () => MatrixDevice(name: '', logicalSize: const Size(100, 100)),
+        throwsA(isA<AssertionError>()),
+      );
+    });
+
+    test('non-positive pixelRatio fails the assertion', () {
+      expect(
+        () => MatrixDevice(name: 'x', logicalSize: const Size(100, 100), pixelRatio: 0),
+        throwsA(isA<AssertionError>()),
+      );
+      expect(
+        () => MatrixDevice(name: 'x', logicalSize: const Size(100, 100), pixelRatio: -1),
+        throwsA(isA<AssertionError>()),
+      );
     });
   });
 }

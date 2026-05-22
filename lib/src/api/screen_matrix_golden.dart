@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../core/report_format.dart';
 import '../models/matrix_axes.dart';
 import '../models/matrix_combination.dart';
 import '../models/matrix_preset.dart';
@@ -57,7 +58,11 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 /// - [scenarioTags] — When provided, filters [states] by their
 ///   [MatrixScenario.tags]. Not a Flutter test tag.
 /// - [fileNameBuilder] — Override the default golden file name.
-/// - [report] — When `true` (default), writes JSON/HTML report output.
+/// - [reportFormats] — Set of formats to write (`json`, `html`,
+///   `markdown`). Defaults to all three. Pass an empty set to skip
+///   reporting entirely.
+/// - `report` — **Deprecated.** Legacy bool toggle. Use [reportFormats]
+///   instead. When both are passed, `report` wins.
 /// - [reportDir] — Optional directory for the generated report.
 /// - [skip] — When `true`, all generated tests are skipped.
 /// - [tolerance] — Optional pixel-difference tolerance for the matcher.
@@ -110,7 +115,12 @@ void screenMatrixGolden(
   List<MatrixRule> rules = const [],
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
-  bool report = true,
+  Set<MatrixReportFormat> reportFormats = defaultReportFormats,
+  @Deprecated(
+    'Use reportFormats instead. report:true → all formats, report:false → empty set. '
+    'When both are passed, report: wins for backwards compatibility.',
+  )
+  bool? report,
   String? reportDir,
   bool skip = false,
   double? tolerance,
@@ -133,6 +143,8 @@ void screenMatrixGolden(
     rules: rules,
     scenarioTags: scenarioTags,
     fileNameBuilder: fileNameBuilder,
+    reportFormats: reportFormats,
+    // ignore: deprecated_member_use_from_same_package
     report: report,
     reportDir: reportDir,
     skip: skip,

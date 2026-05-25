@@ -77,4 +77,66 @@ void main() {
       );
     });
   });
+
+  group('isIconFamily', () {
+    test('returns true for well-known icon font families', () {
+      for (final name in [
+        'MaterialIcons',
+        'CupertinoIcons',
+        'FontAwesomeIcons',
+        'MaterialSymbolsRounded',
+        'MaterialSymbolsSharp',
+        'MaterialSymbolsOutlined',
+      ]) {
+        expect(isIconFamily(name), isTrue, reason: 'should match $name');
+      }
+    });
+
+    test('matches case-insensitively', () {
+      expect(isIconFamily('materialicons'), isTrue);
+      expect(isIconFamily('MATERIALICONS'), isTrue);
+      expect(isIconFamily('material_symbols_outlined'), isTrue);
+    });
+
+    test('matches packaged icon families after the prefix', () {
+      // Whatever ends up in family name string — substring match still works.
+      expect(isIconFamily('packages/cupertino_icons/CupertinoIcons'), isTrue);
+    });
+
+    test('returns false for text-only font families', () {
+      for (final name in [
+        'Roboto',
+        'Inter',
+        '.SF Pro Text',
+        '.SF UI Display',
+        'Open Sans',
+        'BrandSans',
+        'AppFont',
+      ]) {
+        expect(isIconFamily(name), isFalse, reason: 'should NOT match $name');
+      }
+    });
+
+    test('returns false for empty string', () {
+      expect(isIconFamily(''), isFalse);
+    });
+
+    test('documented limitation: misses icon fonts without "icons"/"symbols"', () {
+      // Real icon fonts that don't follow the convention.
+      // This test pins the current behavior so a future change is intentional.
+      expect(isIconFamily('Phosphor'), isFalse);
+      expect(isIconFamily('FontAwesomeBrands'), isFalse);
+      expect(isIconFamily('Lucide'), isFalse);
+    });
+  });
+
+  group('loadAppFonts parameter wiring (compile-time)', () {
+    // These checks verify the public API signature didn't drift.
+    // Actual font-loading behavior is exercised by integration tests
+    // via `test/integration/flutter_test_config.dart`.
+    test('accepts textFonts named param', () {
+      const Future<void> Function({bool textFonts, bool iconFonts}) ref = loadAppFonts;
+      expect(ref, isNotNull);
+    });
+  });
 }

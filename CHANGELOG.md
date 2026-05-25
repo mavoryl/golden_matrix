@@ -1,3 +1,21 @@
+## 0.18.0
+
+- **Selective text/icon font loading.** New optional `textFonts` and `iconFonts` parameters on `loadAppFonts()` (both default `true`, fully backward compatible). Enables layout-deterministic golden tests where text uses the Ahem placeholder (predictable geometry across macOS/Linux CI) while icons render with real glyphs.
+
+  ```dart
+  // test/flutter_test_config.dart — Ahem text + real icons
+  Future<void> testExecutable(FutureOr<void> Function() testMain) async {
+    await loadAppFonts(textFonts: false);
+    return testMain();
+  }
+  ```
+
+  Icon families are detected by a substring heuristic (`'icons'` / `'symbols'`, case-insensitive) that catches `MaterialIcons`, `CupertinoIcons`, `FontAwesomeIcons`, `MaterialSymbolsRounded/Sharp/Outlined`. Icon fonts that don't follow this convention (e.g. `Phosphor`) are treated as text — file an issue if your project hits this.
+
+- **MaterialIcons SDK fallback.** When `MaterialIcons` is not in `FontManifest.json` (i.e. no `cupertino_icons` dependency or similar), the loader now reads `$FLUTTER_ROOT/bin/cache/artifacts/material_fonts/MaterialIcons-Regular.otf` automatically. Closes the gap where icons rendered as empty boxes in projects without that dependency. **Heads-up**: if you previously relied on the missing-glyph behavior for goldens, this will change those goldens to show real icon glyphs.
+
+- New `isIconFamily(String)` helper exposed via `@visibleForTesting` for projects that want to mirror the same filter logic.
+
 ## 0.17.0
 
 - **JUnit XML report (`MatrixReportFormat.junit`).** New opt-in report format consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, Azure DevOps, and most CI dashboards. Each scenario becomes a `<testsuite>`, each combination becomes a `<testcase>`; failures emit `<failure>` with the captured error message; skipped combinations emit `<skipped/>`. Output file is `<slug>_report.xml` alongside the other reports.

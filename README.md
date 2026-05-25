@@ -74,7 +74,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.17.0
+  golden_matrix: ^0.18.0
 ```
 
 ### 2. Set up font loading
@@ -89,6 +89,11 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   return testMain();
 }
 ```
+
+> **Tip — layout-deterministic tests** (since 0.18.0):
+> `loadAppFonts(textFonts: false)` loads only icon fonts and uses Ahem
+> placeholders for text. Text geometry becomes predictable across
+> macOS/Linux CI, while icons still render with real glyphs for review.
 
 ### 3. Write your first matrix test
 

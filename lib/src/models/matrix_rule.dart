@@ -1,4 +1,4 @@
-import 'matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
 
 /// The type of matrix rule.
 enum MatrixRuleType {

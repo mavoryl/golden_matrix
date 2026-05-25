@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
-
-import '../models/matrix_combination.dart';
-import 'slug.dart';
+import 'package:golden_matrix/src/core/slug.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
 
 /// Generates deterministic file paths for golden files.
 class NamingStrategy {

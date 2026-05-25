@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../models/matrix_result.dart';
+import 'package:golden_matrix/src/models/matrix_result.dart';
 
 /// Renders a self-contained HTML report from a [MatrixResult].
 class HtmlTemplate {

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
 
 /// The status of a single combination test result.
 enum MatrixResultStatus {

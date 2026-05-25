@@ -1,4 +1,4 @@
-import '../models/matrix_result.dart';
+import 'package:golden_matrix/src/models/matrix_result.dart';
 
 /// Renders a [MatrixResult] as JUnit XML — the de-facto industry-standard
 /// test-report format consumed natively by GitHub Actions, GitLab CI,

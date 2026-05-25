@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import 'matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
 
 /// A side-effect-free description of what `matrixGolden`/`screenMatrixGolden`
 /// would do for a given configuration, without rendering widgets or writing

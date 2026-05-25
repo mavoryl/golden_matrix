@@ -1,11 +1,11 @@
 import 'dart:convert';
 import 'dart:io';
 
-import '../models/matrix_result.dart';
-import 'html_template.dart';
-import 'junit_template.dart';
-import 'markdown_template.dart';
-import 'slug.dart';
+import 'package:golden_matrix/src/core/html_template.dart';
+import 'package:golden_matrix/src/core/junit_template.dart';
+import 'package:golden_matrix/src/core/markdown_template.dart';
+import 'package:golden_matrix/src/core/slug.dart';
+import 'package:golden_matrix/src/models/matrix_result.dart';
 
 /// Writes [MatrixResult] as JSON and HTML report files.
 ///

@@ -1,7 +1,6 @@
 import 'package:flutter/widgets.dart';
-
-import '../models/matrix_result.dart';
-import 'slug.dart';
+import 'package:golden_matrix/src/core/slug.dart';
+import 'package:golden_matrix/src/models/matrix_result.dart';
 
 /// Renders a [MatrixResult] as a Markdown document suitable for
 /// CI step summaries (e.g. GitHub Actions `$GITHUB_STEP_SUMMARY`),

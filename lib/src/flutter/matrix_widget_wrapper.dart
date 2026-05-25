@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-import '../models/matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
 
 /// Wraps a widget in a configured [MaterialApp] shell for golden testing.
 ///

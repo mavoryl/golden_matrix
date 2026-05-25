@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 
-import 'matrix_device.dart';
-import 'matrix_scenario.dart';
-import 'matrix_theme.dart';
+import 'package:golden_matrix/src/models/matrix_device.dart';
+import 'package:golden_matrix/src/models/matrix_scenario.dart';
+import 'package:golden_matrix/src/models/matrix_theme.dart';
 
 /// Represents a single combination of all axis values.
 /// This is the basic unit of test execution.

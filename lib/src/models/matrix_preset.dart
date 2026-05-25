@@ -1,10 +1,10 @@
 import 'package:flutter/widgets.dart';
 
-import 'matrix_axes.dart';
-import 'matrix_device.dart';
-import 'matrix_rule.dart';
-import 'matrix_sampling.dart';
-import 'matrix_theme.dart';
+import 'package:golden_matrix/src/models/matrix_axes.dart';
+import 'package:golden_matrix/src/models/matrix_device.dart';
+import 'package:golden_matrix/src/models/matrix_rule.dart';
+import 'package:golden_matrix/src/models/matrix_sampling.dart';
+import 'package:golden_matrix/src/models/matrix_theme.dart';
 
 /// A reusable bundle of axes, sampling strategy, and rules.
 ///

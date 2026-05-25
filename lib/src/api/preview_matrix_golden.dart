@@ -1,13 +1,13 @@
-import '../core/matrix_generator.dart';
-import '../core/naming_strategy.dart';
-import '../models/matrix_axes.dart';
-import '../models/matrix_combination.dart';
-import '../models/matrix_preset.dart';
-import '../models/matrix_preview.dart';
-import '../models/matrix_rule.dart';
-import '../models/matrix_sampling.dart';
-import '../models/matrix_scenario.dart';
-import 'matrix_test_runner.dart';
+import 'package:golden_matrix/src/api/matrix_test_runner.dart';
+import 'package:golden_matrix/src/core/matrix_generator.dart';
+import 'package:golden_matrix/src/core/naming_strategy.dart';
+import 'package:golden_matrix/src/models/matrix_axes.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_preset.dart';
+import 'package:golden_matrix/src/models/matrix_preview.dart';
+import 'package:golden_matrix/src/models/matrix_rule.dart';
+import 'package:golden_matrix/src/models/matrix_sampling.dart';
+import 'package:golden_matrix/src/models/matrix_scenario.dart';
 
 /// Returns a [MatrixPreview] describing what a `matrixGolden` or
 /// `screenMatrixGolden` call with the same parameters would do — without

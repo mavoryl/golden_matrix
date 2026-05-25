@@ -1,13 +1,12 @@
 import 'package:flutter/widgets.dart';
-
-import '../models/matrix_axes.dart';
-import '../models/matrix_combination.dart';
-import '../models/matrix_device.dart';
-import '../models/matrix_rule.dart';
-import '../models/matrix_sampling.dart';
-import '../models/matrix_scenario.dart';
-import '../models/matrix_theme.dart';
-import 'pairwise_generator.dart';
+import 'package:golden_matrix/src/core/pairwise_generator.dart';
+import 'package:golden_matrix/src/models/matrix_axes.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_device.dart';
+import 'package:golden_matrix/src/models/matrix_rule.dart';
+import 'package:golden_matrix/src/models/matrix_sampling.dart';
+import 'package:golden_matrix/src/models/matrix_scenario.dart';
+import 'package:golden_matrix/src/models/matrix_theme.dart';
 
 /// Generates all combinations from scenarios and axes.
 ///

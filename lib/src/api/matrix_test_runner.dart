@@ -4,22 +4,22 @@ import 'dart:typed_data';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../core/matrix_generator.dart';
-import '../core/matrix_report_writer.dart';
-import '../core/naming_strategy.dart';
-import '../core/orphan_registry.dart';
-import '../core/report_format.dart';
-import '../core/slug.dart';
-import '../core/stale_detector.dart';
-import '../flutter/error_capture.dart';
-import '../flutter/pump_helpers.dart';
-import '../models/matrix_axes.dart';
-import '../models/matrix_combination.dart';
-import '../models/matrix_preset.dart';
-import '../models/matrix_result.dart';
-import '../models/matrix_rule.dart';
-import '../models/matrix_sampling.dart';
-import '../models/matrix_scenario.dart';
+import 'package:golden_matrix/src/core/matrix_generator.dart';
+import 'package:golden_matrix/src/core/matrix_report_writer.dart';
+import 'package:golden_matrix/src/core/naming_strategy.dart';
+import 'package:golden_matrix/src/core/orphan_registry.dart';
+import 'package:golden_matrix/src/core/report_format.dart';
+import 'package:golden_matrix/src/core/slug.dart';
+import 'package:golden_matrix/src/core/stale_detector.dart';
+import 'package:golden_matrix/src/flutter/error_capture.dart';
+import 'package:golden_matrix/src/flutter/pump_helpers.dart';
+import 'package:golden_matrix/src/models/matrix_axes.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_preset.dart';
+import 'package:golden_matrix/src/models/matrix_result.dart';
+import 'package:golden_matrix/src/models/matrix_rule.dart';
+import 'package:golden_matrix/src/models/matrix_sampling.dart';
+import 'package:golden_matrix/src/models/matrix_scenario.dart';
 
 /// Builds a widget tree for a given [MatrixCombination].
 typedef MatrixWidgetBuilder = Widget Function(MatrixCombination combination);

@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
-import '../models/matrix_device.dart';
+import 'package:golden_matrix/src/models/matrix_device.dart';
 
 /// Helpers for configuring the test view and pumping widgets.
 class PumpHelpers {

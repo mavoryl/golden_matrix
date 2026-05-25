@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../core/slug.dart';
+import 'package:golden_matrix/src/core/slug.dart';
 
 /// Represents a device configuration for matrix golden testing.
 ///

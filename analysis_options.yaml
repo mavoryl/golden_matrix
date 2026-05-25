@@ -45,6 +45,9 @@ linter:
     avoid_unused_constructor_parameters: true
     avoid_void_async: true
 
+    # Imports
+    always_use_package_imports: true
+
     # Style
     directives_ordering: true
     sort_pub_dependencies: true

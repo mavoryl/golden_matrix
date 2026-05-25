@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import '../core/slug.dart';
+import 'package:golden_matrix/src/core/slug.dart';
 
 /// Represents a theme configuration for matrix golden testing.
 ///

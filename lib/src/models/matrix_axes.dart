@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
-import 'matrix_device.dart';
-import 'matrix_theme.dart';
+import 'package:golden_matrix/src/models/matrix_device.dart';
+import 'package:golden_matrix/src/models/matrix_theme.dart';
 
 /// Describes the dimensions of the test matrix.
 class MatrixAxes {

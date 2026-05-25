@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-
-import '../core/report_format.dart';
-import '../flutter/matrix_widget_wrapper.dart';
-import '../models/matrix_axes.dart';
-import '../models/matrix_combination.dart';
-import '../models/matrix_preset.dart';
-import '../models/matrix_rule.dart';
-import '../models/matrix_sampling.dart';
-import '../models/matrix_scenario.dart';
-import 'matrix_test_runner.dart';
+import 'package:golden_matrix/src/api/matrix_test_runner.dart';
+import 'package:golden_matrix/src/core/report_format.dart';
+import 'package:golden_matrix/src/flutter/matrix_widget_wrapper.dart';
+import 'package:golden_matrix/src/models/matrix_axes.dart';
+import 'package:golden_matrix/src/models/matrix_combination.dart';
+import 'package:golden_matrix/src/models/matrix_preset.dart';
+import 'package:golden_matrix/src/models/matrix_rule.dart';
+import 'package:golden_matrix/src/models/matrix_sampling.dart';
+import 'package:golden_matrix/src/models/matrix_scenario.dart';
 
 /// Creates a group of golden tests for each combination in the matrix.
 ///

@@ -1,6 +1,6 @@
 import 'package:flutter/widgets.dart';
 
-import '../core/slug.dart';
+import 'package:golden_matrix/src/core/slug.dart';
 
 /// A builder function that creates a widget for a test scenario.
 typedef ScenarioBuilder = Widget Function();

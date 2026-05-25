@@ -12,11 +12,7 @@ import '../models/matrix_combination.dart';
 /// Use [wrapChild] to customize the inner layout (e.g. remove Scaffold,
 /// change alignment, add padding).
 class MatrixWidgetWrapper extends StatelessWidget {
-  final MatrixCombination combination;
-  final Widget child;
-  final List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates;
-  final Widget Function(Widget child)? wrapChild;
-
+  /// Wraps [child] in a configured `MaterialApp` for the given [combination].
   const MatrixWidgetWrapper({
     super.key,
     required this.combination,
@@ -24,6 +20,20 @@ class MatrixWidgetWrapper extends StatelessWidget {
     this.extraLocalizationsDelegates = const [],
     this.wrapChild,
   });
+
+  /// The combination whose theme/locale/device/direction is applied.
+  final MatrixCombination combination;
+
+  /// The widget under test.
+  final Widget child;
+
+  /// Extra localization delegates merged into the `MaterialApp`.
+  final List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates;
+
+  /// Optional builder that wraps [child] before it's placed inside the app.
+  ///
+  /// When null, [child] is wrapped in `Scaffold(body: Center(child: child))`.
+  final Widget Function(Widget child)? wrapChild;
 
   @override
   Widget build(BuildContext context) {

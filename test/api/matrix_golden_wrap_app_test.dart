@@ -3,9 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
 
 class _TestInherited extends InheritedWidget {
-  final String value;
-
   const _TestInherited({required this.value, required super.child});
+  final String value;
 
   static _TestInherited? maybeOf(BuildContext context) =>
       context.dependOnInheritedWidgetOfExactType<_TestInherited>();

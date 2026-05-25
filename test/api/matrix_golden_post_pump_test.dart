@@ -8,8 +8,8 @@ import 'package:golden_matrix/golden_matrix.dart';
 /// A widget that increments a counter on every frame via a [Ticker].
 /// Used to observe `freezeAnimations` actually halts ticking.
 class _TickingWidget extends StatefulWidget {
-  final ValueNotifier<int> ticks;
   const _TickingWidget(this.ticks);
+  final ValueNotifier<int> ticks;
   @override
   State<_TickingWidget> createState() => _TickingWidgetState();
 }

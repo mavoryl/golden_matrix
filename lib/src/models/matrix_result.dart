@@ -3,7 +3,16 @@ import 'package:flutter/widgets.dart';
 import 'matrix_combination.dart';
 
 /// The status of a single combination test result.
-enum MatrixResultStatus { passed, failed, skipped }
+enum MatrixResultStatus {
+  /// The combination matched its golden file.
+  passed,
+
+  /// The combination differed from its golden file.
+  failed,
+
+  /// The combination was not executed (e.g. excluded by rules or `skip: true`).
+  skipped,
+}
 
 /// Result of a single combination's golden test.
 ///
@@ -12,6 +21,15 @@ enum MatrixResultStatus { passed, failed, skipped }
 /// are aggregated in [MatrixResult] and written to the JSON/HTML
 /// report.
 class MatrixCombinationResult {
+  /// Creates a result for one rendered [MatrixCombination].
+  const MatrixCombinationResult({
+    required this.combination,
+    required this.status,
+    required this.goldenPath,
+    this.errorMessage,
+    this.warnings = const [],
+  });
+
   /// The combination that produced this result.
   final MatrixCombination combination;
 
@@ -26,14 +44,6 @@ class MatrixCombinationResult {
 
   /// Non-fatal warnings captured during the test (e.g. RenderFlex overflows).
   final List<String> warnings;
-
-  const MatrixCombinationResult({
-    required this.combination,
-    required this.status,
-    required this.goldenPath,
-    this.errorMessage,
-    this.warnings = const [],
-  });
 
   /// Serializes this result to a JSON-compatible map.
   ///
@@ -73,6 +83,15 @@ class MatrixCombinationResult {
 /// `matrixGolden` or `screenMatrixGolden` invocation, along with run
 /// metadata and convenience counters.
 class MatrixResult {
+  /// Creates an aggregated result for a matrix golden run.
+  MatrixResult({
+    required this.name,
+    required this.results,
+    DateTime? timestamp,
+    this.duration = Duration.zero,
+    this.staleGoldens = const [],
+  }) : timestamp = timestamp ?? DateTime.now();
+
   /// Test group name (the first argument to `matrixGolden`).
   final String name;
 
@@ -99,14 +118,6 @@ class MatrixResult {
   /// - a custom `fileNameBuilder` is supplied (paths are not relative to
   ///   the conventional `goldens/<test>/` subdir).
   final List<String> staleGoldens;
-
-  MatrixResult({
-    required this.name,
-    required this.results,
-    DateTime? timestamp,
-    this.duration = Duration.zero,
-    this.staleGoldens = const [],
-  }) : timestamp = timestamp ?? DateTime.now();
 
   /// Total number of combinations rendered.
   int get total => results.length;

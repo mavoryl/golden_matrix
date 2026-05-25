@@ -52,7 +52,21 @@ import '../core/slug.dart';
 /// final myTheme = combination.theme.data as MyTheme;
 /// ```
 class MatrixTheme {
+  const MatrixTheme._(this.name, [this.themeData, this.data]);
+
+  /// Creates a custom theme with a [name], [ThemeData], and optional [data].
+  factory MatrixTheme.custom(String name, ThemeData themeData, {Object? data}) {
+    assert(name != '', 'MatrixTheme name must not be empty');
+    return MatrixTheme._(name, themeData, data);
+  }
+
+  /// Human-readable name used in golden file paths and reports.
   final String name;
+
+  /// Explicit `ThemeData` to apply, if provided.
+  ///
+  /// When null, [resolve] derives `ThemeData.light()` / `ThemeData.dark()`
+  /// from [isDark].
   final ThemeData? themeData;
 
   /// Arbitrary data attached to this theme.
@@ -61,16 +75,11 @@ class MatrixTheme {
   /// or any other context needed in widget builders.
   final Object? data;
 
-  const MatrixTheme._(this.name, [this.themeData, this.data]);
+  /// Built-in light theme — resolves to `ThemeData.light()`.
+  static const light = MatrixTheme._('light');
 
-  static const light = MatrixTheme._('light', null, null);
-  static const dark = MatrixTheme._('dark', null, null);
-
-  /// Creates a custom theme with a [name], [ThemeData], and optional [data].
-  factory MatrixTheme.custom(String name, ThemeData themeData, {Object? data}) {
-    assert(name != '', 'MatrixTheme name must not be empty');
-    return MatrixTheme._(name, themeData, data);
-  }
+  /// Built-in dark theme — resolves to `ThemeData.dark()`.
+  static const dark = MatrixTheme._('dark');
 
   /// Whether this is the built-in dark theme.
   bool get isDark => identical(this, dark) || (themeData?.brightness == Brightness.dark);
@@ -81,6 +90,7 @@ class MatrixTheme {
     return isDark ? ThemeData.dark() : ThemeData.light();
   }
 
+  /// Slugified [name] suitable for use in file paths.
   String get slug => slugify(name);
 
   @override

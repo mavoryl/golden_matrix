@@ -48,7 +48,7 @@ void main() {
       final result = MatrixResult(
         name: 'TestWidget',
         results: [
-          makeResult(status: MatrixResultStatus.passed),
+          makeResult(),
           makeResult(
             scenario: 'error',
             theme: MatrixTheme.dark,
@@ -152,7 +152,7 @@ void main() {
       final result = MatrixResult(
         name: 'TestWidget',
         results: [
-          makeResult(status: MatrixResultStatus.passed),
+          makeResult(),
           makeResult(
             scenario: 'error',
             theme: MatrixTheme.dark,
@@ -178,8 +178,8 @@ void main() {
       final result = MatrixResult(
         name: 'Widget',
         results: [
-          makeResult(status: MatrixResultStatus.passed),
-          makeResult(status: MatrixResultStatus.passed),
+          makeResult(),
+          makeResult(),
           makeResult(status: MatrixResultStatus.failed, errorMessage: 'err'),
         ],
       );
@@ -209,10 +209,7 @@ void main() {
     });
 
     test('generates correct image paths', () {
-      final result = MatrixResult(
-        name: 'Widget',
-        results: [makeResult(goldenPath: 'goldens/default/light_en_ltr_1x_phonesmall.png')],
-      );
+      final result = MatrixResult(name: 'Widget', results: [makeResult()]);
 
       final html = HtmlTemplate.render(result);
 

@@ -98,10 +98,7 @@ void main() {
     });
 
     test('testcase name and classname follow expected format', () {
-      final result = MatrixResult(
-        name: 'matrixGolden: Foo',
-        results: [_passed(_combo(scenario: 'default'))],
-      );
+      final result = MatrixResult(name: 'matrixGolden: Foo', results: [_passed(_combo())]);
 
       final xml = JunitTemplate.render(result);
       expect(xml, contains('classname="matrixGolden: Foo.default"'));

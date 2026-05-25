@@ -9,7 +9,7 @@ void main() {
 
       PumpHelpers.configureView(tester, device);
 
-      expect(tester.view.physicalSize, Size(414 * 3.0, 896 * 3.0));
+      expect(tester.view.physicalSize, const Size(414 * 3.0, 896 * 3.0));
       expect(tester.view.devicePixelRatio, 3.0);
 
       PumpHelpers.resetView(tester);
@@ -20,7 +20,7 @@ void main() {
 
       PumpHelpers.configureView(tester, device);
 
-      expect(tester.view.physicalSize, Size(768 * 2.0, 1024 * 2.0));
+      expect(tester.view.physicalSize, const Size(768 * 2.0, 1024 * 2.0));
       expect(tester.view.devicePixelRatio, 2.0);
 
       PumpHelpers.resetView(tester);

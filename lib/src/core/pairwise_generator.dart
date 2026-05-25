@@ -103,12 +103,11 @@ class PairwiseGenerator {
 
 /// Represents a pair of (parameter, value) tuples.
 class _Pair {
+  const _Pair(this.param1, this.value1, this.param2, this.value2);
   final int param1;
   final int value1;
   final int param2;
   final int value2;
-
-  const _Pair(this.param1, this.value1, this.param2, this.value2);
 
   @override
   bool operator ==(Object other) =>

@@ -45,7 +45,6 @@ MatrixPreview previewMatrixGolden({
   final afterRulesCount = MatrixGenerator.generate(
     scenarios: filteredScenarios,
     axes: effectiveAxes,
-    sampling: MatrixSampling.full,
     rules: effectiveRules,
   ).length;
 

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:golden_matrix/golden_matrix.dart';
 
 import 'package:golden_matrix_example/widgets/sample_button.dart';
@@ -34,11 +33,11 @@ void main() {
         tags: ['core', 'edge'],
       ),
     ],
-    axes: MatrixAxes(
-      themes: const [MatrixTheme.light, MatrixTheme.dark],
-      locales: const [Locale('en'), Locale('ar')],
-      textScales: const [1.0, 2.0],
-      devices: const [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light, MatrixTheme.dark],
+      locales: [Locale('en'), Locale('ar')],
+      textScales: [1.0, 2.0],
+      devices: [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
     ),
     tolerance: 0.01 / 100, // absorb cross-macOS AA noise on CI
     // Spike: emit JUnit XML alongside the default JSON/HTML/MD reports
@@ -91,9 +90,9 @@ void main() {
             const UserAvatar(name: 'Alex Johnson', isOnline: true, size: AvatarSize.large),
       ),
     ],
-    axes: MatrixAxes(
-      themes: const [MatrixTheme.light, MatrixTheme.dark],
-      devices: const [MatrixDevice.iphoneSE, MatrixDevice.galaxyA51],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light, MatrixTheme.dark],
+      devices: [MatrixDevice.iphoneSE, MatrixDevice.galaxyA51],
     ),
     tolerance: 0.01 / 100,
   );
@@ -172,11 +171,11 @@ void main() {
       MatrixScenario('own_profile', builder: () => const SizedBox.shrink()),
       MatrixScenario('other_profile', builder: () => const SizedBox.shrink()),
     ],
-    axes: MatrixAxes(
-      themes: const [MatrixTheme.light, MatrixTheme.dark],
-      locales: const [Locale('en')],
-      textScales: const [1.0, 1.5],
-      devices: const [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge, MatrixDevice.tablet],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light, MatrixTheme.dark],
+      locales: [Locale('en')],
+      textScales: [1.0, 1.5],
+      devices: [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge, MatrixDevice.tablet],
     ),
     sampling: MatrixSampling.priorityBased,
     maxCombinations: 8,
@@ -189,11 +188,11 @@ void main() {
   matrixGolden(
     'SampleButton_WithRules',
     scenarios: [MatrixScenario('default', builder: () => const SampleButton(label: 'Submit'))],
-    axes: MatrixAxes(
-      themes: const [MatrixTheme.light, MatrixTheme.dark],
-      locales: const [Locale('en'), Locale('ar')],
-      directions: const [TextDirection.ltr, TextDirection.rtl],
-      devices: const [MatrixDevice.phoneSmall],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light, MatrixTheme.dark],
+      locales: [Locale('en'), Locale('ar')],
+      directions: [TextDirection.ltr, TextDirection.rtl],
+      devices: [MatrixDevice.phoneSmall],
     ),
     rules: [
       // Don't test RTL with English — only Arabic is RTL
@@ -208,10 +207,10 @@ void main() {
   matrixGolden(
     'TightRow_OverflowDemo',
     scenarios: [MatrixScenario('default', builder: () => const TightRow())],
-    axes: MatrixAxes(
-      themes: const [MatrixTheme.light],
-      textScales: const [1.0, 2.0],
-      devices: const [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light],
+      textScales: [1.0, 2.0],
+      devices: [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
     ),
     // Overflow stripes are AA-heavy and noisy across macOS versions.
     tolerance: 0.02 / 100,
@@ -223,9 +222,9 @@ void main() {
   matrixGolden(
     'SampleButton_WithTolerance',
     scenarios: [MatrixScenario('default', builder: () => const SampleButton(label: 'OK'))],
-    axes: MatrixAxes(
-      themes: const [MatrixTheme.light, MatrixTheme.dark],
-      devices: const [MatrixDevice.phoneSmall],
+    axes: const MatrixAxes(
+      themes: [MatrixTheme.light, MatrixTheme.dark],
+      devices: [MatrixDevice.phoneSmall],
     ),
     tolerance: 0.05 / 100, // 0.05% pixel diff allowed
   );

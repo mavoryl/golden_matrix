@@ -9,11 +9,11 @@ void main() {
     test('reduces 2×2×2×2 to ~5 per scenario', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          locales: const [Locale('en'), Locale('ar')],
-          textScales: const [1.0, 2.0],
-          devices: const [MatrixDevice.phoneSmall, MatrixDevice.tablet],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ar')],
+          textScales: [1.0, 2.0],
+          devices: [MatrixDevice.phoneSmall, MatrixDevice.tablet],
         ),
         sampling: MatrixSampling.smoke,
       );
@@ -40,9 +40,9 @@ void main() {
           MatrixScenario('b', builder: placeholder),
           MatrixScenario('c', builder: placeholder),
         ],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          locales: const [Locale('en'), Locale('ru')],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ru')],
         ),
         sampling: MatrixSampling.smoke,
       );
@@ -55,9 +55,9 @@ void main() {
     test('always includes base combination per scenario', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          locales: const [Locale('en'), Locale('ar')],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ar')],
         ),
         sampling: MatrixSampling.smoke,
       );
@@ -72,10 +72,7 @@ void main() {
     test('includes dark theme delta when available', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          locales: const [Locale('en')],
-        ),
+        axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
         sampling: MatrixSampling.smoke,
       );
 
@@ -88,9 +85,9 @@ void main() {
     test('returns all combinations sorted by priority', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          textScales: const [1.0, 2.0],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          textScales: [1.0, 2.0],
         ),
         sampling: MatrixSampling.priorityBased,
       );
@@ -105,11 +102,11 @@ void main() {
     test('maxCombinations truncates result', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          locales: const [Locale('en'), Locale('ar')],
-          textScales: const [1.0, 2.0],
-          devices: const [MatrixDevice.phoneSmall, MatrixDevice.tablet],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ar')],
+          textScales: [1.0, 2.0],
+          devices: [MatrixDevice.phoneSmall, MatrixDevice.tablet],
         ),
         sampling: MatrixSampling.priorityBased,
         maxCombinations: 5,
@@ -121,10 +118,9 @@ void main() {
     test('dark+largeText gets high priority', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          textScales: const [1.0, 2.0],
-          devices: const [MatrixDevice.phoneSmall],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          textScales: [1.0, 2.0],
         ),
         sampling: MatrixSampling.priorityBased,
       );

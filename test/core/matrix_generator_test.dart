@@ -38,11 +38,11 @@ void main() {
           MatrixScenario('a', builder: placeholder),
           MatrixScenario('b', builder: placeholder),
         ],
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light, MatrixTheme.dark],
-          locales: const [Locale('en'), Locale('ru')],
-          textScales: const [1.0, 2.0],
-          devices: const [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
+        axes: const MatrixAxes(
+          themes: [MatrixTheme.light, MatrixTheme.dark],
+          locales: [Locale('en'), Locale('ru')],
+          textScales: [1.0, 2.0],
+          devices: [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
         ),
       );
 
@@ -52,7 +52,7 @@ void main() {
     test('direction inferred from locale: ar → RTL, en → LTR', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(locales: const [Locale('en'), Locale('ar')]),
+        axes: const MatrixAxes(locales: [Locale('en'), Locale('ar')]),
       );
 
       expect(combinations.length, 2);
@@ -67,10 +67,7 @@ void main() {
     test('explicit directions become a separate axis', () {
       final combinations = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: MatrixAxes(
-          locales: const [Locale('en')],
-          directions: const [TextDirection.ltr, TextDirection.rtl],
-        ),
+        axes: const MatrixAxes(directions: [TextDirection.ltr, TextDirection.rtl]),
       );
 
       // 1 scenario × 1 theme × 1 locale × 1 textScale × 1 device × 2 directions = 2

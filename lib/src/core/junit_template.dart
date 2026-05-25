@@ -10,6 +10,7 @@ import '../models/matrix_result.dart';
 /// `<failure>` child with the captured error message; skipped ones emit
 /// a self-closing `<skipped/>` tag.
 class JunitTemplate {
+  /// Renders [result] as a JUnit XML document string.
   static String render(MatrixResult result) {
     final byScenario = <String, List<MatrixCombinationResult>>{};
     for (final r in result.results) {

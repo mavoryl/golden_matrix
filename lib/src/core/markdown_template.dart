@@ -14,6 +14,7 @@ import 'slug.dart';
 /// - `## Stale goldens` bullet list when non-empty
 /// - Trailing link to the sibling HTML report
 class MarkdownTemplate {
+  /// Renders [result] as a GitHub-Flavored Markdown report.
   static String render(MatrixResult result) {
     final buf = StringBuffer();
     _writeHeader(buf, result);

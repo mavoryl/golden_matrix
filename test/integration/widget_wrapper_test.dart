@@ -34,7 +34,7 @@ void main() {
     testWidgets('applies light theme', (tester) async {
       await tester.pumpWidget(
         MatrixWidgetWrapper(
-          combination: combo(theme: MatrixTheme.light),
+          combination: combo(),
           child: Builder(
             builder: (context) {
               final brightness = Theme.of(context).brightness;

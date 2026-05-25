@@ -10,10 +10,7 @@ void main() {
     test('uses axes directly when no preset', () {
       final result = resolveCombinations(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: const MatrixAxes(
-          themes: [MatrixTheme.light, MatrixTheme.dark],
-          devices: [MatrixDevice.phoneSmall],
-        ),
+        axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
       );
 
       expect(result.length, 2);
@@ -32,7 +29,7 @@ void main() {
     test('explicit axes wins over preset', () {
       final result = resolveCombinations(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: const MatrixAxes(themes: [MatrixTheme.light], devices: [MatrixDevice.tablet]),
+        axes: const MatrixAxes(devices: [MatrixDevice.tablet]),
         preset: MatrixPreset.componentFull,
       );
 

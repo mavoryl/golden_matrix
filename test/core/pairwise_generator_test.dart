@@ -157,7 +157,7 @@ void main() {
     test('single-value axes returns full set', () {
       final result = MatrixGenerator.generate(
         scenarios: [MatrixScenario('test', builder: placeholder)],
-        axes: const MatrixAxes(themes: [MatrixTheme.light], locales: [Locale('en'), Locale('ar')]),
+        axes: const MatrixAxes(locales: [Locale('en'), Locale('ar')]),
         sampling: MatrixSampling.pairwise,
       );
 

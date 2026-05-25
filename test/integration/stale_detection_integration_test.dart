@@ -42,7 +42,7 @@ void main() {
       final file = File('${tempDir.path}/matrixgolden__widget_report.json');
       expect(file.existsSync(), isTrue);
       final json = jsonDecode(file.readAsStringSync()) as Map<String, dynamic>;
-      expect(json['staleGoldens'], isA<List>());
+      expect(json['staleGoldens'], isA<List<dynamic>>());
       expect(json['staleGoldens'], hasLength(2));
       expect(json['staleGoldens'], contains('goldens/widget/old_state/light.png'));
     });
@@ -123,7 +123,6 @@ void main() {
       'SyntheticTest',
       scenarios: [MatrixScenario('default', builder: () => const SizedBox.shrink())],
       axes: const MatrixAxes(),
-      detectStaleGoldens: true,
       // No fileNameBuilder, so detection is enabled.
       printSummary: false,
       reportFormats: const {}, // skip writing files; we only assert pipeline runs

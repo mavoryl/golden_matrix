@@ -166,6 +166,9 @@ List<MatrixCombination> resolveCombinations({
   );
 }
 
+/// Groups [combinations] by their scenario name, preserving order.
+///
+/// Exposed for tests of the runner internals; not part of the public API.
 @visibleForTesting
 Map<String, List<MatrixCombination>> groupByScenario(List<MatrixCombination> combinations) {
   final grouped = <String, List<MatrixCombination>>{};
@@ -445,10 +448,9 @@ String _testDescription(MatrixCombination c) {
 /// (golden lookups would silently miss). We append a placeholder segment
 /// so `dirname` strips it and leaves the original basedir intact.
 class _TolerantComparator extends LocalFileComparator {
-  final double _tolerance;
-
   _TolerantComparator(LocalFileComparator delegate, this._tolerance)
     : super(delegate.basedir.resolve('_golden_matrix_tolerance_anchor.dart'));
+  final double _tolerance;
 
   @override
   Future<bool> compare(Uint8List imageBytes, Uri golden) async {

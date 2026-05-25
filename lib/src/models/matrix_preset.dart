@@ -49,6 +49,13 @@ import 'matrix_theme.dart';
 /// );
 /// ```
 class MatrixPreset {
+  /// Creates a preset bundling [axes], [sampling], and [rules].
+  const MatrixPreset({
+    required this.axes,
+    this.sampling = MatrixSampling.full,
+    this.rules = const [],
+  });
+
   /// The matrix axes (themes, locales, text scales, devices).
   final MatrixAxes axes;
 
@@ -57,12 +64,6 @@ class MatrixPreset {
 
   /// Filtering rules applied after the Cartesian product, before sampling.
   final List<MatrixRule> rules;
-
-  const MatrixPreset({
-    required this.axes,
-    this.sampling = MatrixSampling.full,
-    this.rules = const [],
-  });
 
   /// Quick smoke test for components.
   ///
@@ -74,10 +75,7 @@ class MatrixPreset {
   /// where you only want to verify "does this still render in light and
   /// dark mode?".
   static const componentSmoke = MatrixPreset(
-    axes: MatrixAxes(
-      themes: [MatrixTheme.light, MatrixTheme.dark],
-      devices: [MatrixDevice.phoneSmall],
-    ),
+    axes: MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
     sampling: MatrixSampling.smoke,
   );
 

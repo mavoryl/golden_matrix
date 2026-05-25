@@ -7,13 +7,7 @@ import 'matrix_theme.dart';
 /// Represents a single combination of all axis values.
 /// This is the basic unit of test execution.
 class MatrixCombination {
-  final MatrixScenario scenario;
-  final MatrixTheme theme;
-  final Locale locale;
-  final double textScale;
-  final MatrixDevice device;
-  final TextDirection direction;
-
+  /// Creates a combination with one concrete value per axis.
   const MatrixCombination({
     required this.scenario,
     required this.theme,
@@ -22,6 +16,24 @@ class MatrixCombination {
     required this.device,
     required this.direction,
   });
+
+  /// Scenario this combination renders.
+  final MatrixScenario scenario;
+
+  /// Theme applied to the scenario widget.
+  final MatrixTheme theme;
+
+  /// Locale applied to the wrapping `MaterialApp`.
+  final Locale locale;
+
+  /// Text scale factor applied via `MediaQuery`.
+  final double textScale;
+
+  /// Device profile (size, pixel ratio, safe area) used for rendering.
+  final MatrixDevice device;
+
+  /// Text direction applied to the widget tree.
+  final TextDirection direction;
 
   /// Returns a copy of this combination with selected fields replaced.
   ///

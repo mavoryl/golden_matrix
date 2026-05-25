@@ -1,4 +1,57 @@
-include: package:flutter_lints/flutter.yaml
+include: package:lints/recommended.yaml
 
-# Additional information about this file can be found at
-# https://dart.dev/guides/language/analysis-options
+analyzer:
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+  errors:
+    todo: info
+    public_member_api_docs: warning
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+
+linter:
+  rules:
+    public_member_api_docs: true
+
+    # Const correctness
+    prefer_const_constructors: true
+    prefer_const_constructors_in_immutables: true
+    prefer_const_declarations: true
+    prefer_const_literals_to_create_immutables: true
+
+    # Final locals
+    prefer_final_locals: true
+    prefer_final_in_for_each: true
+
+    # Formatting
+    require_trailing_commas: true
+
+    # Async hygiene
+    cancel_subscriptions: true
+    close_sinks: true
+    unawaited_futures: true
+
+    # Avoid common mistakes
+    avoid_print: true
+    avoid_dynamic_calls: true
+    avoid_redundant_argument_values: true
+    avoid_returning_null_for_void: true
+    avoid_slow_async_io: true
+    avoid_type_to_string: true
+    avoid_unused_constructor_parameters: true
+    avoid_void_async: true
+
+    # Style
+    directives_ordering: true
+    sort_pub_dependencies: true
+    sort_unnamed_constructors_first: true
+    sort_constructors_first: true
+    use_super_parameters: true
+    use_string_buffers: true
+
+    # Disable: we use line-length 100, see CLAUDE.md
+    lines_longer_than_80_chars: false

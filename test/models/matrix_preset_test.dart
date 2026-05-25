@@ -24,11 +24,8 @@ void main() {
     });
 
     test('custom preset preserves values', () {
-      final custom = MatrixPreset(
-        axes: MatrixAxes(
-          themes: const [MatrixTheme.light],
-          locales: const [Locale('en'), Locale('ru'), Locale('ar')],
-        ),
+      const custom = MatrixPreset(
+        axes: MatrixAxes(locales: [Locale('en'), Locale('ru'), Locale('ar')]),
         sampling: MatrixSampling.priorityBased,
       );
 

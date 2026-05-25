@@ -16,14 +16,17 @@ void main() {
         '.SF Pro Text',
         '.SF Pro Display',
       ]) {
-        expect(derivedFontFamily({'family': name, 'fonts': []}), name);
+        expect(derivedFontFamily(<String, dynamic>{'family': name, 'fonts': <dynamic>[]}), name);
       }
     });
 
     test('strips package prefix from family name when it maps to an overridable system font', () {
       // e.g. some pubspecs declare "packages/cupertino_icons/Roboto"
       expect(
-        derivedFontFamily({'family': 'packages/cupertino_icons/Roboto', 'fonts': []}),
+        derivedFontFamily(<String, dynamic>{
+          'family': 'packages/cupertino_icons/Roboto',
+          'fonts': <dynamic>[],
+        }),
         'Roboto',
       );
     });
@@ -31,7 +34,10 @@ void main() {
     test('keeps prefixed family verbatim when last segment is not overridable', () {
       // Non-system font that happens to be packaged
       expect(
-        derivedFontFamily({'family': 'packages/my_pkg/CustomFont', 'fonts': []}),
+        derivedFontFamily(<String, dynamic>{
+          'family': 'packages/my_pkg/CustomFont',
+          'fonts': <dynamic>[],
+        }),
         'packages/my_pkg/CustomFont',
       );
     });

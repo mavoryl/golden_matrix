@@ -5,12 +5,10 @@ import 'matrix_theme.dart';
 
 /// Describes the dimensions of the test matrix.
 class MatrixAxes {
-  final List<MatrixTheme> themes;
-  final List<Locale> locales;
-  final List<double> textScales;
-  final List<MatrixDevice> devices;
-  final List<TextDirection> directions;
-
+  /// Creates a set of axes describing the test matrix.
+  ///
+  /// All fields default to a minimal single-value set that produces
+  /// one combination per scenario when no other axes are specified.
   const MatrixAxes({
     this.themes = const [MatrixTheme.light],
     this.locales = const [Locale('en')],
@@ -18,6 +16,22 @@ class MatrixAxes {
     this.devices = const [MatrixDevice.phoneSmall],
     this.directions = const [],
   });
+
+  /// Themes to render each scenario against.
+  final List<MatrixTheme> themes;
+
+  /// Locales to apply when wrapping each scenario in MaterialApp.
+  final List<Locale> locales;
+
+  /// Text scale factors to test (e.g. 1.0, 1.3, 1.5).
+  final List<double> textScales;
+
+  /// Logical device profiles (size, pixel ratio, safe area) to render in.
+  final List<MatrixDevice> devices;
+
+  /// Explicit text directions. When empty, direction is inferred from
+  /// the locale (RTL languages auto-inferred).
+  final List<TextDirection> directions;
 
   /// Returns a copy of these axes with selected fields replaced.
   ///

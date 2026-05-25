@@ -8,6 +8,18 @@ import 'matrix_combination.dart';
 ///
 /// Returned by `previewMatrixGolden`.
 class MatrixPreview {
+  /// Creates a preview snapshot of what a matrix run would produce.
+  const MatrixPreview({
+    required this.name,
+    required this.rawCount,
+    required this.afterRulesCount,
+    required this.afterSamplingCount,
+    required this.combinations,
+    required this.goldenPaths,
+    required this.duplicatePaths,
+    required this.samplingLabel,
+  });
+
   /// The test name as passed to `previewMatrixGolden`.
   final String name;
 
@@ -35,17 +47,6 @@ class MatrixPreview {
   /// Name of the active sampling strategy ('full', 'smoke', 'pairwise',
   /// 'priorityBased') — used in `toString()`.
   final String samplingLabel;
-
-  const MatrixPreview({
-    required this.name,
-    required this.rawCount,
-    required this.afterRulesCount,
-    required this.afterSamplingCount,
-    required this.combinations,
-    required this.goldenPaths,
-    required this.duplicatePaths,
-    required this.samplingLabel,
-  });
 
   @override
   String toString() {

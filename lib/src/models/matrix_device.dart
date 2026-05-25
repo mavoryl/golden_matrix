@@ -61,11 +61,7 @@ import '../core/slug.dart';
 ///   * `galaxyA51` → [androidMedium]
 ///   * `ipadPortrait` → [tablet]
 class MatrixDevice {
-  final String name;
-  final Size logicalSize;
-  final double pixelRatio;
-  final EdgeInsets safeArea;
-
+  /// Creates a custom device profile.
   const MatrixDevice({
     required this.name,
     required this.logicalSize,
@@ -74,7 +70,21 @@ class MatrixDevice {
   }) : assert(name != '', 'MatrixDevice name must not be empty'),
        assert(pixelRatio > 0, 'MatrixDevice pixelRatio must be > 0');
 
+  /// Human-readable identifier used in file names and reports.
+  final String name;
+
+  /// Logical viewport size in device-independent pixels.
+  final Size logicalSize;
+
+  /// Device pixel ratio (physical pixels per logical pixel).
+  final double pixelRatio;
+
+  /// Safe-area insets applied via MediaQuery padding.
+  final EdgeInsets safeArea;
+
   // iOS devices
+
+  /// Small phone profile, 375×667 @ 2x (iPhone SE-class).
   static const phoneSmall = MatrixDevice(
     name: 'phoneSmall',
     logicalSize: Size(375, 667),
@@ -82,6 +92,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 20),
   );
 
+  /// Medium phone profile, 390×844 @ 3x (iPhone 15-class).
   static const phoneMedium = MatrixDevice(
     name: 'phoneMedium',
     logicalSize: Size(390, 844),
@@ -89,6 +100,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 47, bottom: 34),
   );
 
+  /// Large phone profile, 414×896 @ 3x (iPhone Pro Max-class).
   static const phoneLarge = MatrixDevice(
     name: 'phoneLarge',
     logicalSize: Size(414, 896),
@@ -97,12 +109,15 @@ class MatrixDevice {
   );
 
   // Android devices
+
+  /// Small Android phone profile, 360×800 @ 4x.
   static const androidSmall = MatrixDevice(
     name: 'androidSmall',
     logicalSize: Size(360, 800),
     pixelRatio: 4.0,
   );
 
+  /// Medium Android phone profile, 412×915 @ 2.625x.
   static const androidMedium = MatrixDevice(
     name: 'androidMedium',
     logicalSize: Size(412, 915),
@@ -110,6 +125,8 @@ class MatrixDevice {
   );
 
   // Tablet
+
+  /// Tablet portrait profile, 768×1024 @ 2x.
   static const tablet = MatrixDevice(
     name: 'tablet',
     logicalSize: Size(768, 1024),
@@ -118,14 +135,28 @@ class MatrixDevice {
   );
 
   // Named aliases for real devices
+
+  /// Alias for [phoneSmall] — iPhone SE reference geometry.
   static const iphoneSE = phoneSmall;
+
+  /// Alias for [phoneMedium] — iPhone 15 reference geometry.
   static const iphone15 = phoneMedium;
+
+  /// Alias for [phoneLarge] — iPhone 15 Pro Max reference geometry.
   static const iphone15ProMax = phoneLarge;
+
+  /// Alias for [androidSmall] — Galaxy S20 reference geometry.
   static const galaxyS20 = androidSmall;
+
+  /// Alias for [androidMedium] — Galaxy A51 reference geometry.
   static const galaxyA51 = androidMedium;
+
+  /// Alias for [tablet] — iPad portrait reference geometry.
   static const ipadPortrait = tablet;
 
   // Tablet landscape
+
+  /// Tablet landscape profile, 1024×768 @ 2x.
   static const tabletLandscape = MatrixDevice(
     name: 'tabletLandscape',
     logicalSize: Size(1024, 768),
@@ -134,6 +165,8 @@ class MatrixDevice {
   );
 
   // Modern iPhones
+
+  /// iPhone 15 Pro profile, 393×852 @ 3x.
   static const iphone15Pro = MatrixDevice(
     name: 'iphone15Pro',
     logicalSize: Size(393, 852),
@@ -141,6 +174,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 59, bottom: 34),
   );
 
+  /// iPhone 16 Pro Max profile, 440×956 @ 3x.
   static const iphone16ProMax = MatrixDevice(
     name: 'iphone16ProMax',
     logicalSize: Size(440, 956),
@@ -149,6 +183,8 @@ class MatrixDevice {
   );
 
   // Modern Android phones
+
+  /// Google Pixel 8 profile, 412×915 @ 2.625x.
   static const pixel8 = MatrixDevice(
     name: 'pixel8',
     logicalSize: Size(412, 915),
@@ -156,6 +192,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 24),
   );
 
+  /// Google Pixel 8 Pro profile, 448×998 @ 2.625x.
   static const pixel8Pro = MatrixDevice(
     name: 'pixel8Pro',
     logicalSize: Size(448, 998),
@@ -163,6 +200,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 24),
   );
 
+  /// Samsung Galaxy S24 profile, 384×832 @ 3x.
   static const galaxyS24 = MatrixDevice(
     name: 'galaxyS24',
     logicalSize: Size(384, 832),
@@ -171,6 +209,8 @@ class MatrixDevice {
   );
 
   // Foldables (Galaxy Z Fold 5 reference geometry)
+
+  /// Galaxy Z Fold (folded/cover screen) profile, 374×882 @ 3x.
   static const galaxyZFoldFolded = MatrixDevice(
     name: 'galaxyZFoldFolded',
     logicalSize: Size(374, 882),
@@ -178,6 +218,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 24),
   );
 
+  /// Galaxy Z Fold (unfolded/inner screen) profile, 716×882 @ 2.625x.
   static const galaxyZFoldUnfolded = MatrixDevice(
     name: 'galaxyZFoldUnfolded',
     logicalSize: Size(716, 882),
@@ -186,6 +227,8 @@ class MatrixDevice {
   );
 
   // iPads
+
+  /// iPad mini profile, 744×1133 @ 2x.
   static const ipadMini = MatrixDevice(
     name: 'ipadMini',
     logicalSize: Size(744, 1133),
@@ -193,6 +236,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 20),
   );
 
+  /// iPad Air profile, 820×1180 @ 2x.
   static const ipadAir = MatrixDevice(
     name: 'ipadAir',
     logicalSize: Size(820, 1180),
@@ -200,6 +244,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 20),
   );
 
+  /// iPad Pro 11" portrait profile, 834×1194 @ 2x.
   static const ipadPro11 = MatrixDevice(
     name: 'ipadPro11',
     logicalSize: Size(834, 1194),
@@ -207,6 +252,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 20),
   );
 
+  /// iPad Pro 11" landscape profile, 1194×834 @ 2x.
   static const ipadPro11Landscape = MatrixDevice(
     name: 'ipadPro11Landscape',
     logicalSize: Size(1194, 834),
@@ -214,6 +260,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 20),
   );
 
+  /// iPad Pro 13" portrait profile, 1024×1366 @ 2x.
   static const ipadPro13 = MatrixDevice(
     name: 'ipadPro13',
     logicalSize: Size(1024, 1366),
@@ -221,6 +268,7 @@ class MatrixDevice {
     safeArea: EdgeInsets.only(top: 24, bottom: 20),
   );
 
+  /// iPad Pro 13" landscape profile, 1366×1024 @ 2x.
   static const ipadPro13Landscape = MatrixDevice(
     name: 'ipadPro13Landscape',
     logicalSize: Size(1366, 1024),
@@ -253,6 +301,7 @@ class MatrixDevice {
     );
   }
 
+  /// Slugified [name] suitable for use in file paths.
   String get slug => slugify(name);
 
   @override

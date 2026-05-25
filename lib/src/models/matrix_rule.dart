@@ -46,12 +46,6 @@ enum MatrixRuleType {
 /// );
 /// ```
 class MatrixRule {
-  /// The predicate used to evaluate each [MatrixCombination].
-  final bool Function(MatrixCombination) predicate;
-
-  /// Whether this rule excludes or includes matching combinations.
-  final MatrixRuleType type;
-
   const MatrixRule._(this.predicate, this.type);
 
   /// Creates a rule that excludes combinations matching the [predicate].
@@ -68,4 +62,10 @@ class MatrixRule {
   /// AND.
   factory MatrixRule.includeOnly(bool Function(MatrixCombination) predicate) =>
       MatrixRule._(predicate, MatrixRuleType.includeOnly);
+
+  /// The predicate used to evaluate each [MatrixCombination].
+  final bool Function(MatrixCombination) predicate;
+
+  /// Whether this rule excludes or includes matching combinations.
+  final MatrixRuleType type;
 }

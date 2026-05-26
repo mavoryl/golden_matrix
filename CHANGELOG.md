@@ -1,3 +1,17 @@
+## 0.18.1
+
+- **Stale-golden detection now runs even when reports are disabled.** Previously, setting `reportFormats: const {}` silently disabled stale detection too — projects that opted out of report files lost the regression check entirely. As of 0.18.1, stale paths print directly to the test console in that mode, so you always see scenario-level orphans like `goldens/dialog/old_scenario/*.png` regardless of report configuration.
+
+  ```
+  golden_matrix: screenMatrixGolden: dialog has 2 stale golden file(s):
+    - goldens/dialog/alert/dark_en_ltr_1x_phonesmall.png
+    - goldens/dialog/alert/light_en_ltr_1x_phonesmall.png
+  ```
+
+- **Deprecated `reportOrphanGoldenSubdirs` and `MatrixGoldenRegistry`.** The cross-test, top-level orphan detection from `flutter_test_config.dart` cannot be made reliable under Flutter's default parallel-isolate test execution — the registry is per-isolate, so each `flutter test` process saw only its own slugs and emitted false positives for sibling tests. Per-test stale detection (`detectStaleGoldens`, enabled by default) already catches the common scenario-level case. A post-suite CLI tool for accurate top-level orphan detection is planned for a future release. Existing callers continue to compile; the deprecation is informational only.
+
+- **Fixed double-slash in path output.** `reportOrphanGoldenSubdirs` and the internal stale detector both built paths like `components//goldens/...` when the comparator's `basedir` URI carried a trailing separator. Path joining now collapses the redundant separator.
+
 ## 0.18.0
 
 - **Selective text/icon font loading.** New optional `textFonts` and `iconFonts` parameters on `loadAppFonts()` (both default `true`, fully backward compatible). Enables layout-deterministic golden tests where text uses the Ahem placeholder (predictable geometry across macOS/Linux CI) while icons render with real glyphs.

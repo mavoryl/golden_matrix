@@ -24,11 +24,7 @@ void main() {
                 subtitle: 'Theme, language, account',
               ),
               SizedBox(height: 12),
-              SampleCard(
-                icon: Icons.help_outline,
-                title: 'Help',
-                subtitle: 'FAQ and support',
-              ),
+              SampleCard(icon: Icons.help_outline, title: 'Help', subtitle: 'FAQ and support'),
             ],
           ),
         ),

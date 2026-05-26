@@ -1,3 +1,7 @@
+// Tests for the deprecated orphan-detection API. The deprecation is
+// intentional (see CHANGELOG 0.18.1); these tests still exist to lock
+// behavior until removal in a later release.
+// ignore_for_file: deprecated_member_use_from_same_package
 import 'dart:io';
 
 import 'package:flutter/widgets.dart';

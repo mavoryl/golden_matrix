@@ -65,6 +65,10 @@ void runMatrixTests(
 }) {
   final effectiveFormats = resolveReportFormats(reportFormats: reportFormats, report: report);
   final writeReports = effectiveFormats.isNotEmpty;
+  // Stale detection needs per-combination results too, so we record them
+  // whenever it's enabled even if no reports are being written.
+  final wantStaleDetection = detectStaleGoldens && fileNameBuilder == null;
+  final recordResults = writeReports || wantStaleDetection;
   final combinations = resolveCombinations(
     scenarios: scenarios,
     axes: axes,
@@ -81,10 +85,11 @@ void runMatrixTests(
   final stopwatch = Stopwatch()..start();
 
   group(name, () {
-    // Register this test's subdir slug so cross-test orphan detection
-    // (via reportOrphanGoldenSubdirs, opt-in from flutter_test_config.dart)
-    // doesn't flag this directory as orphaned. We use the same slug
-    // computation as NamingStrategy.goldenPath so disk paths match.
+    // Register this test's subdir slug for the deprecated
+    // reportOrphanGoldenSubdirs path. Kept in 0.18.x so existing
+    // flutter_test_config.dart setups keep working until the proper
+    // replacement ships.
+    // ignore: deprecated_member_use_from_same_package
     MatrixGoldenRegistry.recordTouched(slugify(_stripPrefix(name)));
 
     _setupTolerance(tolerance);
@@ -96,7 +101,7 @@ void runMatrixTests(
               ? fileNameBuilder(combination)
               : NamingStrategy.goldenPath(combination, testName: _stripPrefix(name));
 
-          if (skip && writeReports) {
+          if (skip && recordResults) {
             _recordSkipped(results, combination, goldenPath);
           }
 
@@ -108,7 +113,7 @@ void runMatrixTests(
               combination: combination,
               goldenPath: goldenPath,
               widgetBuilder: widgetBuilder,
-              report: writeReports,
+              report: recordResults,
               results: results,
               setup: setup,
               freezeAnimations: freezeAnimations,
@@ -119,7 +124,7 @@ void runMatrixTests(
       });
     }
 
-    if (writeReports) {
+    if (recordResults) {
       _setupReportWriting(
         name,
         results,
@@ -127,7 +132,7 @@ void runMatrixTests(
         reportDir,
         printSummary,
         formats: effectiveFormats,
-        detectStaleGoldens: detectStaleGoldens && fileNameBuilder == null,
+        detectStaleGoldens: wantStaleDetection,
       );
     }
   });
@@ -351,6 +356,14 @@ void _setupReportWriting(
     if (printSummary) {
       debugPrint(formatSummary(result));
     }
+    // When no reports are written, surface stale goldens to the console so
+    // users who deliberately disable reports still see correctness issues.
+    if (formats.isEmpty && stale.isNotEmpty) {
+      debugPrint('golden_matrix: $name has ${stale.length} stale golden file(s):');
+      for (final path in stale) {
+        debugPrint('  - $path');
+      }
+    }
   });
 }
 
@@ -365,9 +378,9 @@ Future<List<String>> _detectStaleGoldensSafe(
     if (comparator is! LocalFileComparator) return const [];
 
     final basedir = Directory.fromUri(comparator.basedir);
-    final goldensRoot = Directory('${basedir.path}${Platform.pathSeparator}goldens');
+    final goldensRoot = Directory(_joinPath(basedir.path, 'goldens'));
     final testSlug = slugify(_stripPrefix(name));
-    final testSubdir = Directory('${goldensRoot.path}${Platform.pathSeparator}$testSlug');
+    final testSubdir = Directory(_joinPath(goldensRoot.path, testSlug));
 
     final expected = results.map((r) => r.goldenPath).toSet();
     return await findStaleGoldens(
@@ -424,6 +437,16 @@ String formatSummary(MatrixResult result) {
 }
 
 // -- Helpers --
+
+/// Joins two path segments with a single platform separator, regardless of
+/// whether [base] ends in one. `Directory.fromUri(...).path` for a directory
+/// URI commonly contains a trailing separator, which would otherwise produce
+/// `foo//bar`-style paths in user-visible output.
+String _joinPath(String base, String leaf) {
+  final sep = Platform.pathSeparator;
+  final trimmed = base.endsWith(sep) ? base.substring(0, base.length - sep.length) : base;
+  return '$trimmed$sep$leaf';
+}
 
 /// Strips the public API prefix ('matrixGolden: ' or 'screenMatrixGolden: ')
 /// from a test name to get just the user-provided identifier.

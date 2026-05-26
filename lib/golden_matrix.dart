@@ -9,6 +9,7 @@ export 'src/core/ci_detection.dart' show isCiEnvironment;
 export 'src/core/matrix_generator.dart';
 export 'src/core/matrix_report_writer.dart';
 export 'src/core/naming_strategy.dart';
+// ignore: deprecated_member_use_from_same_package
 export 'src/core/orphan_registry.dart' show MatrixGoldenRegistry, reportOrphanGoldenSubdirs;
 export 'src/core/pairwise_generator.dart';
 export 'src/core/report_format.dart' show MatrixReportFormat, defaultReportFormats;

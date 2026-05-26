@@ -74,7 +74,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.18.0
+  golden_matrix: ^0.18.1
 ```
 
 ### 2. Set up font loading
@@ -625,7 +625,7 @@ matrixGolden('wallet/Button', scenarios: [...]);
 matrixGolden('marketing/Button', scenarios: [...]);
 ```
 
-Cross-module `MatrixGoldenRegistry` (orphan detection) is process-local — each `flutter test` invocation per module gets a fresh registry, so `reportOrphanGoldenSubdirs()` in each module's `flutter_test_config.dart` works independently without cross-contamination.
+Per-test stale-golden detection (enabled by default) catches scenario-level orphans — files left over from removed scenarios — automatically inside each module without any extra setup.
 
 ### `isCiEnvironment` helper
 
@@ -641,19 +641,19 @@ matrixGolden(
 
 Detection is best-effort and recognises `CI=true|1` (GitHub Actions, GitLab CI, CircleCI, Travis, Buildkite, Drone, Netlify) plus vendor env-vars: `GITHUB_ACTIONS`, `GITLAB_CI`, `CIRCLECI`, `BUILDKITE`, `TF_BUILD` (Azure Pipelines), `BITBUCKET_COMMIT`, `CM_BUILD_ID` (Codemagic), `JENKINS_URL`, `TEAMCITY_VERSION`, `bamboo_planKey`. Force-enable on any other CI by setting `CI=true` in your pipeline.
 
-### Cross-test orphan-subdir detection
+### Stale-golden detection
 
-Add one line to `flutter_test_config.dart` to fail the build when entire `matrixGolden` subdirs become orphaned (after a test was renamed or deleted):
+Per-test stale-golden detection runs automatically and catches files in a test's subdir that weren't produced by any combination — for example, a scenario was renamed and the old PNGs were left behind. When reports are enabled (default), stale paths appear in the JSON/HTML/Markdown/JUnit output. When you've disabled reports with `reportFormats: const {}`, stale files are printed to the console:
 
-```dart
-Future<void> testExecutable(FutureOr<void> Function() testMain) async {
-  await loadAppFonts();
-  await testMain();
-  await reportOrphanGoldenSubdirs(fail: isCiEnvironment);
-}
+```
+golden_matrix: screenMatrixGolden: dialog has 2 stale golden file(s):
+  - goldens/dialog/old_scenario/dark_en_ltr_1x_phonesmall.png
+  - goldens/dialog/old_scenario/light_en_ltr_1x_phonesmall.png
 ```
 
-This complements per-test stale detection (which only sees orphans *inside* an active test's subdir).
+Opt out per test with `detectStaleGoldens: false` if you have an intentional reason for extra files in the subdir.
+
+> `reportOrphanGoldenSubdirs` (whole-test-subdir orphan detection from `flutter_test_config.dart`) was deprecated in 0.18.1 — it cannot work reliably under Flutter's default parallel-isolate test execution. A post-suite CLI tool is planned for a future release.
 
 ## Requirements
 

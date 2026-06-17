@@ -1,0 +1,72 @@
+{
+  "name": "componentMatrixGolden: SampleButton",
+  "timestamp": "2026-06-17T22:18:32.754730",
+  "durationMs": 479,
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "skipped": 0,
+  "warnings": 0,
+  "results": [
+    {
+      "scenario": "default",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/samplebutton/default/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "default",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_1x.png"
+    },
+    {
+      "scenario": "disabled",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "disabled",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_1x.png"
+    },
+    {
+      "scenario": "loading",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/samplebutton/loading/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "loading",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/samplebutton/loading/dark_en_ltr_1x.png"
+    }
+  ]
+}

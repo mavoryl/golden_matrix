@@ -341,17 +341,18 @@ void _setupReportWriting(
       duration: stopwatch.elapsed,
       staleGoldens: stale,
     );
+    final dir = reportDir ?? _resolveDefaultReportDir();
     if (formats.contains(MatrixReportFormat.json)) {
-      await MatrixReportWriter.write(result, outputDir: reportDir);
+      await MatrixReportWriter.write(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.html)) {
-      await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
+      await MatrixReportWriter.writeHtml(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.markdown)) {
-      await MatrixReportWriter.writeMarkdown(result, outputDir: reportDir);
+      await MatrixReportWriter.writeMarkdown(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.junit)) {
-      await MatrixReportWriter.writeJunit(result, outputDir: reportDir);
+      await MatrixReportWriter.writeJunit(result, outputDir: dir);
     }
     if (printSummary) {
       debugPrint(formatSummary(result));
@@ -365,6 +366,21 @@ void _setupReportWriting(
       }
     }
   });
+}
+
+/// Resolves the default report directory when [reportDir] is omitted.
+///
+/// Derives the goldens root from the active golden comparator's `basedir`
+/// (`<test-file-dir>/goldens`) — the authoritative location next to the
+/// golden PNGs, regardless of what the test file's directory is named. This
+/// replaces the old prefix-guessing heuristic, which only knew `test/`,
+/// `test/golden/`, and `test/goldens/` and dumped reports into a stray
+/// top-level `goldens/` for any other layout. Returns null for non-local
+/// comparators so the writer falls back to its own heuristic.
+String? _resolveDefaultReportDir() {
+  final comparator = goldenFileComparator;
+  if (comparator is! LocalFileComparator) return null;
+  return _joinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
 }
 
 /// Detects stale goldens for this test's subdirectory, swallowing IO

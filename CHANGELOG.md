@@ -1,3 +1,16 @@
+## 0.19.1
+
+- **Reports now land next to their golden PNGs for any test directory layout.**
+  When `reportDir` is omitted, the report directory is derived from the active
+  golden comparator's `basedir` (`<test-file-dir>/goldens`) instead of guessing
+  from a fixed list of prefixes (`test/`, `test/golden/`, `test/goldens/`).
+  Previously, tests living in any other directory — e.g. `test/golden_component/`
+  or `test/widget/screens/` — had their `*_report.{json,html,md,xml}` written to
+  a stray top-level `goldens/` relative to the working directory, away from the
+  PNGs they describe (so the HTML report's image links resolved to nothing).
+  Tests under the conventional `test/golden/` layout are unaffected — the
+  resolved path is identical, just absolute instead of relative.
+
 ## 0.19.0
 
 - **`componentMatrixGolden` — new API for small widgets at their intrinsic size.** Sister function to `matrixGolden`/`screenMatrixGolden` for component-level testing (buttons, badges, chips, list tiles). Instead of rendering inside a full `Scaffold` and capturing the whole 375×667 viewport with the widget centered in 95% whitespace, the function keeps the `MaterialApp` context (so theme/fonts/icons/locale all work) but anchors the widget via `Align(widthFactor: 1, heightFactor: 1)` and places the `RepaintBoundary` directly around it. The resulting PNG is exactly widget-sized plus optional padding.

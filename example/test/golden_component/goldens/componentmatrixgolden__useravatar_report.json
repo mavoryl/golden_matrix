@@ -1,0 +1,72 @@
+{
+  "name": "componentMatrixGolden: UserAvatar",
+  "timestamp": "2026-06-17T22:18:32.825512",
+  "durationMs": 549,
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "skipped": 0,
+  "warnings": 0,
+  "results": [
+    {
+      "scenario": "small_offline",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "small_offline",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x.png"
+    },
+    {
+      "scenario": "medium_online",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "medium_online",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x.png"
+    },
+    {
+      "scenario": "large_online",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "large_online",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x.png"
+    }
+  ]
+}

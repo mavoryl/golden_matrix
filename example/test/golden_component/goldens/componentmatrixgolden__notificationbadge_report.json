@@ -1,0 +1,72 @@
+{
+  "name": "componentMatrixGolden: NotificationBadge",
+  "timestamp": "2026-06-17T22:18:32.647587",
+  "durationMs": 376,
+  "total": 6,
+  "passed": 6,
+  "failed": 0,
+  "skipped": 0,
+  "warnings": 0,
+  "results": [
+    {
+      "scenario": "info",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "info",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_1x.png"
+    },
+    {
+      "scenario": "warning",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "warning",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_1x.png"
+    },
+    {
+      "scenario": "error",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_1x.png"
+    },
+    {
+      "scenario": "error",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_1x.png"
+    }
+  ]
+}

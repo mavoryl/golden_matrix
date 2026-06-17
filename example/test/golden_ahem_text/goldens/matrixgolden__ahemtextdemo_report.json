@@ -1,0 +1,32 @@
+{
+  "name": "matrixGolden: AhemTextDemo",
+  "timestamp": "2026-06-17T22:18:32.656630",
+  "durationMs": 390,
+  "total": 2,
+  "passed": 2,
+  "failed": 0,
+  "skipped": 0,
+  "warnings": 0,
+  "results": [
+    {
+      "scenario": "card_with_icons",
+      "theme": "light",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/ahemtextdemo/card_with_icons/light_en_ltr_1x_phonesmall.png"
+    },
+    {
+      "scenario": "card_with_icons",
+      "theme": "dark",
+      "locale": "en",
+      "textScale": 1.0,
+      "device": "phoneSmall",
+      "direction": "ltr",
+      "status": "passed",
+      "goldenPath": "goldens/ahemtextdemo/card_with_icons/dark_en_ltr_1x_phonesmall.png"
+    }
+  ]
+}

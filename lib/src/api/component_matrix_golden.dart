@@ -405,17 +405,18 @@ void _setupComponentTearDown(
       duration: stopwatch.elapsed,
       staleGoldens: stale,
     );
+    final dir = reportDir ?? _resolveComponentDefaultReportDir();
     if (formats.contains(MatrixReportFormat.json)) {
-      await MatrixReportWriter.write(result, outputDir: reportDir);
+      await MatrixReportWriter.write(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.html)) {
-      await MatrixReportWriter.writeHtml(result, outputDir: reportDir);
+      await MatrixReportWriter.writeHtml(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.markdown)) {
-      await MatrixReportWriter.writeMarkdown(result, outputDir: reportDir);
+      await MatrixReportWriter.writeMarkdown(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.junit)) {
-      await MatrixReportWriter.writeJunit(result, outputDir: reportDir);
+      await MatrixReportWriter.writeJunit(result, outputDir: dir);
     }
     if (printSummary) {
       debugPrint(formatSummary(result));
@@ -427,6 +428,17 @@ void _setupComponentTearDown(
       }
     }
   });
+}
+
+/// Resolves the default report directory when `reportDir` is omitted.
+///
+/// Like the screen/component runner, derives `<test-file-dir>/goldens` from
+/// the active comparator's `basedir` so reports land next to the golden PNGs
+/// for any test layout. Returns null for non-local comparators.
+String? _resolveComponentDefaultReportDir() {
+  final comparator = goldenFileComparator;
+  if (comparator is! LocalFileComparator) return null;
+  return _componentJoinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
 }
 
 Future<List<String>> _detectComponentStaleGoldensSafe(

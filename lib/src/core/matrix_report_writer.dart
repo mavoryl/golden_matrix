@@ -55,11 +55,13 @@ class MatrixReportWriter {
     await file.writeAsString(xml);
   }
 
-  /// Finds the actual goldens directory by scanning for existing golden files.
+  /// Fallback resolver for the goldens directory when no [outputDir] is given.
   ///
-  /// Golden files are written by flutter test relative to the test file,
-  /// but ReportWriter runs from the package root. This method searches
-  /// for the first golden file on disk to determine the correct path.
+  /// The API layer normally passes an explicit `outputDir` derived from the
+  /// golden comparator's `basedir` (the authoritative location next to the
+  /// golden PNGs). This heuristic only runs when that resolution is
+  /// unavailable — e.g. a non-`LocalFileComparator` — and guesses the path by
+  /// probing a few common test-directory prefixes for the first golden file.
   static String _findGoldensDir(MatrixResult result) {
     if (result.results.isEmpty) return 'goldens';
 

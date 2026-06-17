@@ -30,6 +30,11 @@ migrate_working_dir/
 /build/
 /coverage/
 **/build/
+**/coverage/
+# Stray report dir: tests in non-standard subdirs (test/golden_component, etc.)
+# get reports here because _findGoldensDir only knows test/golden/. See docs
+# fluttergems audit "Better stale detection with custom paths". Fix planned.
+/example/goldens/
 
 # Claude Code
 .claude/

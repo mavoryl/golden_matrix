@@ -13,7 +13,7 @@ void main() {
   // between dev machines and CI macOS runners. Without it, 1-pixel diffs
   // would fail the regression check on a fresh CI image even though the
   // widget renders identically by eye.
-  const _kDemoTolerance = 0.005;
+  const kDemoTolerance = 0.005;
 
   componentMatrixGolden(
     'NotificationBadge',
@@ -23,7 +23,7 @@ void main() {
       MatrixScenario('error', builder: _badgeError),
     ],
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
-    tolerance: _kDemoTolerance,
+    tolerance: kDemoTolerance,
   );
 
   componentMatrixGolden(
@@ -35,7 +35,7 @@ void main() {
     ],
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
     freezeAnimations: true, // loading uses CircularProgressIndicator
-    tolerance: _kDemoTolerance,
+    tolerance: kDemoTolerance,
   );
 
   componentMatrixGolden(
@@ -46,7 +46,7 @@ void main() {
       MatrixScenario('large_online', builder: _avatarLargeOnline),
     ],
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
-    tolerance: _kDemoTolerance,
+    tolerance: kDemoTolerance,
   );
 }
 

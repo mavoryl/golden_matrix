@@ -9,7 +9,7 @@ import '../_helpers/no_op_comparator.dart';
 /// Each `matrixGolden(...)` call below writes its reports into a fresh
 /// temp directory via `reportDir:`, then a follow-up `test(...)` asserts
 /// which files actually exist there. Together they exercise the
-/// `reportFormats` dispatch + the `report:` legacy alias.
+/// `reportFormats` dispatch (including the empty set and junit opt-in).
 void main() {
   GoldenFileComparator? saved;
 
@@ -28,22 +28,10 @@ void main() {
   final mdOnlyDir = Directory.systemTemp.createTempSync('rf_md_');
   final jsonHtmlDir = Directory.systemTemp.createTempSync('rf_jsonhtml_');
   final emptyDir = Directory.systemTemp.createTempSync('rf_empty_');
-  final legacyTrueDir = Directory.systemTemp.createTempSync('rf_legacy_true_');
-  final legacyFalseDir = Directory.systemTemp.createTempSync('rf_legacy_false_');
-  final reportWinsDir = Directory.systemTemp.createTempSync('rf_report_wins_');
   final junitOnlyDir = Directory.systemTemp.createTempSync('rf_junit_');
 
   tearDownAll(() {
-    for (final d in [
-      defaultDir,
-      mdOnlyDir,
-      jsonHtmlDir,
-      emptyDir,
-      legacyTrueDir,
-      legacyFalseDir,
-      reportWinsDir,
-      junitOnlyDir,
-    ]) {
+    for (final d in [defaultDir, mdOnlyDir, jsonHtmlDir, emptyDir, junitOnlyDir]) {
       if (d.existsSync()) d.deleteSync(recursive: true);
     }
   });
@@ -115,57 +103,7 @@ void main() {
     expect(fileExists(emptyDir, 'matrixgolden__rf_empty_report.md'), isFalse);
   });
 
-  // 5. Legacy report: true — all three (compat with pre-0.16.0).
-  matrixGolden(
-    'rf_legacy_true',
-    scenarios: [scenario()],
-    axes: const MatrixAxes(),
-    reportDir: legacyTrueDir.path,
-    // ignore: deprecated_member_use_from_same_package
-    report: true,
-    detectStaleGoldens: false,
-    printSummary: false,
-  );
-  test('legacy report:true writes all three (compat)', () {
-    expect(fileExists(legacyTrueDir, 'matrixgolden__rf_legacy_true_report.json'), isTrue);
-    expect(fileExists(legacyTrueDir, 'matrixgolden__rf_legacy_true_report.html'), isTrue);
-    expect(fileExists(legacyTrueDir, 'matrixgolden__rf_legacy_true_report.md'), isTrue);
-  });
-
-  // 6. Legacy report: false — nothing (compat).
-  matrixGolden(
-    'rf_legacy_false',
-    scenarios: [scenario()],
-    axes: const MatrixAxes(),
-    reportDir: legacyFalseDir.path,
-    // ignore: deprecated_member_use_from_same_package
-    report: false,
-    detectStaleGoldens: false,
-    printSummary: false,
-  );
-  test('legacy report:false writes no files (compat)', () {
-    expect(fileExists(legacyFalseDir, 'matrixgolden__rf_legacy_false_report.json'), isFalse);
-    expect(fileExists(legacyFalseDir, 'matrixgolden__rf_legacy_false_report.html'), isFalse);
-    expect(fileExists(legacyFalseDir, 'matrixgolden__rf_legacy_false_report.md'), isFalse);
-  });
-
-  // 7. Compat rule — report:false overrides reportFormats:{markdown}.
-  matrixGolden(
-    'rf_report_wins',
-    scenarios: [scenario()],
-    axes: const MatrixAxes(),
-    reportDir: reportWinsDir.path,
-    reportFormats: const {MatrixReportFormat.markdown},
-    // ignore: deprecated_member_use_from_same_package
-    report: false,
-    detectStaleGoldens: false,
-    printSummary: false,
-  );
-  test('legacy report:false overrides reportFormats (compat rule)', () {
-    expect(fileExists(reportWinsDir, 'matrixgolden__rf_report_wins_report.md'), isFalse);
-  });
-
-  // 8. {junit} — only .xml is written; .json/.html/.md absent.
+  // 5. {junit} — only .xml is written; .json/.html/.md absent.
   matrixGolden(
     'rf_junit',
     scenarios: [scenario()],
@@ -182,7 +120,7 @@ void main() {
     expect(fileExists(junitOnlyDir, 'matrixgolden__rf_junit_report.md'), isFalse);
   });
 
-  // 9. default reportFormats does NOT include junit (opt-in).
+  // 6. default reportFormats does NOT include junit (opt-in).
   test('default reportFormats omits junit', () {
     expect(fileExists(defaultDir, 'matrixgolden__rf_default_report.xml'), isFalse);
   });

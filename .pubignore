@@ -3,6 +3,7 @@ article_medium.md
 docs/
 internal_docs/
 requirements.txt
+assets/
 .claude/
 build/
 example/build/

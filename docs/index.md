@@ -1,5 +1,7 @@
 # golden_matrix
 
+![golden_matrix](assets/banner.svg){ width="100%" }
+
 [![pub package](https://img.shields.io/pub/v/golden_matrix.svg)](https://pub.dev/packages/golden_matrix)
 [![test](https://github.com/mavoryl/golden_matrix/actions/workflows/test.yml/badge.svg?branch=main)](https://github.com/mavoryl/golden_matrix/actions/workflows/test.yml)
 [![codecov](https://codecov.io/gh/mavoryl/golden_matrix/branch/main/graph/badge.svg)](https://codecov.io/gh/mavoryl/golden_matrix)
@@ -51,7 +53,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.19.2
+  golden_matrix: ^1.0.0
 ```
 
 ### 2. Set up font loading

@@ -7,7 +7,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/src/core/matrix_generator.dart';
 import 'package:golden_matrix/src/core/matrix_report_writer.dart';
 import 'package:golden_matrix/src/core/naming_strategy.dart';
-import 'package:golden_matrix/src/core/orphan_registry.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/core/stale_detector.dart';
@@ -49,11 +48,6 @@ void runMatrixTests(
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   Set<MatrixReportFormat> reportFormats = defaultReportFormats,
-  @Deprecated(
-    'Use reportFormats instead. report:true → all formats, report:false → empty set. '
-    'When both are passed, report: wins for backwards compatibility.',
-  )
-  bool? report,
   String? reportDir,
   bool skip = false,
   double? tolerance,
@@ -63,7 +57,7 @@ void runMatrixTests(
   Duration? captureAfter,
   bool detectStaleGoldens = true,
 }) {
-  final effectiveFormats = resolveReportFormats(reportFormats: reportFormats, report: report);
+  final effectiveFormats = reportFormats;
   final writeReports = effectiveFormats.isNotEmpty;
   // Stale detection needs per-combination results too, so we record them
   // whenever it's enabled even if no reports are being written.
@@ -85,13 +79,6 @@ void runMatrixTests(
   final stopwatch = Stopwatch()..start();
 
   group(name, () {
-    // Register this test's subdir slug for the deprecated
-    // reportOrphanGoldenSubdirs path. Kept in 0.18.x so existing
-    // flutter_test_config.dart setups keep working until the proper
-    // replacement ships.
-    // ignore: deprecated_member_use_from_same_package
-    MatrixGoldenRegistry.recordTouched(slugify(_stripPrefix(name)));
-
     _setupTolerance(tolerance);
 
     for (final entry in byScenario.entries) {

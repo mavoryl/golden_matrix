@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/mavoryl/golden_matrix/main/assets/banner.png" alt="golden_matrix" width="100%">
+</p>
+
 # golden_matrix
 
 [![pub package](https://img.shields.io/pub/v/golden_matrix.svg)](https://pub.dev/packages/golden_matrix)
@@ -18,7 +22,7 @@ HTML + JUnit reports for CI.
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.19.2
+  golden_matrix: ^1.0.0
 ```
 
 ```dart

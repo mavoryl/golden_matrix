@@ -15,6 +15,15 @@ Moving an existing golden-test setup to `golden_matrix` — what maps to what, a
 
 It does not replace `flutter_test` or Flutter's own golden machinery; it sits on top of them and drives the combinations.
 
+## Upgrading to 1.0.0
+
+1.0.0 removes the APIs deprecated during 0.x:
+
+- **`report: bool`** on `matrixGolden` / `screenMatrixGolden` → use `reportFormats`:
+    - `report: true` → drop it (the default writes JSON + HTML + Markdown), or pass `reportFormats: defaultReportFormats`.
+    - `report: false` → `reportFormats: const {}`.
+- **`reportOrphanGoldenSubdirs` / `MatrixGoldenRegistry`** → removed. Per-test stale detection (`detectStaleGoldens`, on by default) already catches scenario-level orphans — see [Reports](reports.md).
+
 ## From golden_toolkit
 
 `golden_toolkit` is the most common existing dependency. The concepts map directly:

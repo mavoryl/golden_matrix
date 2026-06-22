@@ -115,11 +115,6 @@ void screenMatrixGolden(
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   Set<MatrixReportFormat> reportFormats = defaultReportFormats,
-  @Deprecated(
-    'Use reportFormats instead. report:true → all formats, report:false → empty set. '
-    'When both are passed, report: wins for backwards compatibility.',
-  )
-  bool? report,
   String? reportDir,
   bool skip = false,
   double? tolerance,
@@ -143,8 +138,6 @@ void screenMatrixGolden(
     scenarioTags: scenarioTags,
     fileNameBuilder: fileNameBuilder,
     reportFormats: reportFormats,
-    // ignore: deprecated_member_use_from_same_package
-    report: report,
     reportDir: reportDir,
     skip: skip,
     tolerance: tolerance,

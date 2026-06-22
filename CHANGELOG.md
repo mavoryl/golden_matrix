@@ -1,3 +1,26 @@
+## 1.0.0
+
+First stable release. Visual identity, a documentation site, and removal of the
+APIs deprecated during 0.x.
+
+### BREAKING
+
+- **Removed the deprecated `report: bool` parameter** from `matrixGolden` and
+  `screenMatrixGolden` (deprecated since 0.16.0). Use `reportFormats` instead:
+  - `report: true` → drop it (the default already writes JSON + HTML + Markdown),
+    or pass an explicit set like `reportFormats: defaultReportFormats`.
+  - `report: false` → `reportFormats: const {}`.
+- **Removed `reportOrphanGoldenSubdirs` and `MatrixGoldenRegistry`** (deprecated
+  since 0.18.1). Top-level orphan detection was unreliable under Flutter's
+  default parallel-isolate test execution. Per-test stale detection
+  (`detectStaleGoldens`, enabled by default) already catches scenario-level
+  orphans; a post-suite CLI tool for accurate top-level detection is planned.
+
+### Added
+
+- **Brand identity** — README hero banner plus a package logo / favicon
+  ("golden snapshot grid": a 3×3 grid of widget variants, gold on the diagonal).
+
 ## 0.19.2
 
 - **Documentation site + leaner README.** Full documentation now lives at a

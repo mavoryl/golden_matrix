@@ -2,6 +2,7 @@ golden_matrix_plan.md
 article_medium.md
 docs/
 internal_docs/
+requirements.txt
 .claude/
 build/
 example/build/

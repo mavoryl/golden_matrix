@@ -1,0 +1,4 @@
+# Documentation site build dependencies (MkDocs Material).
+# Pinned to major 9 so a breaking theme release can't silently brick the
+# docs build. Consumed by .github/workflows/docs.yml.
+mkdocs-material>=9.5,<10

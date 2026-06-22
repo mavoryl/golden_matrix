@@ -6,6 +6,7 @@ on:
     paths:
       - 'docs/**'
       - 'mkdocs.yml'
+      - 'requirements.txt'
       - '.github/workflows/docs.yml'
   workflow_dispatch:
 
@@ -23,5 +24,6 @@ jobs:
         with:
           python-version: '3.11'
           cache: pip
-      - run: pip install mkdocs-material
+          cache-dependency-path: requirements.txt
+      - run: pip install -r requirements.txt
       - run: mkdocs gh-deploy --force

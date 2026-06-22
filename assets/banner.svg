@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1600 400" font-family="'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace">
+  <defs>
+    <linearGradient id="gold1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F4D77A"/>
+      <stop offset="0.45" stop-color="#D4AF37"/>
+      <stop offset="0.55" stop-color="#C8941F"/>
+      <stop offset="1" stop-color="#9C7414"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="400" fill="#0D1B2A"/>
+  <!-- wordmark -->
+  <text x="110" y="195" fill="#F5F1E8" font-size="72" font-weight="700" letter-spacing="-1">golden_matrix</text>
+  <text x="112" y="245" fill="#D4AF37" font-size="26" font-weight="400" letter-spacing="1">Matrix-based golden testing for Flutter</text>
+  <!-- 3x3 button grid -->
+  <g>
+    <!-- row1 -->
+    <g transform="translate(980,108)"><rect width="160" height="50" rx="25" fill="url(#gold1)"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#0D1B2A" opacity="0.55"/></g>
+    <g transform="translate(1160,108)"><rect width="160" height="50" rx="25" fill="#27384A"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#5C7186"/></g>
+    <g transform="translate(1340,108)"><rect width="160" height="50" rx="25" fill="#27384A"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#5C7186"/></g>
+    <!-- row2 -->
+    <g transform="translate(980,184)"><rect width="160" height="50" rx="25" fill="#27384A"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#5C7186"/></g>
+    <g transform="translate(1160,184)"><rect width="160" height="50" rx="25" fill="url(#gold1)"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#0D1B2A" opacity="0.55"/></g>
+    <g transform="translate(1340,184)"><rect width="160" height="50" rx="25" fill="#27384A"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#5C7186"/></g>
+    <!-- row3 -->
+    <g transform="translate(980,260)"><rect width="160" height="50" rx="25" fill="#27384A"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#5C7186"/></g>
+    <g transform="translate(1160,260)"><rect width="160" height="50" rx="25" fill="#27384A"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#5C7186"/></g>
+    <g transform="translate(1340,260)"><rect width="160" height="50" rx="25" fill="url(#gold1)"/><rect x="28" y="22" width="104" height="6" rx="3" fill="#0D1B2A" opacity="0.55"/></g>
+  </g>
+</svg>

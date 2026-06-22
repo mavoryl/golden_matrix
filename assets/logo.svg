@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" font-family="'JetBrains Mono','IBM Plex Mono',ui-monospace,monospace">
+  <defs>
+    <linearGradient id="goldL" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#F4D77A"/>
+      <stop offset="0.45" stop-color="#D4AF37"/>
+      <stop offset="0.55" stop-color="#C8941F"/>
+      <stop offset="1" stop-color="#9C7414"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="96" fill="#0D1B2A"/>
+  <!-- 3x3 tile grid, gold on the diagonal -->
+  <!-- tile 116, gap 28, total 3*116+2*28=404; start (512-404)/2=54 -->
+  <rect x="54"  y="54"  width="116" height="116" rx="26" fill="url(#goldL)"/>
+  <rect x="198" y="54"  width="116" height="116" rx="26" fill="#27384A"/>
+  <rect x="342" y="54"  width="116" height="116" rx="26" fill="#27384A"/>
+  <rect x="54"  y="198" width="116" height="116" rx="26" fill="#27384A"/>
+  <rect x="198" y="198" width="116" height="116" rx="26" fill="url(#goldL)"/>
+  <rect x="342" y="198" width="116" height="116" rx="26" fill="#27384A"/>
+  <rect x="54"  y="342" width="116" height="116" rx="26" fill="#27384A"/>
+  <rect x="198" y="342" width="116" height="116" rx="26" fill="#27384A"/>
+  <rect x="342" y="342" width="116" height="116" rx="26" fill="url(#goldL)"/>
+</svg>

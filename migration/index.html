@@ -20,7 +20,7 @@
         
       
       
-      <link rel="icon" href="../assets/images/favicon.png">
+      <link rel="icon" href="../assets/logo.svg">
       <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
     
     
@@ -92,8 +92,7 @@
   <nav class="md-header__inner md-grid" aria-label="Header">
     <a href=".." title="golden_matrix" class="md-header__button md-logo" aria-label="golden_matrix" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="../assets/logo.svg" alt="logo">
 
     </a>
     <label class="md-header__button md-icon" for="__drawer">
@@ -381,8 +380,7 @@
   <label class="md-nav__title" for="__drawer">
     <a href=".." title="golden_matrix" class="md-nav__button md-logo" aria-label="golden_matrix" data-md-component="logo">
       
-  
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+  <img src="../assets/logo.svg" alt="logo">
 
     </a>
     golden_matrix
@@ -642,6 +640,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#upgrading-to-100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upgrading to 1.0.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#from-golden_toolkit" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -731,6 +740,17 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#upgrading-to-100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Upgrading to 1.0.0
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#from-golden_toolkit" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -812,6 +832,16 @@
 <li>Zero external dependencies — only the Flutter SDK.</li>
 </ul>
 <p>It does not replace <code>flutter_test</code> or Flutter's own golden machinery; it sits on top of them and drives the combinations.</p>
+<h2 id="upgrading-to-100">Upgrading to 1.0.0<a class="headerlink" href="#upgrading-to-100" title="Permanent link">&para;</a></h2>
+<p>1.0.0 removes the APIs deprecated during 0.x:</p>
+<ul>
+<li><strong><code>report: bool</code></strong> on <code>matrixGolden</code> / <code>screenMatrixGolden</code> → use <code>reportFormats</code>:<ul>
+<li><code>report: true</code> → drop it (the default writes JSON + HTML + Markdown), or pass <code>reportFormats: defaultReportFormats</code>.</li>
+<li><code>report: false</code> → <code>reportFormats: const {}</code>.</li>
+</ul>
+</li>
+<li><strong><code>reportOrphanGoldenSubdirs</code> / <code>MatrixGoldenRegistry</code></strong> → removed. Per-test stale detection (<code>detectStaleGoldens</code>, on by default) already catches scenario-level orphans — see <a href="../reports/">Reports</a>.</li>
+</ul>
 <h2 id="from-golden_toolkit">From golden_toolkit<a class="headerlink" href="#from-golden_toolkit" title="Permanent link">&para;</a></h2>
 <p><code>golden_toolkit</code> is the most common existing dependency. The concepts map directly:</p>
 <table>

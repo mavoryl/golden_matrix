@@ -1,3 +1,12 @@
+## 0.19.2
+
+- **Documentation site + leaner README.** Full documentation now lives at a
+  dedicated MkDocs Material site (Home, Sampling, Devices, Reports, CI
+  integration, Advanced, Migration guide). The pub.dev/GitHub README is now a
+  concise landing card that links out to the site. No API changes.
+- **Repository moved to the `mavoryl` organization.** Homepage, repository,
+  and issue-tracker links now point to `github.com/mavoryl/golden_matrix`.
+
 ## 0.19.1
 
 - **Reports now land next to their golden PNGs for any test directory layout.**

@@ -18,7 +18,7 @@ HTML + JUnit reports for CI.
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^0.19.1
+  golden_matrix: ^0.19.2
 ```
 
 ```dart

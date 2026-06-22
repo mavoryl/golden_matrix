@@ -1,0 +1,71 @@
+site_name: golden_matrix
+site_description: Matrix-based golden testing for Flutter
+site_url: https://mavoryl.github.io/golden_matrix/
+repo_url: https://github.com/mavoryl/golden_matrix
+repo_name: mavoryl/golden_matrix
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: indigo
+      accent: indigo
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - content.code.copy
+    - content.code.annotate
+    - content.action.edit
+  icon:
+    repo: fontawesome/brands/github
+
+nav:
+  - Home: index.md
+  - Sampling: sampling.md
+  - Devices: devices.md
+  - Reports: reports.md
+  - CI integration: ci.md
+  - Advanced: advanced.md
+  - Migration guide: migration.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - md_in_html
+  - tables
+  - pymdownx.details
+  - pymdownx.superfences
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.snippets
+  - pymdownx.tabbed:
+      alternate_style: true
+  - toc:
+      permalink: true
+
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/mavoryl/golden_matrix
+    - icon: fontawesome/brands/dart-lang
+      link: https://pub.dev/packages/golden_matrix

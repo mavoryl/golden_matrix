@@ -42,5 +42,6 @@ migrate_working_dir/
 # Internal docs
 /CLAUDE.md
 **/failures/
-docs/
+# Internal planning docs — not part of the published MkDocs site (docs/).
+/internal_docs/
 example/pubspec.lock

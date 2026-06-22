@@ -15,7 +15,6 @@ jobs:
       fail-fast: false
       matrix:
         flutter:
-          - '3.7.12'   # Dart 2.19
           - '3.10.6'   # Dart 3.0
           - '3.13.9'   # Dart 3.1
           - '3.16.9'   # Dart 3.2
@@ -34,7 +33,7 @@ jobs:
         run: |
           # Only the 2-space-indented environment `sdk:`/`lints:` keys match;
           # the 4-space `    sdk: flutter` deps and `  flutter:` key are untouched.
-          sed -i -E 's/^  sdk:.*/  sdk: ">=2.17.0 <4.0.0"/' pubspec.yaml
+          sed -i -E 's/^  sdk:.*/  sdk: ">=3.0.0 <4.0.0"/' pubspec.yaml
           sed -i -E 's/^  lints:.*/  lints: any/' pubspec.yaml
           rm -f analysis_options.yaml
           # `flutter pub get` auto-resolves example/, which pins its own

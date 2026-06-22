@@ -21,6 +21,12 @@ APIs deprecated during 0.x.
 - **Brand identity** — README hero banner plus a package logo / favicon
   ("golden snapshot grid": a 3×3 grid of widget variants, gold on the diagonal).
 
+### Changed
+
+- **Widened the SDK constraint to `>=3.2.0 <4.0.0` (Flutter ≥ 3.16)**, verified
+  via a CI compatibility matrix down to the `TextScaler` API floor. The package
+  no longer needlessly required Dart 3.9.
+
 ## 0.19.2
 
 - **Documentation site + leaner README.** Full documentation now lives at a

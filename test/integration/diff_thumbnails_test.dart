@@ -5,13 +5,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
 
 MatrixCombination _combo({String name = 'default'}) => MatrixCombination(
-  scenario: MatrixScenario(name, builder: () => const SizedBox.shrink()),
-  theme: MatrixTheme.light,
-  locale: const Locale('en'),
-  textScale: 1.0,
-  device: MatrixDevice.phoneSmall,
-  direction: TextDirection.ltr,
-);
+      scenario: MatrixScenario(name, builder: () => const SizedBox.shrink()),
+      theme: MatrixTheme.light,
+      locale: const Locale('en'),
+      textScale: 1.0,
+      device: MatrixDevice.phoneSmall,
+      direction: TextDirection.ltr,
+    );
 
 void main() {
   late Directory tempDir;
@@ -129,9 +129,8 @@ void main() {
       );
       final html = await renderHtml(result);
       // Four images, each with onerror that hides its <figure> parent.
-      final onErrorCount = "onerror=\"this.closest('figure').style.display='none'\""
-          .allMatches(html)
-          .length;
+      final onErrorCount =
+          "onerror=\"this.closest('figure').style.display='none'\"".allMatches(html).length;
       expect(onErrorCount, 4);
     });
 

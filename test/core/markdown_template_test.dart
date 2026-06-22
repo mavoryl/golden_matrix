@@ -29,11 +29,11 @@ MatrixCombinationResult _passed(MatrixCombination c, {String? goldenPath}) =>
     );
 
 MatrixCombinationResult _failed(MatrixCombination c, String error) => MatrixCombinationResult(
-  combination: c,
-  status: MatrixResultStatus.failed,
-  goldenPath: 'goldens/x/default/light.png',
-  errorMessage: error,
-);
+      combination: c,
+      status: MatrixResultStatus.failed,
+      goldenPath: 'goldens/x/default/light.png',
+      errorMessage: error,
+    );
 
 void main() {
   group('MarkdownTemplate.render', () {

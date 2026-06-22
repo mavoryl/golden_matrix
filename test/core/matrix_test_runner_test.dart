@@ -183,17 +183,17 @@ void main() {
 
   group('formatSummary', () {
     MatrixCombinationResult passed(String scenario) => MatrixCombinationResult(
-      combination: MatrixCombination(
-        scenario: MatrixScenario(scenario, builder: placeholder),
-        theme: MatrixTheme.light,
-        locale: const Locale('en'),
-        textScale: 1.0,
-        device: MatrixDevice.phoneSmall,
-        direction: TextDirection.ltr,
-      ),
-      status: MatrixResultStatus.passed,
-      goldenPath: 'goldens/$scenario/light_en_ltr_1x_phonesmall.png',
-    );
+          combination: MatrixCombination(
+            scenario: MatrixScenario(scenario, builder: placeholder),
+            theme: MatrixTheme.light,
+            locale: const Locale('en'),
+            textScale: 1.0,
+            device: MatrixDevice.phoneSmall,
+            direction: TextDirection.ltr,
+          ),
+          status: MatrixResultStatus.passed,
+          goldenPath: 'goldens/$scenario/light_en_ltr_1x_phonesmall.png',
+        );
 
     MatrixCombinationResult failedResult({
       String scenario = 'default',
@@ -201,19 +201,20 @@ void main() {
       Locale locale = const Locale('en'),
       double textScale = 1.0,
       MatrixDevice device = MatrixDevice.phoneSmall,
-    }) => MatrixCombinationResult(
-      combination: MatrixCombination(
-        scenario: MatrixScenario(scenario, builder: placeholder),
-        theme: theme,
-        locale: locale,
-        textScale: textScale,
-        device: device,
-        direction: TextDirection.ltr,
-      ),
-      status: MatrixResultStatus.failed,
-      goldenPath: 'goldens/$scenario/file.png',
-      errorMessage: 'mismatch',
-    );
+    }) =>
+        MatrixCombinationResult(
+          combination: MatrixCombination(
+            scenario: MatrixScenario(scenario, builder: placeholder),
+            theme: theme,
+            locale: locale,
+            textScale: textScale,
+            device: device,
+            direction: TextDirection.ltr,
+          ),
+          status: MatrixResultStatus.failed,
+          goldenPath: 'goldens/$scenario/file.png',
+          errorMessage: 'mismatch',
+        );
 
     test('includes name and counts', () {
       final summary = formatSummary(

@@ -396,9 +396,8 @@ void _setupComponentTearDown(
 }) {
   tearDownAll(() async {
     stopwatch.stop();
-    final stale = detectStaleGoldens
-        ? await _detectComponentStaleGoldensSafe(testName, results)
-        : <String>[];
+    final stale =
+        detectStaleGoldens ? await _detectComponentStaleGoldensSafe(testName, results) : <String>[];
     final result = MatrixResult(
       name: groupName,
       results: results,
@@ -474,7 +473,7 @@ String _componentJoinPath(String base, String leaf) {
 
 class _TolerantComponentComparator extends LocalFileComparator {
   _TolerantComponentComparator(LocalFileComparator delegate, this._tolerance)
-    : super(delegate.basedir.resolve('_golden_matrix_tolerance_anchor.dart'));
+      : super(delegate.basedir.resolve('_golden_matrix_tolerance_anchor.dart'));
 
   final double _tolerance;
 

@@ -46,9 +46,8 @@ class MatrixWidgetWrapper extends StatelessWidget {
       GlobalWidgetsLocalizations.delegate,
     ];
 
-    final wrappedChild = wrapChild != null
-        ? wrapChild!(child)
-        : Scaffold(body: Center(child: child));
+    final wrappedChild =
+        wrapChild != null ? wrapChild!(child) : Scaffold(body: Center(child: child));
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,

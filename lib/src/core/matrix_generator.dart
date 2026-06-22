@@ -171,9 +171,8 @@ class MatrixGenerator {
       final baseLocale = axes.locales.first;
       final baseTextScale = axes.textScales.first;
       final baseDevice = axes.devices.first;
-      final baseDirection = axes.directions.isEmpty
-          ? directionForLocale(baseLocale)
-          : axes.directions.first;
+      final baseDirection =
+          axes.directions.isEmpty ? directionForLocale(baseLocale) : axes.directions.first;
 
       // Find the base combination
       final base = scenarioCombos.where(
@@ -328,8 +327,7 @@ class MatrixGenerator {
 
     // Find the smallest device by area
     final smallestDevice = axes.devices.reduce(
-      (a, b) =>
-          (a.logicalSize.width * a.logicalSize.height) <=
+      (a, b) => (a.logicalSize.width * a.logicalSize.height) <=
               (b.logicalSize.width * b.logicalSize.height)
           ? a
           : b,

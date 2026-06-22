@@ -322,9 +322,9 @@ void main() {
 
     testWidgets('themed widget paints theme-derived colors', (tester) async {
       Widget themed(ThemeData theme) => buildTree(
-        theme: theme,
-        child: Container(width: 40, height: 40, color: theme.colorScheme.primary),
-      );
+            theme: theme,
+            child: Container(width: 40, height: 40, color: theme.colorScheme.primary),
+          );
 
       await tester.pumpWidget(themed(ThemeData.light()));
       final lightColor = (find.byType(Container).evaluate().single.widget as Container).color;

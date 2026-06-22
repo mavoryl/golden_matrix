@@ -64,17 +64,17 @@ class MatrixCombinationResult {
   /// `error` is included only when [errorMessage] is non-null;
   /// `warnings` is included only when non-empty.
   Map<String, dynamic> toJson() => {
-    'scenario': combination.scenario.name,
-    'theme': combination.theme.name,
-    'locale': combination.locale.toLanguageTag(),
-    'textScale': combination.textScale,
-    'device': combination.device.name,
-    'direction': combination.direction == TextDirection.ltr ? 'ltr' : 'rtl',
-    'status': status.name,
-    'goldenPath': goldenPath,
-    if (errorMessage != null) 'error': errorMessage,
-    if (warnings.isNotEmpty) 'warnings': warnings,
-  };
+        'scenario': combination.scenario.name,
+        'theme': combination.theme.name,
+        'locale': combination.locale.toLanguageTag(),
+        'textScale': combination.textScale,
+        'device': combination.device.name,
+        'direction': combination.direction == TextDirection.ltr ? 'ltr' : 'rtl',
+        'status': status.name,
+        'goldenPath': goldenPath,
+        if (errorMessage != null) 'error': errorMessage,
+        if (warnings.isNotEmpty) 'warnings': warnings,
+      };
 }
 
 /// Aggregated result of a matrix golden test run.
@@ -151,15 +151,15 @@ class MatrixResult {
   /// }
   /// ```
   Map<String, dynamic> toJson() => {
-    'name': name,
-    'timestamp': timestamp.toIso8601String(),
-    'durationMs': duration.inMilliseconds,
-    'total': total,
-    'passed': passed,
-    'failed': failed,
-    'skipped': skipped,
-    'warnings': warningCount,
-    'results': results.map((r) => r.toJson()).toList(),
-    if (staleGoldens.isNotEmpty) 'staleGoldens': staleGoldens,
-  };
+        'name': name,
+        'timestamp': timestamp.toIso8601String(),
+        'durationMs': duration.inMilliseconds,
+        'total': total,
+        'passed': passed,
+        'failed': failed,
+        'skipped': skipped,
+        'warnings': warningCount,
+        'results': results.map((r) => r.toJson()).toList(),
+        if (staleGoldens.isNotEmpty) 'staleGoldens': staleGoldens,
+      };
 }

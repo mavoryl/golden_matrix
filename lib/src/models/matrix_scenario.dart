@@ -12,7 +12,7 @@ class MatrixScenario {
   /// [tags] can be used to filter scenarios via `scenarioTags:` on
   /// `matrixGolden`/`screenMatrixGolden`.
   const MatrixScenario(this.name, {required this.builder, this.tags = const []})
-    : assert(name != '', 'MatrixScenario name must not be empty');
+      : assert(name != '', 'MatrixScenario name must not be empty');
 
   /// Human-readable name used in golden file paths and reports.
   final String name;

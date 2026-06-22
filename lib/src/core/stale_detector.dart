@@ -48,9 +48,8 @@ bool _isInsideFailuresDir(String filePath) {
 /// Used to keep golden paths consistent across operating systems (so
 /// the same JSON/HTML output is produced on Linux and macOS CI).
 String _relativePosix(String target, String base) {
-  final normalizedBase = base.endsWith(Platform.pathSeparator)
-      ? base
-      : '$base${Platform.pathSeparator}';
+  final normalizedBase =
+      base.endsWith(Platform.pathSeparator) ? base : '$base${Platform.pathSeparator}';
   final rel = target.startsWith(normalizedBase) ? target.substring(normalizedBase.length) : target;
   return rel.replaceAll(Platform.pathSeparator, '/');
 }

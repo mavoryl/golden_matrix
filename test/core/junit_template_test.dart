@@ -19,23 +19,23 @@ MatrixCombination _combo({
 }
 
 MatrixCombinationResult _passed(MatrixCombination c) => MatrixCombinationResult(
-  combination: c,
-  status: MatrixResultStatus.passed,
-  goldenPath: 'goldens/x/${c.scenario.name}/x.png',
-);
+      combination: c,
+      status: MatrixResultStatus.passed,
+      goldenPath: 'goldens/x/${c.scenario.name}/x.png',
+    );
 
 MatrixCombinationResult _failed(MatrixCombination c, String err) => MatrixCombinationResult(
-  combination: c,
-  status: MatrixResultStatus.failed,
-  goldenPath: 'goldens/x/${c.scenario.name}/x.png',
-  errorMessage: err,
-);
+      combination: c,
+      status: MatrixResultStatus.failed,
+      goldenPath: 'goldens/x/${c.scenario.name}/x.png',
+      errorMessage: err,
+    );
 
 MatrixCombinationResult _skipped(MatrixCombination c) => MatrixCombinationResult(
-  combination: c,
-  status: MatrixResultStatus.skipped,
-  goldenPath: 'goldens/x/${c.scenario.name}/x.png',
-);
+      combination: c,
+      status: MatrixResultStatus.skipped,
+      goldenPath: 'goldens/x/${c.scenario.name}/x.png',
+    );
 
 void main() {
   group('JunitTemplate.render', () {

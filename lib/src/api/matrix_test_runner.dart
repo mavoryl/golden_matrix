@@ -32,8 +32,10 @@ const _goldenBoundaryKey = ValueKey('__golden_matrix_boundary__');
 /// file is captured. Use to drive interactions like `tester.tap(...)`,
 /// `tester.enterText(...)`, or scrolling — anything needed to bring the
 /// widget into the visual state you want to snapshot.
-typedef MatrixSetupCallback =
-    Future<void> Function(WidgetTester tester, MatrixCombination combination);
+typedef MatrixSetupCallback = Future<void> Function(
+  WidgetTester tester,
+  MatrixCombination combination,
+);
 
 /// Internal test runner shared by [matrixGolden] and [screenMatrixGolden].
 void runMatrixTests(
@@ -474,7 +476,7 @@ String _testDescription(MatrixCombination c) {
 /// so `dirname` strips it and leaves the original basedir intact.
 class _TolerantComparator extends LocalFileComparator {
   _TolerantComparator(LocalFileComparator delegate, this._tolerance)
-    : super(delegate.basedir.resolve('_golden_matrix_tolerance_anchor.dart'));
+      : super(delegate.basedir.resolve('_golden_matrix_tolerance_anchor.dart'));
   final double _tolerance;
 
   @override

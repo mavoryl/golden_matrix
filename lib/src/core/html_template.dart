@@ -36,8 +36,7 @@ class HtmlTemplate {
     final duration = result.duration.inSeconds > 0
         ? '${result.duration.inSeconds}s'
         : '${result.duration.inMilliseconds}ms';
-    final time =
-        '${result.timestamp.year}'
+    final time = '${result.timestamp.year}'
         '-${_pad(result.timestamp.month)}'
         '-${_pad(result.timestamp.day)}'
         ' ${_pad(result.timestamp.hour)}'

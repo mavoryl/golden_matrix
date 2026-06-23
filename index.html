@@ -1082,7 +1082,7 @@ device sizes, and states, you get copy-paste and combinatorial explosion:</p>
 <h3 id="1-add-the-dependency">1. Add the dependency<a class="headerlink" href="#1-add-the-dependency" title="Permanent link">&para;</a></h3>
 <div class="language-yaml highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># pubspec.yaml</span>
 </span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">dev_dependencies</span><span class="p">:</span>
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">golden_matrix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^1.0.0</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nt">golden_matrix</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">^1.1.0</span>
 </span></code></pre></div>
 <h3 id="2-set-up-font-loading">2. Set up font loading<a class="headerlink" href="#2-set-up-font-loading" title="Permanent link">&para;</a></h3>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1">// test/flutter_test_config.dart</span>
@@ -1183,6 +1183,8 @@ exactly widget-sized plus optional padding. The <code>devices</code> axis is ign
 <li><strong>Smart defaults</strong> — <code>MatrixAxes()</code> with no arguments produces one valid test
   (light, en, 1.0x, phoneSmall).</li>
 <li><strong>RTL auto-inference</strong> — Arabic, Hebrew, Farsi automatically get RTL.</li>
+<li><strong><a href="advanced/">Typed scenarios</a></strong> — <code>MatrixScenario.typed&lt;T&gt;</code> attaches a
+  compile-time-checked state payload so one builder covers all states.</li>
 <li><strong><a href="sampling/">Sampling</a></strong> — <code>full</code>, <code>smoke</code>, <code>pairwise</code>, <code>priorityBased</code>
   to keep CI fast.</li>
 <li><strong><a href="devices/">20+ device presets</a></strong> — modern iPhones, Android, foldables,

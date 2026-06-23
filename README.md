@@ -22,7 +22,7 @@ HTML + JUnit reports for CI.
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^1.0.0
+  golden_matrix: ^1.1.0
 ```
 
 ```dart
@@ -69,6 +69,7 @@ flutter test                   # run regression tests
 
 - **Declarative matrix** — themes × locales × devices × text scales × directions, all combinations automatically
 - **Three entry points** — `matrixGolden` (components), `screenMatrixGolden` (full screens), `componentMatrixGolden` (intrinsic-size primitives)
+- **Typed scenarios** — `MatrixScenario.typed<T>` attaches a compile-time-checked state payload, so one builder covers loading/loaded/error/empty
 - **Sampling** — `full`, `smoke`, `pairwise`, `priorityBased` to keep CI fast
 - **HTML / JSON / Markdown / JUnit XML reports** — with inline pixel-diff thumbnails on failure
 - **Stale + overflow detection** — orphan goldens and `RenderFlex overflow` surface automatically

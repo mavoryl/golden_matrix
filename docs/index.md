@@ -53,7 +53,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^1.0.0
+  golden_matrix: ^1.1.0
 ```
 
 ### 2. Set up font loading
@@ -177,6 +177,8 @@ componentMatrixGolden(
 - **Smart defaults** — `MatrixAxes()` with no arguments produces one valid test
   (light, en, 1.0x, phoneSmall).
 - **RTL auto-inference** — Arabic, Hebrew, Farsi automatically get RTL.
+- **[Typed scenarios](advanced.md)** — `MatrixScenario.typed<T>` attaches a
+  compile-time-checked state payload so one builder covers all states.
 - **[Sampling](sampling.md)** — `full`, `smoke`, `pairwise`, `priorityBased`
   to keep CI fast.
 - **[20+ device presets](devices.md)** — modern iPhones, Android, foldables,

@@ -1,8 +1,81 @@
 # Advanced
 
-Deep configuration for `golden_matrix`: filtering rules, RTL, tolerance, skipping, wrappers, dependency injection, post-pump state, custom theme data, dry-run previews, and font loading.
+Deep configuration for `golden_matrix`: typed scenarios, filtering rules, RTL, tolerance, skipping, wrappers, dependency injection, post-pump state, custom theme data, dry-run previews, and font loading.
 
 See also: [Sampling](sampling.md) · [Devices](devices.md) · [Reports](reports.md) · [CI integration](ci.md) · [Migration guide](migration.md) · [Home](index.md).
+
+## Typed scenarios
+
+A common case is **one widget rendered across several state-manager states**
+(loading / loaded / error / empty from a Cubit, Bloc, Riverpod provider, or
+`ChangeNotifier`). `MatrixScenario.typed<T>` attaches a compile-time-checked
+`payload` to each scenario and feeds it to a builder you can reuse across all
+of them — no stringly-typed `switch` on the scenario name, no per-scenario
+`BlocProvider` boilerplate.
+
+```dart
+sealed class UserState { ... }   // your state-manager state
+
+Widget buildUserList(UserState state) => BlocProvider<UserCubit>(
+  create: (_) => UserCubit()..emit(state),
+  child: const UserListScreen(),
+);
+
+matrixGolden(
+  'UserList',
+  scenarios: [
+    MatrixScenario.typed('loading', payload: const UserState.loading(), builder: buildUserList),
+    MatrixScenario.typed('loaded',  payload: UserState.loaded([alice, bob]), builder: buildUserList),
+    MatrixScenario.typed('error',   payload: const UserState.error('Timeout'), builder: buildUserList),
+    MatrixScenario.typed('empty',   payload: const UserState.empty(), builder: buildUserList),
+  ],
+  axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
+);
+```
+
+`T` is inferred from `payload`/`builder` (write `MatrixScenario.typed<UserState>(...)`
+to pin it). Each scenario can carry a different payload type — the typedness is
+per-scenario, so it composes with every axis (themes × locales × devices × scales).
+
+!!! note "Non-breaking"
+    `MatrixScenario.typed` is additive — the plain `MatrixScenario(name, builder: () => widget)`
+    constructor is unchanged. Internally the typed builder is wrapped into the
+    zero-argument builder (it closes over the payload), so nothing else in the
+    matrix changes. The payload is also exposed as `scenario.payload` (typed as
+    `Object?`) for introspection.
+
+### Mocks, GetIt, and per-combination setup
+
+Each combination is its own `testWidgets` block, so `setUp`/`tearDown` run
+per-combination (fresh mocks) and `setUpAll` runs once per matrix. That layers
+cleanly with the typed builder, which is the right home for per-scenario stub
+variations:
+
+```dart
+late MockUserRepository repo;
+
+setUpAll(() => provideDummy<Either<Failure, List<User>>>(const Right([])));
+setUp(() {
+  repo = MockUserRepository();
+  GetIt.I.registerSingleton<UserRepository>(repo);
+});
+tearDown(() => GetIt.I.reset());
+
+Widget build(UserPayload p) {
+  when(repo.fetchUsers()).thenAnswer((_) async =>
+      p.error != null ? Left(Failure(p.error!)) : Right(p.users));
+  return BlocProvider<UserCubit>(
+    create: (_) => UserCubit(repo: repo)..loadUsers(),
+    child: const UserListScreen(),
+  );
+}
+
+matrixGolden('UserList', scenarios: [
+  MatrixScenario.typed('loaded', payload: UserPayload(users: [alice, bob]), builder: build),
+  MatrixScenario.typed('empty',  payload: const UserPayload(), builder: build),
+  MatrixScenario.typed('error',  payload: const UserPayload(error: 'net'), builder: build),
+]);
+```
 
 ## Rules
 

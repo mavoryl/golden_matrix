@@ -1,3 +1,27 @@
+## 1.1.0
+
+- **Typed scenarios — `MatrixScenario.typed<T>`.** Attach a
+  compile-time-checked `payload` to a scenario and feed it to a builder you can
+  reuse across all scenarios — ideal for one widget rendered across several
+  state-manager states (loading / loaded / error / empty). Replaces stringly-typed
+  `switch (combination.scenario.name)` and per-scenario `BlocProvider` boilerplate.
+
+  ```dart
+  Widget build(UserState s) =>
+      BlocProvider<UserCubit>(create: (_) => UserCubit()..emit(s), child: const UserList());
+
+  matrixGolden('UserList', scenarios: [
+    MatrixScenario.typed('loading', payload: const UserState.loading(), builder: build),
+    MatrixScenario.typed('loaded',  payload: UserState.loaded([...]), builder: build),
+    MatrixScenario.typed('error',   payload: const UserState.error('x'), builder: build),
+  ]);
+  ```
+
+  Fully **non-breaking**: the plain `MatrixScenario(name, builder: () => widget)`
+  constructor is unchanged; the typed builder is wrapped into the zero-argument
+  builder internally. The payload is also exposed as `scenario.payload`. See the
+  [Advanced guide](https://mavoryl.github.io/golden_matrix/advanced/#typed-scenarios).
+
 ## 1.0.0
 
 First stable release. Visual identity, a documentation site, and removal of the

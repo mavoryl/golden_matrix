@@ -358,6 +358,27 @@ void main() {
     });
   });
 
+  group('why the decoded-key retry works (SDK behavior pinned)', () {
+    // PlatformAssetBundle.load builds its platform message with
+    // Uri.encodeFull(key). These three facts are the whole reason loadFontAsset
+    // retries with the decoded key; if the SDK's encoding rules ever change,
+    // this group fails and the retry needs revisiting.
+    const onDisk = 'packages/shadcn_ui/fonts/Geist[wght].ttf';
+    const manifestKey = 'packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf';
+
+    test('encoding the decoded key reproduces the manifest key', () {
+      expect(Uri.encodeFull(onDisk), manifestKey);
+    });
+
+    test('encoding the manifest key double-encodes it and matches nothing', () {
+      expect(Uri.encodeFull(manifestKey), 'packages/shadcn_ui/fonts/Geist%255Bwght%255D.ttf');
+    });
+
+    test('decoding the manifest key yields the literal filename', () {
+      expect(Uri.decodeFull(manifestKey), onDisk);
+    });
+  });
+
   group('loadFontRegistrations', () {
     ({String family, List<String> assets}) reg(String family, List<String> assets) =>
         (family: family, assets: assets);

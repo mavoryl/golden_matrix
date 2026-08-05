@@ -3,7 +3,9 @@ article_medium.md
 docs/
 internal_docs/
 requirements.txt
-assets/
+# Root-anchored: the README banner is not worth shipping, but example/assets/
+# holds the bracketed-font regression fixture the example's tests need.
+/assets/
 .claude/
 build/
 example/build/

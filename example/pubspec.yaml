@@ -17,3 +17,15 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+
+  fonts:
+    # Regression fixture for golden_matrix 1.1.2: a filename with square
+    # brackets is the upstream convention for variable fonts
+    # (Geist[wght].ttf, Inter[opsz,wght].ttf). flutter_tools percent-encodes
+    # such a key in FontManifest.json, which used to make the asset
+    # unloadable — and took the whole test file down with it.
+    # Guarded by example/test/golden/bracketed_font_regression_test.dart.
+    # The file itself is a copy of the SDK's Roboto-Regular.
+    - family: BracketedVariable
+      fonts:
+        - asset: assets/fonts/Bracketed[wght].ttf

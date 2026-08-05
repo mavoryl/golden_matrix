@@ -145,6 +145,8 @@ Pin the dependency to a version that ships static font files (achievement_compan
 
 3. **Document it.** Done in 1.1.2 — `docs/font-namespacing.md` gained a "Variable fonts with brackets in the filename" section; `docs/advanced.md` links to it from the font-loading section.
 
+4. **Guard it.** Done in 1.1.2. Unit tests over an injected loader cannot catch this class of regression — reverting the wiring to `rootBundle.load(asset)` left the entire root suite green (verified by mutation). The real guard is `example/test/golden/bracketed_font_regression_test.dart`, backed by a genuine bracketed font asset (`example/assets/fonts/Bracketed[wght].ttf`, declared in `example/pubspec.yaml`): it measures rendered text width against the Ahem baseline, so a broken retry shows up as "family never loaded". The example suite runs in CI on every push. `test/flutter/font_loader_test.dart` additionally pins the three `Uri.encodeFull`/`decodeFull` facts the retry depends on, so an SDK change in encoding rules surfaces as a failure rather than as a silently dead fallback.
+
 ### Upstream
 
 Still worth a `flutter/flutter` issue: **the asset key in `FontManifest.json` is percent-encoded, but every consumer of that key passes it to `AssetBundle.load`, which encodes it a second time** — so a font declared as `fonts/Test[wght].ttf` is unreachable through the key the framework itself published. Either the manifest should carry the raw path or `load()` should not re-encode.

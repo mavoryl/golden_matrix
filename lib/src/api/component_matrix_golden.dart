@@ -80,7 +80,12 @@ const _componentBoundaryKey = ValueKey('__golden_matrix_component_boundary__');
 /// - [sampling] / [maxCombinations] / [rules] / [scenarioTags] — same
 ///   semantics as [matrixGolden].
 /// - [pixelRatio] — capture density (default `2.0`). PNG resolution in
-///   physical pixels = widget logical size × this value.
+///   physical pixels = (widget logical size + [padding]) × this value, so
+///   the default writes a 20×10 widget as a 40×20 file. Must be > 0.
+///   Up to 1.1.2 this value only configured layout and every golden was
+///   written at logical size; since 1.2.0 it drives the raster as documented,
+///   which means existing component goldens need one
+///   `flutter test --update-goldens`.
 /// - [padding] — added around the widget inside the boundary so PNG
 ///   edges have a little visual breathing room. Default
 ///   `EdgeInsets.all(8)`; pass `EdgeInsets.zero` for tightest crop.
@@ -114,6 +119,7 @@ void componentMatrixGolden(
   double pixelRatio = 2.0,
   EdgeInsets padding = const EdgeInsets.all(8),
 }) {
+  validateCaptureScale(pixelRatio, 'pixelRatio');
   final effectiveFormats = reportFormats;
   final writeReports = effectiveFormats.isNotEmpty;
   final wantStaleDetection = detectStaleGoldens && fileNameBuilder == null;
@@ -234,7 +240,12 @@ Future<void> _executeComponentGoldenTest({
     if (record) {
       Object? capturedError;
       try {
-        await expectLater(find.byKey(_componentBoundaryKey), matchesGoldenFile(goldenPath));
+        await expectMatchesGolden(
+          tester,
+          _componentBoundaryKey,
+          goldenPath,
+          captureScale: pixelRatio,
+        );
       } catch (e) {
         capturedError = e;
       }
@@ -262,7 +273,12 @@ Future<void> _executeComponentGoldenTest({
         ),
       );
     } else {
-      await expectLater(find.byKey(_componentBoundaryKey), matchesGoldenFile(goldenPath));
+      await expectMatchesGolden(
+        tester,
+        _componentBoundaryKey,
+        goldenPath,
+        captureScale: pixelRatio,
+      );
     }
   } finally {
     capture.stop();

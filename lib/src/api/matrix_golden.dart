@@ -109,6 +109,9 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 ///   JSON / HTML reports. Detection is automatically skipped when
 ///   [fileNameBuilder] is supplied (paths are custom — we don't know
 ///   where to look). Set to `false` to disable on a per-test basis.
+/// - [captureScale] — Physical pixels per logical pixel in the captured
+///   PNG. Default `1.0` (goldens at the device's logical size). See
+///   *Capture resolution* below; this is **not** `MatrixDevice.pixelRatio`.
 ///
 /// ## Example
 ///
@@ -138,6 +141,26 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 /// );
 /// ```
 ///
+/// ## Capture resolution
+///
+/// Goldens are written at the device's **logical** size — a `phoneSmall`
+/// (375×667) golden is a 375×667 PNG. `MatrixDevice.pixelRatio` configures
+/// layout and `MediaQuery` (including which resolution-aware asset variant
+/// is picked); it deliberately does **not** change the file's resolution,
+/// which keeps goldens small and diffs readable.
+///
+/// Pass [captureScale] when you want a higher-resolution raster — e.g.
+/// supersampled marketing screenshots:
+///
+/// ```dart
+/// matrixGolden('Hero', scenarios: [...], captureScale: 2.0);  // 750×1334
+/// ```
+///
+/// Changing [captureScale] changes the size of every golden the call
+/// produces, so an existing baseline will fail on dimensions until it is
+/// regenerated with `flutter test --update-goldens`. The scale is not part
+/// of the golden path.
+///
 /// See also:
 ///   * [screenMatrixGolden] — for full-screen golden tests with a
 ///     user-supplied app shell.
@@ -166,6 +189,7 @@ void matrixGolden(
   bool freezeAnimations = false,
   Duration? captureAfter,
   bool detectStaleGoldens = true,
+  double captureScale = 1.0,
 }) {
   runMatrixTests(
     'matrixGolden: $name',
@@ -192,6 +216,7 @@ void matrixGolden(
     freezeAnimations: freezeAnimations,
     captureAfter: captureAfter,
     detectStaleGoldens: detectStaleGoldens,
+    captureScale: captureScale,
   );
 }
 

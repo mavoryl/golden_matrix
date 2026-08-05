@@ -22,7 +22,7 @@ HTML + JUnit reports for CI.
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^1.1.2
+  golden_matrix: ^1.2.0
 ```
 
 ```dart
@@ -75,6 +75,7 @@ flutter test                   # run regression tests
 - **Stale + overflow detection** — orphan goldens and `RenderFlex overflow` surface automatically
 - **RTL auto-inference** for Arabic / Hebrew / Farsi
 - **20+ device presets** — modern iPhones, Android, foldables, full iPad lineup, plus custom devices
+- **Capture resolution** — `captureScale` for supersampled goldens (2×/3× rasters); device `pixelRatio` stays layout-only
 - **DI-friendly** — `wrapApp` / `wrapChild` hooks for Riverpod / Bloc / Provider
 - **Dry-run preview** — inspect counts, paths, and collisions without rendering
 - **Zero external dependencies** — only the Flutter SDK

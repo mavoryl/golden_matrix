@@ -68,6 +68,30 @@ Build one fully from scratch:
 MatrixDevice(name: 'pixel7', logicalSize: Size(412, 915), pixelRatio: 2.75)
 ```
 
+## What `pixelRatio` does — and does not
+
+`MatrixDevice.pixelRatio` configures **layout**, not file resolution:
+
+- `MediaQuery.of(context).devicePixelRatio` reports it, so widgets that branch on density see the real value
+- resolution-aware asset variants (`2.0x/`, `3.0x/`) are picked according to it, so golden *content* can differ between devices
+- the physical viewport size is `logicalSize × pixelRatio`
+
+What it does **not** do is change the size of the PNG. A `phoneSmall` golden (375×667 @ 2x) is a **375×667** file, not 750×1334 — goldens are captured at logical size, which keeps them small and their diffs readable. This matches golden_toolkit and alchemist.
+
+!!! tip "Need a higher-resolution golden? (since 1.2.0)"
+    Pass `captureScale` to `matrixGolden()` / `screenMatrixGolden()` — it is
+    the knob for raster resolution, independent of the device:
+
+    ```dart
+    matrixGolden('Hero', scenarios: [...], captureScale: 2.0);  // 750×1334
+    ```
+
+    Useful for supersampled marketing screenshots. Changing it changes the
+    size of every golden the call produces, so regenerate with
+    `flutter test --update-goldens`; the scale is not encoded in the golden
+    path. For `componentMatrixGolden()` the equivalent knob is its own
+    `pixelRatio` parameter (default `2.0`).
+
 ## Tweaking a preset
 
 Use `copyWith()` to derive a variant — e.g. force a custom name and rotate `ipadPro11` to landscape:

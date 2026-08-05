@@ -67,6 +67,13 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 /// - [tolerance] — Optional pixel-difference tolerance for the matcher.
 /// - [printSummary] — When `true` (default), prints a textual summary
 ///   line at the end of the run.
+/// - [captureScale] — Physical pixels per logical pixel in the captured
+///   PNG. Default `1.0`: a `phoneSmall` (375×667) golden is a 375×667 file.
+///   `MatrixDevice.pixelRatio` drives layout and `MediaQuery` only, never
+///   the file's resolution. Raise this for supersampled output
+///   (`captureScale: 2.0` → 750×1334); every golden the call produces
+///   changes size, so regenerate with `flutter test --update-goldens`.
+///   The scale is not part of the golden path.
 ///
 /// ## Example
 ///
@@ -123,6 +130,7 @@ void screenMatrixGolden(
   bool freezeAnimations = false,
   Duration? captureAfter,
   bool detectStaleGoldens = true,
+  double captureScale = 1.0,
 }) {
   final scenarios = states ?? [MatrixScenario('default', builder: () => const SizedBox.shrink())];
 
@@ -146,5 +154,6 @@ void screenMatrixGolden(
     freezeAnimations: freezeAnimations,
     captureAfter: captureAfter,
     detectStaleGoldens: detectStaleGoldens,
+    captureScale: captureScale,
   );
 }

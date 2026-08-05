@@ -4,6 +4,6 @@
 
 - **Total:** 6
 - **Passed:** 6
-- **Duration:** 376ms
+- **Duration:** 697ms
 
 [View HTML report](componentmatrixgolden__notificationbadge_report.html)

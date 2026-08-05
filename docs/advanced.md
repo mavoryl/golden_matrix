@@ -116,6 +116,38 @@ Arabic, Hebrew, and Farsi locales automatically get `TextDirection.rtl` — no m
 final rtl = combination.copyWith(direction: TextDirection.rtl);
 ```
 
+## Capture resolution (`captureScale`)
+
+Goldens are captured at the device's **logical** size: a `phoneSmall`
+(375×667 @ 2x) golden is a 375×667 PNG. `MatrixDevice.pixelRatio` drives layout
+and `MediaQuery` — not the file's resolution (see
+[Devices](devices.md#what-pixelratio-does-and-does-not)).
+
+Pass `captureScale` when you want a denser raster — supersampled marketing
+shots, or reviewing fine detail:
+
+```dart
+matrixGolden(
+  'Hero',
+  scenarios: [...],
+  axes: const MatrixAxes(devices: [MatrixDevice.phoneSmall]),
+  captureScale: 2.0,   // 750×1334 instead of 375×667
+);
+```
+
+Same parameter on `screenMatrixGolden()`. In component mode the equivalent is
+`componentMatrixGolden(pixelRatio: ...)`, which defaults to `2.0`.
+
+!!! warning "Changing the scale invalidates existing goldens"
+    The comparator fails on differing dimensions before it ever compares
+    pixels (`image sizes do not match`), so regenerate with
+    `flutter test --update-goldens`. The scale is deliberately **not** part of
+    the golden path — two calls that write the same path with different scales
+    will fight over the file.
+
+File size scales with the square of the value: `captureScale: 3.0` is ~9× the
+pixels. Raise it for the handful of goldens that need it, not matrix-wide.
+
 ## Tolerance
 
 Allow small pixel differences for stable CI:

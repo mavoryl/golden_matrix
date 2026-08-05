@@ -53,7 +53,7 @@ matrixGolden(
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^1.1.2
+  golden_matrix: ^1.2.0
 ```
 
 ### 2. Set up font loading
@@ -157,7 +157,8 @@ screenMatrixGolden(
 For small visual primitives — buttons, badges, chips, list tiles — captured at
 their **natural** size instead of a full device viewport. Keeps the full
 `MaterialApp` context (theme, fonts, icons, locale, overlays); the PNG is
-exactly widget-sized plus optional padding. The `devices` axis is ignored.
+exactly widget-sized plus optional padding, multiplied by `pixelRatio`
+(default `2.0`). The `devices` axis is ignored.
 
 ```dart
 componentMatrixGolden(
@@ -183,6 +184,8 @@ componentMatrixGolden(
   to keep CI fast.
 - **[20+ device presets](devices.md)** — modern iPhones, Android, foldables,
   the full iPad lineup, plus `copyWith()` and fully custom devices.
+- **[Capture resolution](advanced.md)** — `captureScale` for supersampled
+  goldens; `MatrixDevice.pixelRatio` drives layout, not file resolution.
 - **[Reports](reports.md)** — self-contained HTML with diff thumbnails, JSON,
   Markdown summary, and opt-in JUnit XML.
 - **Stale golden detection** — flags orphan PNGs after renamed scenarios or

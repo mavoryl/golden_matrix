@@ -5,6 +5,7 @@
 **Version:** 1.1.1
 **Reported:** 2026-08-01 (found while building the achievement_companion marketing-golden harness)
 **Severity:** medium — blocks supersampled/high-DPR golden output
+**Status: RESOLVED in 1.2.0** — screen-level captures take an opt-in `captureScale` (default 1.0, nothing changes unless you ask); `componentMatrixGolden`'s existing `pixelRatio` now actually drives the raster, as its documentation always claimed. `MatrixDevice.pixelRatio` stays layout-only *by design* and is now documented as such.
 
 ### Symptom
 
@@ -26,16 +27,20 @@ Set `pixelRatio: 1.0` and treat the logical size as the final output resolution.
 
 `matchesGoldenFile(Finder)` goes through flutter_test's `captureImage()`, which walks up to the nearest repaint boundary and calls `layer.toImage(renderObject.paintBounds)` — and `OffsetLayer.toImage` defaults to `pixelRatio: 1.0`. The DPR transform lives in `RenderView`, *above* our boundary (`matrix_test_runner.dart:222`), so it never enters the captured layer. Capturing at logical size is also what golden_toolkit/alchemist do; this is a convention, not a regression.
 
-### Possible fix (for later) — must be opt-in
+### Fix (shipped in 1.2.0)
 
-Rasterize via `RenderRepaintBoundary.toImage(pixelRatio: ...)` and hand the `Future<ui.Image>` to `matchesGoldenFile` (the matcher accepts images, not just finders).
+Rasterize via `RenderRepaintBoundary.toImage(pixelRatio: ...)` and hand the `ui.Image` to `matchesGoldenFile` (the matcher accepts images, not just finders) — `expectMatchesGolden` in `matrix_test_runner.dart`. At scale 1.0 it deliberately keeps the old `matchesGoldenFile(Finder)` path so existing goldens cannot shift by a rounding pixel.
 
-Design constraints found while analysing this:
+Measured while implementing (prototype, Flutter 3.44.8): a 100×50 logical boundary with `view.devicePixelRatio = 2.0` gives a **100×50** PNG through `Finder` — the bug — and **300×150** through `toImage(pixelRatio: 3.0)`. No `tester.runAsync` needed; the fake-async concern below turned out not to apply.
 
-- **Do not re-purpose `MatrixDevice.pixelRatio`.** Every built-in preset declares 2.0–4.0 (`matrix_device.dart:91-275`); honoring it at capture time would grow every consumer's PNGs 4–16× in area and require regenerating every golden. That is a major release with a migration, for a behavior most users don't want.
-- Prefer an orthogonal, default-1.0 `captureScale` on `matrixGolden()` / `screenMatrixGolden()`, plus explicit docs that `pixelRatio` affects layout/MediaQuery only.
-- **Four call sites, not two:** `matrix_test_runner.dart:252,289` *and* `component_matrix_golden.dart:237,265`.
-- `RenderRepaintBoundary.toImage()` inside a widget test lives in a fake-async zone and usually needs `tester.runAsync`; prototype before committing to the approach.
+Design constraints found while analysing this, and how they were resolved:
+
+- **`MatrixDevice.pixelRatio` was not re-purposed.** Every built-in preset declares 2.0–4.0 (`matrix_device.dart:91-275`); honoring it at capture time would grow every consumer's PNGs 4–16× in area for a behavior most users don't want. Kept as layout/MediaQuery density, now documented in `docs/devices.md`.
+- Screen level got the orthogonal, default-1.0 `captureScale` on `matrixGolden()` / `screenMatrixGolden()`.
+- **Component level was different and worse:** `componentMatrixGolden` already had `pixelRatio` (default **2.0**) documented as *"PNG resolution in physical pixels = widget logical size × this value"* — a promise it never kept. Verified on the example's own goldens: a badge measured 117×53, i.e. 1×. Making it honest is a **breaking change for every consumer** (the affected value is the default), and it fails loudly — the comparator reports `image sizes do not match` before comparing pixels, so one `flutter test --update-goldens` fixes it. Shipped as breaking in 1.2.0 rather than left as a documentation lie.
+- **Four call sites, not two:** all four now route through `expectMatchesGolden`.
+- The fake-async worry was unfounded — `await boundary.toImage(...)` completes inside `testWidgets` with no `runAsync`.
+- Guarded by `test/api/capture_scale_test.dart`, which asserts PNG **dimensions** via a comparator that records the bytes it is handed (`test/_helpers/capturing_comparator.dart`) — content is identical at every scale, so dimensions are the only thing that can catch a regression.
 
 ## `loadAppFonts` aborts the whole suite when one font asset has URI-unsafe characters (`[`, `]`)
 

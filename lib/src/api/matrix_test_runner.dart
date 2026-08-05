@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'dart:typed_data';
 
+import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -58,7 +59,9 @@ void runMatrixTests(
   bool freezeAnimations = false,
   Duration? captureAfter,
   bool detectStaleGoldens = true,
+  double captureScale = 1.0,
 }) {
+  validateCaptureScale(captureScale, 'captureScale');
   final effectiveFormats = reportFormats;
   final writeReports = effectiveFormats.isNotEmpty;
   // Stale detection needs per-combination results too, so we record them
@@ -107,6 +110,7 @@ void runMatrixTests(
               setup: setup,
               freezeAnimations: freezeAnimations,
               captureAfter: captureAfter,
+              captureScale: captureScale,
             ),
           );
         }
@@ -203,6 +207,54 @@ void _setupTolerance(double? tolerance) {
   });
 }
 
+// -- Capture --
+
+/// Compares the widget under [boundaryKey] against the golden at [goldenPath],
+/// rasterizing at [captureScale] physical pixels per logical pixel.
+///
+/// At the default scale of 1.0 this is the plain `matchesGoldenFile(Finder)`
+/// path, byte-for-byte what golden_matrix has always produced: flutter_test's
+/// `captureImage` rasterizes the boundary's layer at `pixelRatio: 1.0`,
+/// *regardless* of `tester.view.devicePixelRatio` — the device-pixel-ratio
+/// transform lives in `RenderView`, above the boundary, so it never enters the
+/// captured layer.
+///
+/// Above 1.0 the boundary is rasterized explicitly and the resulting image is
+/// handed to the matcher (which accepts a `ui.Image` as well as a `Finder`).
+/// The 1.0 case deliberately keeps the old path so existing goldens cannot
+/// shift by a rounding pixel.
+///
+/// Used internally by `matrixGolden` / `screenMatrixGolden` /
+/// `componentMatrixGolden`; also covered by unit tests directly.
+Future<void> expectMatchesGolden(
+  WidgetTester tester,
+  Key boundaryKey,
+  String goldenPath, {
+  required double captureScale,
+}) async {
+  if (captureScale == 1.0) {
+    await expectLater(find.byKey(boundaryKey), matchesGoldenFile(goldenPath));
+    return;
+  }
+
+  final boundary = tester.renderObject<RenderRepaintBoundary>(find.byKey(boundaryKey));
+  final image = await boundary.toImage(pixelRatio: captureScale);
+  try {
+    // The matcher does not take ownership of an image it did not create,
+    // so disposal is ours.
+    await expectLater(image, matchesGoldenFile(goldenPath));
+  } finally {
+    image.dispose();
+  }
+}
+
+/// Throws [ArgumentError] unless [value] is a positive, finite capture scale.
+void validateCaptureScale(double value, String name) {
+  if (value <= 0 || !value.isFinite) {
+    throw ArgumentError.value(value, name, 'must be > 0');
+  }
+}
+
 // -- Test execution --
 
 Future<void> _executeGoldenTest({
@@ -215,6 +267,7 @@ Future<void> _executeGoldenTest({
   MatrixSetupCallback? setup,
   bool freezeAnimations = false,
   Duration? captureAfter,
+  double captureScale = 1.0,
 }) async {
   PumpHelpers.configureView(tester, combination.device);
   final capture = ErrorCapture()..start();
@@ -249,7 +302,12 @@ Future<void> _executeGoldenTest({
     if (report) {
       Object? capturedError;
       try {
-        await expectLater(find.byKey(_goldenBoundaryKey), matchesGoldenFile(goldenPath));
+        await expectMatchesGolden(
+          tester,
+          _goldenBoundaryKey,
+          goldenPath,
+          captureScale: captureScale,
+        );
       } catch (e) {
         capturedError = e;
       }
@@ -286,7 +344,7 @@ Future<void> _executeGoldenTest({
         ),
       );
     } else {
-      await expectLater(find.byKey(_goldenBoundaryKey), matchesGoldenFile(goldenPath));
+      await expectMatchesGolden(tester, _goldenBoundaryKey, goldenPath, captureScale: captureScale);
     }
   } finally {
     capture.stop();

@@ -1,3 +1,39 @@
+## 1.2.0
+
+- **BREAKING — `componentMatrixGolden` now really captures at `pixelRatio`.**
+  Its docs have always said *"PNG resolution in physical pixels = widget logical
+  size × this value"* with a default of `2.0`, but every component golden was in
+  fact written at logical size: the capture went through
+  `matchesGoldenFile(Finder)`, which rasterizes the boundary's layer at
+  `pixelRatio: 1.0` regardless of `tester.view.devicePixelRatio` (the
+  device-pixel-ratio transform lives in `RenderView`, above the boundary). The
+  documented behavior is now the real one.
+
+  **Migration:** since the affected value is the *default*, every existing
+  component golden changes size — a 117×53 badge becomes 234×106. The comparator
+  reports `image sizes do not match` before comparing any pixels, so the failure
+  is loud and the fix is one command:
+
+  ```bash
+  flutter test --update-goldens
+  ```
+
+  Pass `pixelRatio: 1.0` to keep the old files instead. `matrixGolden` and
+  `screenMatrixGolden` are unaffected.
+
+- **`captureScale` on `matrixGolden` / `screenMatrixGolden`** (default `1.0`,
+  opt-in — existing goldens are untouched). Sets physical pixels per logical
+  pixel in the captured PNG, so supersampled output is finally reachable:
+  `captureScale: 2.0` turns a `phoneSmall` golden from 375×667 into 750×1334.
+  Raising it invalidates that call's baselines by dimension; the scale is
+  deliberately not part of the golden path.
+
+- **`MatrixDevice.pixelRatio` documented as layout-only.** It drives
+  `MediaQuery.devicePixelRatio`, resolution-aware asset variants and the
+  physical viewport — never the golden's resolution. Capturing screens at
+  logical size stays the default, matching golden_toolkit and alchemist. See
+  the new sections in `docs/devices.md` and `docs/advanced.md`.
+
 ## 1.1.2
 
 - **Variable fonts with square brackets in the filename now load.**

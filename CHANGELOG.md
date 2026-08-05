@@ -1,16 +1,25 @@
 ## 1.1.2
 
-- **`loadAppFonts()` no longer fails the whole test file when one font asset is
-  unloadable.** A single font that could not be loaded threw out of
-  `loadAppFonts()`, and because it is awaited in `flutter_test_config.dart`'s
-  `testExecutable`, the **entire test file failed at load time** — every golden
-  in it, including those that never render that font. The usual trigger is a
-  dependency shipping a variable font whose filename contains square brackets
-  (`Geist[wght].ttf`): `[` and `]` are URI gen-delims, so the manifest key is
-  percent-encoded while the file on disk is not, and the `AssetBundle` lookup
-  misses. Such a family is now skipped with a warning naming the family, its
-  assets and the underlying error, and the rest of the suite runs. Families
-  sharing the same assets (a family and its `packages/<pkg>/` alias) warn once.
+- **Variable fonts with square brackets in the filename now load.**
+  `Geist[wght].ttf`, `Inter[opsz,wght].ttf` and friends — the upstream naming
+  convention for variable fonts — were unloadable, and worse, took the whole
+  test file down with them (see below). `[` and `]` are URI gen-delims, so
+  `flutter_tools` percent-encodes the key it writes into `FontManifest.json`
+  (`Geist%5Bwght%5D.ttf`); `PlatformAssetBundle.load` then encodes it *again*,
+  looks for `Geist%255Bwght%255D.ttf` and misses. `loadAppFonts()` now retries
+  such an asset with the percent-**decoded** key, whose single encoding lands on
+  the real filename. Verified end to end on Flutter 3.44.8 for a project-level
+  asset, a dependency's `packages/<pkg>/…` asset and the self-test alias: text
+  renders with real glyphs instead of Ahem squares. The raw key is always tried
+  first, so nothing changes for fonts that already worked.
+- **`loadAppFonts()` no longer fails the whole test file when a font asset is
+  unloadable.** Any font that could not be loaded threw out of `loadAppFonts()`,
+  and because it is awaited in `flutter_test_config.dart`'s `testExecutable`, the
+  **entire test file failed at load time** — every golden in it, including those
+  that never render that font. Such a family is now skipped with a warning naming
+  the family, its assets and the underlying error, and the rest of the suite
+  runs. Families sharing the same assets (a family and its `packages/<pkg>/`
+  alias) warn once.
 - **Fixed: a failed `Roboto` / `MaterialIcons` manifest entry suppressed the
   Flutter SDK fallbacks.** Families were marked as loaded before the load was
   awaited, so a failure left the family "claimed" and skipped the SDK fallback,

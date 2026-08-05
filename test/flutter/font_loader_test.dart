@@ -268,6 +268,96 @@ void main() {
     });
   });
 
+  group('loadFontAsset', () {
+    final bytes = ByteData(4);
+
+    test('loads the manifest key as-is when it resolves', () async {
+      final tried = <String>[];
+
+      final data = await loadFontAsset(
+        'fonts/BrandSans.ttf',
+        load: (key) async {
+          tried.add(key);
+          return bytes;
+        },
+      );
+
+      expect(data, same(bytes));
+      expect(tried, ['fonts/BrandSans.ttf'], reason: 'no retry on the happy path');
+    });
+
+    test('retries with the percent-decoded key when the encoded one fails', () async {
+      final tried = <String>[];
+
+      final data = await loadFontAsset(
+        'packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf',
+        load: (key) async {
+          tried.add(key);
+          if (key.contains('%5B')) throw Exception('Unable to load asset: "$key"');
+          return bytes;
+        },
+      );
+
+      expect(data, same(bytes));
+      expect(tried, [
+        'packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf',
+        'packages/shadcn_ui/fonts/Geist[wght].ttf',
+      ]);
+    });
+
+    test('rethrows without retrying when the key has nothing to decode', () async {
+      final tried = <String>[];
+
+      await expectLater(
+        loadFontAsset(
+          'fonts/Missing.ttf',
+          load: (key) async {
+            tried.add(key);
+            throw Exception('Unable to load asset: "$key"');
+          },
+        ),
+        throwsA(isA<Exception>()),
+      );
+      expect(tried, ['fonts/Missing.ttf']);
+    });
+
+    test('propagates the failure when the decoded key fails too', () async {
+      final tried = <String>[];
+
+      await expectLater(
+        loadFontAsset(
+          'fonts/Geist%5Bwght%5D.ttf',
+          load: (key) async {
+            tried.add(key);
+            throw Exception('Unable to load asset: "$key"');
+          },
+        ),
+        throwsA(isA<Exception>()),
+      );
+      expect(tried, ['fonts/Geist%5Bwght%5D.ttf', 'fonts/Geist[wght].ttf']);
+    });
+
+    test('rethrows the original error when the key is not valid percent-encoding', () async {
+      // Uri.decodeFull throws on a stray '%' — the retry must not mask the
+      // real asset error with a FormatException.
+      final tried = <String>[];
+
+      await expectLater(
+        loadFontAsset(
+          'fonts/100%.ttf',
+          load: (key) async {
+            tried.add(key);
+            throw Exception('Unable to load asset: "$key"');
+          },
+        ),
+        throwsA(
+          isA<Exception>().having((e) => e.toString(), 'message', contains('Unable to load asset')),
+        ),
+      );
+      expect(tried, ['fonts/100%.ttf']);
+    });
+  });
+
   group('loadFontRegistrations', () {
     ({String family, List<String> assets}) reg(String family, List<String> assets) =>
         (family: family, assets: assets);

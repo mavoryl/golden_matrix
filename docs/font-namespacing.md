@@ -155,49 +155,67 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
   manifest is correctly prefixed and `loadAppFonts()` alone works — at the cost
   of testing through an extra app target.
 
-## A font asset that cannot be loaded at all
+## Variable fonts with brackets in the filename
 
-!!! success "No longer fatal since 1.1.2"
-    Up to 1.1.1 a single unloadable font asset threw out of `loadAppFonts()`.
-    Because it is awaited in `flutter_test_config.dart`, that failed the **whole
-    test file at load time** — every golden in it, including the ones that never
-    touch the font. Since 1.1.2 the family is skipped, a warning is printed, and
-    the rest of the suite runs.
+!!! success "Handled automatically since 1.1.2"
+    `Geist[wght].ttf`, `Inter[opsz,wght].ttf`, `Roboto[wdth,wght].ttf` — the
+    upstream naming convention for variable fonts — now load with no extra
+    setup. Up to 1.1.1 they were unloadable **and** took the whole test file
+    down with them.
 
-The common trigger is a **variable font whose filename contains square
-brackets** — the upstream naming convention (`Geist[wght].ttf`,
-`Inter[opsz,wght].ttf`, `Roboto[wdth,wght].ttf`). `[` and `]` are URI
-gen-delims, so the key that reaches `FontManifest.json` is percent-encoded
-(`Geist%5Bwght%5D.ttf`) while the file on disk keeps its literal name, and the
-`AssetBundle` lookup misses:
+### The symptom on 1.1.1 and earlier
+
+Every test file whose `flutter_test_config.dart` calls `loadAppFonts()` fails
+**at load time**, before a single test runs — including files that never render
+the font:
 
 ```
+Failed to load ".../test/marketing/hero_golden_test.dart":
 Unable to load asset: "packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf".
 The asset does not exist or has empty data.
+package:golden_matrix/src/flutter/font_loader.dart 90:37  loadAppFonts
+test/marketing/flutter_test_config.dart 9:3               testExecutable
 ```
 
-On 1.1.2+ you get this instead, and the suite keeps going:
+The blast radius is the whole file because `loadAppFonts()` is awaited in
+`testExecutable`, and the message names *your* test file rather than the
+offending dependency — which makes it read like a project bug.
+
+### Why it happens
+
+`[` and `]` are URI gen-delims, so `flutter_tools` percent-encodes the key it
+writes into `FontManifest.json`:
+
+```json
+[{"family":"packages/shadcn_ui/DepFont",
+  "fonts":[{"asset":"packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf"}]}]
+```
+
+`PlatformAssetBundle.load()` builds its platform message with
+`Uri.encodeFull(key)` — so that already-encoded key gets encoded **again**, the
+lookup asks for `Geist%255Bwght%255D.ttf`, and nothing matches. The bug is the
+double encoding, not the file: under `flutter test` the asset really is on disk
+at `build/unit_test_assets/packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf`.
+
+### What 1.1.2 does
+
+Retries the asset with the percent-**decoded** key
+(`packages/shadcn_ui/fonts/Geist[wght].ttf`), whose single encoding by
+`load()` lands exactly on the real filename. The raw key is always tried
+first, so fonts that already worked take the same path as before.
+
+If a font still cannot be loaded — for any reason — that family alone is
+skipped with a warning, and the rest of the suite runs:
 
 ```
 golden_matrix: skipped font family "Geist" (packages/shadcn_ui/fonts/Geist[wght].ttf):
 Unable to load asset: ... Goldens that use it fall back to another font.
 ```
 
-What to do about the missing typeface itself:
-
-- **Accept the fallback.** If the font is a transitive dependency you don't
-  render with, the warning is all you need.
-- **Load the file yourself**, bypassing `AssetBundle` — the same
-  `File(...).readAsBytes()` + `FontLoader.addFont` pattern as the
-  [manual loader above](#manual-workaround-older-versions), pointed at the real
-  path on disk. This works
-  because the encoding problem lives in the asset-key lookup, not in the file.
-- **Pin the dependency** to a version that ships static font weights.
-
-!!! note "The encoding half is not golden_matrix's"
-    The percent-encoded key comes out of `flutter_tools`; a retry with
-    `Uri.decodeFull()` does not help, since `PlatformAssetBundle.load()`
-    re-encodes it. Tracked in `KNOWN_ISSUES.md` in the repository.
+!!! note "On older versions"
+    Pin the dependency to a version that ships static font weights, or load the
+    files yourself with the `File(...).readAsBytes()` +
+    [`FontLoader` pattern above](#manual-workaround-older-versions).
 
 ## See also
 

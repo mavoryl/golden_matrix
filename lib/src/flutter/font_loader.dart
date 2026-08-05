@@ -86,7 +86,7 @@ Future<void> loadAppFonts({bool textFonts = true, bool iconFonts = true}) async 
     register: (family, assets) async {
       final fontLoader = FontLoader(family);
       for (final asset in assets) {
-        fontLoader.addFont(rootBundle.load(asset));
+        fontLoader.addFont(loadFontAsset(asset, load: rootBundle.load));
       }
       await fontLoader.load();
     },
@@ -109,6 +109,49 @@ Future<void> loadAppFonts({bool textFonts = true, bool iconFonts = true}) async 
   // icons would otherwise render as empty boxes.
   if (iconFonts && !loadedFamilies.contains('MaterialIcons')) {
     await _loadMaterialIconsFromSdk();
+  }
+}
+
+/// Loads one font asset's bytes, retrying with a percent-**decoded** key when
+/// the key from `FontManifest.json` fails to resolve.
+///
+/// Variable fonts are conventionally named with square brackets
+/// (`Geist[wght].ttf`, `Inter[opsz,wght].ttf`). `[` and `]` are URI gen-delims,
+/// so `flutter_tools` writes the manifest entry — and, under `flutter test`, the
+/// file in `build/unit_test_assets/` — percent-encoded (`Geist%5Bwght%5D.ttf`).
+/// `PlatformAssetBundle.load` then encodes the key *again*, looks for
+/// `Geist%255Bwght%255D.ttf` and misses. Feeding it the decoded key
+/// (`Geist[wght].ttf`) makes its single encoding land on the real filename.
+///
+/// The raw key is always tried first, so nothing changes for the normal case
+/// and for platforms where the encoded key is the one that resolves.
+@visibleForTesting
+Future<ByteData> loadFontAsset(
+  String asset, {
+  required Future<ByteData> Function(String key) load,
+}) async {
+  try {
+    return await load(asset);
+  } on Object {
+    final decoded = _percentDecodedOrNull(asset);
+    // Nothing to decode, or the key is not valid percent-encoding (a literal
+    // '%' in the filename) — surface the original asset failure.
+    if (decoded == null || decoded == asset) rethrow;
+    return load(decoded);
+  }
+}
+
+/// [Uri.decodeFull] for [key], or `null` when it is not valid percent-encoding.
+///
+/// Catches broadly on purpose: the SDK signals invalid encoding with
+/// `ArgumentError('Invalid URL encoding')`, older/other versions with a
+/// `FormatException`, and this helper performs no other operation that could
+/// fail — a decoding hiccup must never mask the asset error it came from.
+String? _percentDecodedOrNull(String key) {
+  try {
+    return Uri.decodeFull(key);
+  } on Object {
+    return null;
   }
 }
 

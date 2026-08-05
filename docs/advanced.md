@@ -337,9 +337,10 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     placeholders for text. Text geometry becomes predictable across
     macOS/Linux CI, while icons still render with real glyphs for review.
 
-!!! note "A font that fails to load no longer fails the suite (since 1.1.2)"
-    If one family cannot be loaded — e.g. a dependency ships a variable font
-    whose filename contains `[` / `]` — `loadAppFonts()` prints a warning,
-    skips that family and continues. Before 1.1.2 the exception propagated out
-    of `testExecutable` and failed the entire test file before any test ran.
-    See [Font namespacing](font-namespacing.md#a-font-asset-that-cannot-be-loaded-at-all).
+!!! note "Variable fonts and font failures (since 1.1.2)"
+    Fonts whose filename contains `[` / `]` (`Geist[wght].ttf` — the variable-font
+    convention) now load: `loadAppFonts()` retries the percent-decoded asset key
+    that `flutter_tools` double-encodes. And if a family still fails, it is
+    skipped with a warning instead of throwing out of `testExecutable` and
+    failing the entire test file before any test runs.
+    See [Font namespacing](font-namespacing.md#variable-fonts-with-brackets-in-the-filename).

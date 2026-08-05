@@ -42,7 +42,9 @@ Design constraints found while analysing this:
 **Version:** 1.1.1
 **Reported:** 2026-08-04 (found while upgrading achievement_companion to Flutter 3.44.8 / Dart 3.12.2)
 **Severity:** high — a single unloadable font asset in *any* dependency fails **every** test file that calls `loadAppFonts()`
-**Status:** the blast radius is **fixed in 1.1.2** (part 2 below — `loadFontRegistrations` isolates per-family failures and only records families that actually loaded). Part 1 — the percent-encoded asset key — is upstream and still open, so the font itself remains unloadable through `AssetBundle`; you get a warning and a fallback typeface instead of a dead suite.
+**Status: FIXED in 1.1.2** — both halves. The font itself now loads (`loadFontAsset` retries the percent-**decoded** key), and any font that still fails is isolated to its own family instead of killing the test file (`loadFontRegistrations`).
+
+> **Correction to the original analysis below:** it claimed a `Uri.decodeFull` retry cannot work because `PlatformAssetBundle.load` re-encodes the key. That is wrong — re-encoding is exactly what makes it work. Measured on a purpose-built repro (Flutter 3.44.8), see [Verified behavior](#verified-behavior).
 
 ### Symptom
 
@@ -66,7 +68,9 @@ Two independent parts, only the second of which golden_matrix owns:
 
 1. **Not ours — the asset key is URI-encoded before it reaches us.** The `%5B`/`%5D` are already present in the key golden_matrix reads out of `FontManifest.json`. Note the error message prints the *unencoded* argument: `PlatformAssetBundle.load` builds its platform message via `utf8.encode(Uri(path: Uri.encodeFull(key)).path)` but reports the failure through `_errorSummaryWithKey(key)` (`asset_bundle.dart:328-343`) — so a `%5B` in the message means it was in the manifest entry itself, not added by `load()`. `[` and `]` are URI gen-delims, so they get percent-encoded somewhere on the `asset path → Uri → manifest string` path in `flutter_tools`, while the file on disk is still literally named `Geist[wght].ttf`. The lookup therefore misses.
 
-   Consequence worth noting: this makes the asset effectively unreachable through `AssetBundle` in the test harness, so a "retry with `Uri.decodeFull(asset)`" fallback does **not** help — the decoded key is re-encoded by `Uri.encodeFull` inside `load()` and misses again.
+   ~~Consequence worth noting: this makes the asset effectively unreachable through `AssetBundle` in the test harness, so a "retry with `Uri.decodeFull(asset)`" fallback does **not** help — the decoded key is re-encoded by `Uri.encodeFull` inside `load()` and misses again.~~
+
+   **Wrong on two counts** (see [Verified behavior](#verified-behavior)): the file on disk under `flutter test` is *also* named with the encoding (`Geist%5Bwght%5D.ttf`), and the re-encoding inside `load()` is precisely what makes a decoded-key retry succeed. The real defect is **double encoding**: an already-encoded manifest key becomes `%255B` and matches nothing.
 
 2. **Ours — no error isolation.** `loadAppFonts` (`lib/src/flutter/font_loader.dart:86-93`) loops over every registration and awaits `fontLoader.load()` with no guard. One unloadable asset — in a transitive dependency the consumer doesn't control — throws out of `loadAppFonts`, which is awaited in `flutter_test_config.dart`'s `testExecutable`. A throw there fails the **entire test file at load time**, so tests that never render that font die too.
 
@@ -76,13 +80,41 @@ In achievement_companion this took out all 10 marketing golden files at once (`h
 
 Variable fonts with bracketed filenames are the upstream naming convention (`Inter[opsz,wght].ttf`, `Roboto[wdth,wght].ttf`), so more packages will hit this as they migrate.
 
-### Workaround (consumer side)
+### Verified behavior
 
-Pin the dependency to a version that ships static font files (achievement_companion holds `shadcn_ui: 0.53.6` for this reason, documented in its `pubspec.yaml`).
+Measured 2026-08-05 on Flutter 3.44.8 with a purpose-built repro: a package `dep_pkg` declaring `fonts/Dep[wght].ttf`, consumed by an app `bracket_probe` that also declares its own `fonts/Root[wght].ttf` (both files are copies of SDK Roboto).
 
-### Possible fix
+`FontManifest.json` as generated:
 
-Both parts are worth doing, and #1 alone already turns a suite-wide outage into one missing font:
+```json
+[{"family":"RootFont","fonts":[{"asset":"fonts/Root%5Bwght%5D.ttf"}]},
+ {"family":"packages/dep_pkg/DepFont","fonts":[{"asset":"packages/dep_pkg/fonts/Dep%5Bwght%5D.ttf"}]}]
+```
+
+| Attempt | Result |
+| --- | --- |
+| `rootBundle.load('fonts/Root%5Bwght%5D.ttf')` (the manifest key) | **fails** — `Unable to load asset` |
+| `rootBundle.load('fonts/Root[wght].ttf')` (decoded key) | **works** — 171676 bytes |
+| same pair for the `packages/dep_pkg/…` asset | identical outcome |
+
+The file on disk under `flutter test` is **also** percent-encoded — `build/unit_test_assets/fonts/Root%5Bwght%5D.ttf` exists, `…/Root[wght].ttf` does not. So `Uri.encodeFull` inside `load()` is not the enemy; it is what turns the decoded key back into the on-disk name. Feeding the manifest key straight through double-encodes it to `%255B`.
+
+End-to-end through `loadAppFonts()` after the 1.1.2 fix, text width of `'iiiiiiii'` at `fontSize: 20`:
+
+| Family | Width | Meaning |
+| --- | --- | --- |
+| (none → Ahem) | 160.0 | placeholder squares |
+| `RootFont` | 38.83 | project-level bracketed font renders |
+| `packages/dep_pkg/DepFont` | 38.83 | dependency's bracketed font renders |
+| `packages/bracket_probe/RootFont` | 38.83 | the self-test alias renders |
+
+No warnings emitted — the retry path resolves everything.
+
+### Workaround (consumer side, pre-1.1.2)
+
+Pin the dependency to a version that ships static font files (achievement_companion holds `shadcn_ui: 0.53.6` for this reason, documented in its `pubspec.yaml`). On 1.1.2+ the pin can be lifted.
+
+### Fix (shipped in 1.1.2)
 
 1. ~~**Degrade gracefully.**~~ **Done in 1.1.2** — `loadFontRegistrations` (`lib/src/flutter/font_loader.dart`) performs the planned registrations one by one, catching per family, warning once per unique asset list (a family and its `packages/<root>/` alias share assets, so one broken file produced two warnings in the naive version), and returning only the families that loaded. The `register` callback is injected, which is what makes the failure path unit-testable — `rootBundle` is not reachable from a test otherwise. Original sketch:
 
@@ -107,12 +139,16 @@ Both parts are worth doing, and #1 alone already turns a suite-wide outage into 
 
    Note `loadedFamilies.add` must move *after* a successful `load()` — otherwise a failed `Roboto`/`MaterialIcons` registration suppresses the SDK fallbacks that follow.
 
-2. **Bypass `AssetBundle` for bracketed assets.** *(still open)* The SDK-font helpers (`_loadRobotoFromSdk`, `_loadMaterialIconsFromSdk`) already prove the pattern: read the bytes with `File(...).readAsBytes()` and hand them to `FontLoader.addFont` directly, which sidesteps both `Uri.encodeFull` and the harness's asset lookup. For a `packages/<pkg>/<path>` asset the real file can be resolved from `.dart_tool/package_config.json` (`packageUri` root + `<path>`); for a root-project asset it's just `<path>` relative to the project dir. Worth gating on "the bundle load failed" so the normal path stays untouched.
+2. **Retry with the percent-decoded key.** **Done in 1.1.2** — `loadFontAsset` (`lib/src/flutter/font_loader.dart`) tries the manifest key first and, on failure, retries `Uri.decodeFull(asset)`; `load()`'s own `Uri.encodeFull` then reproduces the on-disk name exactly. Cheap, needs no knowledge of the project layout, and leaves the working path untouched. A key that is not valid percent-encoding (a literal `%` in the filename) surfaces the original asset error rather than an `ArgumentError` from the decoder.
 
-   Likely simpler first attempt: `flutter test` copies the bundle into `build/unit_test_assets/<asset key>` with the *literal* filename, so `File('build/unit_test_assets/$asset')` would fix brackets and every other URI-hostile character (spaces, `#`, non-ASCII) in one shot. That path is a `flutter_tools` implementation detail rather than a public contract, so verify it on a live repro and keep it as a fallback attempt, not the primary path.
+   Rejected alternative: bypass `AssetBundle` and read the file with `File(...).readAsBytes()` (the pattern `_loadRobotoFromSdk` uses), resolving `packages/<pkg>/<path>` through `.dart_tool/package_config.json`, or reading `build/unit_test_assets/<key>` directly. Both work in principle but depend on `flutter_tools` layout details that are not a public contract — unnecessary now that the decoded key resolves through the normal bundle.
 
-3. Consider surfacing this in `docs/font-namespacing.md` — it's the page a user lands on when fonts misbehave.
+3. **Document it.** Done in 1.1.2 — `docs/font-namespacing.md` gained a "Variable fonts with brackets in the filename" section; `docs/advanced.md` links to it from the font-loading section.
 
 ### Upstream
 
-The encoding half looks like a `flutter_tools` bug (a bracketed asset filename becomes unloadable through `AssetBundle`) and is worth a `flutter/flutter` issue with a minimal repro: a package with `fonts/Test[wght].ttf` declared in `pubspec.yaml`, plus a widget test that calls `rootBundle.load('packages/<pkg>/fonts/Test[wght].ttf')`. Confirm whether release builds resolve it (engine-side asset lookup may decode) before framing it as test-only.
+Still worth a `flutter/flutter` issue: **the asset key in `FontManifest.json` is percent-encoded, but every consumer of that key passes it to `AssetBundle.load`, which encodes it a second time** — so a font declared as `fonts/Test[wght].ttf` is unreachable through the key the framework itself published. Either the manifest should carry the raw path or `load()` should not re-encode.
+
+Minimal repro (built and confirmed on 3.44.8): a package declaring `fonts/Test[wght].ttf` in `pubspec.yaml`, plus a test that reads the manifest and calls `rootBundle.load(assetKeyFromManifest)` — fails, while `rootBundle.load(Uri.decodeFull(assetKeyFromManifest))` succeeds.
+
+Open question before filing: whether release builds behave the same. Only the test harness (`build/unit_test_assets/…`) was measured here; the engine-side asset lookup in a real app may decode differently, which would make this test-only. Worth checking, since `Text(style: TextStyle(fontFamily: …))` in a real app never touches the manifest key — the engine resolves the family — so a release-mode repro needs an explicit `rootBundle.load` of the font asset.

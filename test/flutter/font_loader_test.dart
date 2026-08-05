@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/src/flutter/font_loader.dart';
 
@@ -264,6 +265,112 @@ void main() {
       expect(isIconFamily('Phosphor'), isFalse);
       expect(isIconFamily('FontAwesomeBrands'), isFalse);
       expect(isIconFamily('Lucide'), isFalse);
+    });
+  });
+
+  group('loadFontRegistrations', () {
+    ({String family, List<String> assets}) reg(String family, List<String> assets) =>
+        (family: family, assets: assets);
+
+    test('returns every family when all registrations succeed', () async {
+      final registered = <String>[];
+      final warnings = <String>[];
+
+      final loaded = await loadFontRegistrations(
+        [
+          reg('BrandSans', ['fonts/BrandSans.ttf']),
+          reg('MaterialIcons', ['fonts/MaterialIcons.otf']),
+        ],
+        register: (family, assets) async => registered.add(family),
+        onWarning: warnings.add,
+      );
+
+      expect(loaded, {'BrandSans', 'MaterialIcons'});
+      expect(registered, ['BrandSans', 'MaterialIcons']);
+      expect(warnings, isEmpty);
+    });
+
+    test('keeps going after a failing family and excludes it from the result', () async {
+      final registered = <String>[];
+
+      final loaded = await loadFontRegistrations(
+        [
+          reg('Geist', ['packages/shadcn_ui/fonts/Geist[wght].ttf']),
+          reg('BrandSans', ['fonts/BrandSans.ttf']),
+        ],
+        register: (family, assets) async {
+          if (family == 'Geist') throw Exception('Unable to load asset');
+          registered.add(family);
+        },
+        onWarning: (_) {},
+      );
+
+      expect(loaded, {'BrandSans'});
+      expect(registered, ['BrandSans'], reason: 'later families must still be registered');
+    });
+
+    test('a failed family is not reported as loaded, so SDK fallbacks still apply', () async {
+      final loaded = await loadFontRegistrations(
+        [
+          reg('Roboto', ['fonts/Roboto-Regular.ttf']),
+        ],
+        register: (family, assets) async => throw Exception('boom'),
+        onWarning: (_) {},
+      );
+
+      expect(loaded.contains('Roboto'), isFalse);
+    });
+
+    test('warns with the family, the assets and the bracket hint', () async {
+      final warnings = <String>[];
+
+      await loadFontRegistrations(
+        [
+          reg('Geist', ['packages/shadcn_ui/fonts/Geist[wght].ttf']),
+        ],
+        register: (family, assets) async => throw Exception('Unable to load asset'),
+        onWarning: warnings.add,
+      );
+
+      expect(warnings, hasLength(1));
+      expect(warnings.single, contains('golden_matrix'));
+      expect(warnings.single, contains('Geist'));
+      expect(warnings.single, contains('packages/shadcn_ui/fonts/Geist[wght].ttf'));
+      expect(warnings.single, contains('Unable to load asset'));
+      expect(warnings.single, contains('font-namespacing'));
+    });
+
+    test('warns once when the same assets fail under a family and its alias', () async {
+      final warnings = <String>[];
+
+      final loaded = await loadFontRegistrations(
+        [
+          reg('Geist', ['packages/shadcn_ui/fonts/Geist[wght].ttf']),
+          reg('packages/ui_kit/Geist', ['packages/shadcn_ui/fonts/Geist[wght].ttf']),
+        ],
+        register: (family, assets) async => throw Exception('Unable to load asset'),
+        onWarning: warnings.add,
+      );
+
+      expect(loaded, isEmpty);
+      expect(warnings, hasLength(1), reason: 'one broken file → one warning');
+    });
+
+    test('defaults onWarning to debugPrint without throwing', () async {
+      final lines = <String?>[];
+      final original = debugPrint;
+      debugPrint = (String? message, {int? wrapWidth}) => lines.add(message);
+      addTearDown(() => debugPrint = original);
+
+      final loaded = await loadFontRegistrations(
+        [
+          reg('Geist', ['fonts/Geist[wght].ttf']),
+        ],
+        register: (family, assets) async => throw Exception('nope'),
+      );
+
+      expect(loaded, isEmpty);
+      expect(lines.single, contains('Geist'));
     });
   });
 

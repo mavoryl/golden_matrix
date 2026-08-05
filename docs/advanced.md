@@ -336,3 +336,10 @@ Future<void> testExecutable(FutureOr<void> Function() testMain) async {
     `loadAppFonts(textFonts: false)` loads only icon fonts and uses Ahem
     placeholders for text. Text geometry becomes predictable across
     macOS/Linux CI, while icons still render with real glyphs for review.
+
+!!! note "A font that fails to load no longer fails the suite (since 1.1.2)"
+    If one family cannot be loaded — e.g. a dependency ships a variable font
+    whose filename contains `[` / `]` — `loadAppFonts()` prints a warning,
+    skips that family and continues. Before 1.1.2 the exception propagated out
+    of `testExecutable` and failed the entire test file before any test ran.
+    See [Font namespacing](font-namespacing.md#a-font-asset-that-cannot-be-loaded-at-all).

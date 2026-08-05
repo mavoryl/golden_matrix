@@ -81,16 +81,16 @@ Future<void> loadAppFonts({bool textFonts = true, bool iconFonts = true}) async 
     rootPackage: rootPackageName(),
   );
 
-  final loadedFamilies = <String>{};
-
-  for (final reg in registrations) {
-    loadedFamilies.add(reg.family);
-    final fontLoader = FontLoader(reg.family);
-    for (final asset in reg.assets) {
-      fontLoader.addFont(rootBundle.load(asset));
-    }
-    await fontLoader.load();
-  }
+  final loadedFamilies = await loadFontRegistrations(
+    registrations,
+    register: (family, assets) async {
+      final fontLoader = FontLoader(family);
+      for (final asset in assets) {
+        fontLoader.addFont(rootBundle.load(asset));
+      }
+      await fontLoader.load();
+    },
+  );
 
   // Load Roboto from Flutter SDK if not already loaded from the manifest
   if (textFonts && !loadedFamilies.contains('Roboto')) {
@@ -110,6 +110,50 @@ Future<void> loadAppFonts({bool textFonts = true, bool iconFonts = true}) async 
   if (iconFonts && !loadedFamilies.contains('MaterialIcons')) {
     await _loadMaterialIconsFromSdk();
   }
+}
+
+/// Performs the registrations planned by [planFontRegistrations], isolating
+/// failures: a family that cannot be loaded is reported through [onWarning]
+/// (`debugPrint` by default) and skipped, instead of aborting the whole run.
+///
+/// This matters because [loadAppFonts] is awaited in `flutter_test_config.dart`
+/// — a throw there fails the **entire test file at load time**, before any test
+/// runs. A single unloadable font asset in a transitive dependency would take
+/// down every golden in the file, including the ones that never use that font.
+///
+/// Returns the families that actually loaded. Only successful registrations are
+/// included, so a failed `Roboto`/`MaterialIcons` entry in the manifest does not
+/// suppress the Flutter SDK fallbacks in [loadAppFonts].
+///
+/// Registrations sharing the same asset list (a family and its
+/// [namespacedAlias]) warn only once — one broken file, one message.
+@visibleForTesting
+Future<Set<String>> loadFontRegistrations(
+  Iterable<({String family, List<String> assets})> registrations, {
+  required Future<void> Function(String family, List<String> assets) register,
+  void Function(String message)? onWarning,
+}) async {
+  final loadedFamilies = <String>{};
+  final warnedAssets = <String>{};
+
+  for (final reg in registrations) {
+    try {
+      await register(reg.family, reg.assets);
+      loadedFamilies.add(reg.family);
+    } on Object catch (error) {
+      if (warnedAssets.add(reg.assets.join(','))) {
+        (onWarning ?? debugPrint)(
+          'golden_matrix: skipped font family "${reg.family}" '
+          '(${reg.assets.join(", ")}): $error. Goldens that use it fall back to '
+          'another font. Asset names containing "[" or "]" (the variable-font '
+          'convention) cannot be loaded through AssetBundle — see '
+          'https://mavoryl.github.io/golden_matrix/font-namespacing/',
+        );
+      }
+    }
+  }
+
+  return loadedFamilies;
 }
 
 /// Pure planning step for [loadAppFonts]: turns the raw `FontManifest.json`

@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/logo.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -1380,6 +1380,15 @@ variations:</p>
 placeholders for text. Text geometry becomes predictable across
 macOS/Linux CI, while icons still render with real glyphs for review.</p>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Variable fonts and font failures (since 1.1.2)</p>
+<p>Fonts whose filename contains <code>[</code> / <code>]</code> (<code>Geist[wght].ttf</code> — the variable-font
+convention) now load: <code>loadAppFonts()</code> retries the percent-decoded asset key
+that <code>flutter_tools</code> double-encodes. And if a family still fails, it is
+skipped with a warning instead of throwing out of <code>testExecutable</code> and
+failing the entire test file before any test runs.
+See <a href="../font-namespacing/#variable-fonts-with-brackets-in-the-filename">Font namespacing</a>.</p>
+</div>
 
 
 
@@ -1465,7 +1474,7 @@ macOS/Linux CI, while icons still render with real glyphs for review.</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.code.annotate", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

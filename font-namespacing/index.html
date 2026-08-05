@@ -23,7 +23,7 @@
       
       
       <link rel="icon" href="../assets/logo.svg">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.6">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.7">
     
     
       
@@ -31,7 +31,7 @@
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.ec1eaa64.min.css">
       
         
         <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
@@ -722,6 +722,56 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#variable-fonts-with-brackets-in-the-filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable fonts with brackets in the filename
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Variable fonts with brackets in the filename">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-symptom-on-111-and-earlier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The symptom on 1.1.1 and earlier
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-happens_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it happens
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-112-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What 1.1.2 does
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#see-also" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -854,6 +904,56 @@
     <span class="md-ellipsis">
       
         Alternatives
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variable-fonts-with-brackets-in-the-filename" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable fonts with brackets in the filename
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Variable fonts with brackets in the filename">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#the-symptom-on-111-and-earlier" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        The symptom on 1.1.1 and earlier
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#why-it-happens_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Why it happens
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#what-112-does" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What 1.1.2 does
       
     </span>
   </a>
@@ -1049,6 +1149,54 @@ Call both — they register disjoint families and don't conflict:</p>
   manifest is correctly prefixed and <code>loadAppFonts()</code> alone works — at the cost
   of testing through an extra app target.</li>
 </ul>
+<h2 id="variable-fonts-with-brackets-in-the-filename">Variable fonts with brackets in the filename<a class="headerlink" href="#variable-fonts-with-brackets-in-the-filename" title="Permanent link">&para;</a></h2>
+<div class="admonition success">
+<p class="admonition-title">Handled automatically since 1.1.2</p>
+<p><code>Geist[wght].ttf</code>, <code>Inter[opsz,wght].ttf</code>, <code>Roboto[wdth,wght].ttf</code> — the
+upstream naming convention for variable fonts — now load with no extra
+setup. Up to 1.1.1 they were unloadable <strong>and</strong> took the whole test file
+down with them.</p>
+</div>
+<h3 id="the-symptom-on-111-and-earlier">The symptom on 1.1.1 and earlier<a class="headerlink" href="#the-symptom-on-111-and-earlier" title="Permanent link">&para;</a></h3>
+<p>Every test file whose <code>flutter_test_config.dart</code> calls <code>loadAppFonts()</code> fails
+<strong>at load time</strong>, before a single test runs — including files that never render
+the font:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-6-1"><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>Failed to load &quot;.../test/marketing/hero_golden_test.dart&quot;:
+</span><span id="__span-6-2"><a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>Unable to load asset: &quot;packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf&quot;.
+</span><span id="__span-6-3"><a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>The asset does not exist or has empty data.
+</span><span id="__span-6-4"><a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>package:golden_matrix/src/flutter/font_loader.dart 90:37  loadAppFonts
+</span><span id="__span-6-5"><a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>test/marketing/flutter_test_config.dart 9:3               testExecutable
+</span></code></pre></div>
+<p>The blast radius is the whole file because <code>loadAppFonts()</code> is awaited in
+<code>testExecutable</code>, and the message names <em>your</em> test file rather than the
+offending dependency — which makes it read like a project bug.</p>
+<h3 id="why-it-happens_1">Why it happens<a class="headerlink" href="#why-it-happens_1" title="Permanent link">&para;</a></h3>
+<p><code>[</code> and <code>]</code> are URI gen-delims, so <code>flutter_tools</code> percent-encodes the key it
+writes into <code>FontManifest.json</code>:</p>
+<div class="language-json highlight"><pre><span></span><code><span id="__span-7-1"><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="p">[{</span><span class="nt">&quot;family&quot;</span><span class="p">:</span><span class="s2">&quot;packages/shadcn_ui/DepFont&quot;</span><span class="p">,</span>
+</span><span id="__span-7-2"><a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">  </span><span class="nt">&quot;fonts&quot;</span><span class="p">:[{</span><span class="nt">&quot;asset&quot;</span><span class="p">:</span><span class="s2">&quot;packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf&quot;</span><span class="p">}]}]</span>
+</span></code></pre></div>
+<p><code>PlatformAssetBundle.load()</code> builds its platform message with
+<code>Uri.encodeFull(key)</code> — so that already-encoded key gets encoded <strong>again</strong>, the
+lookup asks for <code>Geist%255Bwght%255D.ttf</code>, and nothing matches. The bug is the
+double encoding, not the file: under <code>flutter test</code> the asset really is on disk
+at <code>build/unit_test_assets/packages/shadcn_ui/fonts/Geist%5Bwght%5D.ttf</code>.</p>
+<h3 id="what-112-does">What 1.1.2 does<a class="headerlink" href="#what-112-does" title="Permanent link">&para;</a></h3>
+<p>Retries the asset with the percent-<strong>decoded</strong> key
+(<code>packages/shadcn_ui/fonts/Geist[wght].ttf</code>), whose single encoding by
+<code>load()</code> lands exactly on the real filename. The raw key is always tried
+first, so fonts that already worked take the same path as before.</p>
+<p>If a font still cannot be loaded — for any reason — that family alone is
+skipped with a warning, and the rest of the suite runs:</p>
+<div class="language-text highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>golden_matrix: skipped font family &quot;Geist&quot; (packages/shadcn_ui/fonts/Geist[wght].ttf):
+</span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Unable to load asset: ... Goldens that use it fall back to another font.
+</span></code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">On older versions</p>
+<p>Pin the dependency to a version that ships static font weights, or load the
+files yourself with the <code>File(...).readAsBytes()</code> +
+<a href="#manual-workaround-older-versions"><code>FontLoader</code> pattern above</a>.</p>
+</div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>
 <li><a href="../advanced/">Advanced</a> — the <code>## Font loading</code> section and <code>loadAppFonts()</code> options</li>
@@ -1141,7 +1289,7 @@ Call both — they register disjoint families and don't conflict:</p>
       <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.sections", "navigation.top", "navigation.tracking", "search.highlight", "search.share", "search.suggest", "content.code.copy", "content.code.annotate", "content.action.edit"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.d7400e89.min.js"></script>
       
     
   </body>

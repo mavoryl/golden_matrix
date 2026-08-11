@@ -1,3 +1,44 @@
+## 1.3.0
+
+- **BREAKING — `componentMatrixGolden`'s `pixelRatio` now defaults to `1.0`.**
+  1.2.0 made the parameter honest (it finally drives the raster) but kept its
+  historical `2.0` default, which silently doubled every component golden. The
+  default is now `1.0`, so component PNGs are the widget's logical size again —
+  the same files 1.1.2 and earlier produced, and consistent with `captureScale`
+  at screen level.
+
+  **Migration:** if you regenerated goldens on 1.2.0, they are 2× and will fail
+  on dimensions (`image sizes do not match`). Either regenerate:
+
+  ```bash
+  flutter test --update-goldens
+  ```
+
+  or pass `pixelRatio: 2.0` explicitly to keep the 1.2.0 files. Coming from
+  1.1.2 or earlier, nothing changes.
+
+- **BREAKING — reports are opt-in.** `reportFormats` on `matrixGolden`,
+  `screenMatrixGolden` and `componentMatrixGolden` now defaults to `const {}`:
+  a run writes no JSON/HTML/Markdown files unless you ask for them. Golden
+  runs no longer scatter report artifacts through the repo by default.
+
+  **Migration:** pass the bundle where you want reports —
+
+  ```dart
+  matrixGolden('Button', scenarios: [...], reportFormats: defaultReportFormats);
+  ```
+
+  `defaultReportFormats` still exports the JSON + HTML + Markdown set it always
+  did; it is simply no longer the default value. Stale-golden detection is
+  unaffected — with reports off, stale paths are printed to the console.
+
+- **Smaller published archive — 272 KB → 127 KB.** The package no longer ships
+  `test/`, the docs-site config, or the example's bracketed-font fixture, none
+  of which run from a pub cache. It also no longer ships `coverage/` and
+  golden-failure artifacts: those are gitignored, but a `.pubignore` makes pub
+  skip `.gitignore` entirely, so they had been leaking into the archive.
+  `lib/` and the `example/` usage surface are unchanged.
+
 ## 1.2.0
 
 - **BREAKING — `componentMatrixGolden` now really captures at `pixelRatio`.**

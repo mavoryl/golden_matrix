@@ -48,6 +48,7 @@ void main() {
       'rdef',
       scenarios: [MatrixScenario('default', builder: () => const SizedBox.shrink())],
       axes: const MatrixAxes(),
+      reportFormats: defaultReportFormats,
       // reportDir omitted on purpose — exercises default resolution.
       detectStaleGoldens: false,
       printSummary: false,
@@ -77,6 +78,7 @@ void main() {
         ),
       ],
       axes: const MatrixAxes(),
+      reportFormats: defaultReportFormats,
       // reportDir omitted on purpose.
       detectStaleGoldens: false,
       printSummary: false,

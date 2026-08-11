@@ -79,13 +79,16 @@ const _componentBoundaryKey = ValueKey('__golden_matrix_component_boundary__');
 ///   `devices` field is ignored.
 /// - [sampling] / [maxCombinations] / [rules] / [scenarioTags] — same
 ///   semantics as [matrixGolden].
-/// - [pixelRatio] — capture density (default `2.0`). PNG resolution in
-///   physical pixels = (widget logical size + [padding]) × this value, so
-///   the default writes a 20×10 widget as a 40×20 file. Must be > 0.
+/// - [pixelRatio] — capture density (default `1.0`, i.e. goldens are
+///   written at logical size). PNG resolution in physical pixels =
+///   (widget logical size + [padding]) × this value, so `pixelRatio: 2.0`
+///   writes a 20×10 widget as a 40×20 file. Must be > 0.
 ///   Up to 1.1.2 this value only configured layout and every golden was
-///   written at logical size; since 1.2.0 it drives the raster as documented,
-///   which means existing component goldens need one
-///   `flutter test --update-goldens`.
+///   written at logical size regardless; 1.2.0 made it drive the raster
+///   but kept the old `2.0` default, doubling everyone's goldens. Since
+///   1.3.0 the default is `1.0` — same size as pre-1.2.0, so 1.2.0 users
+///   need one `flutter test --update-goldens` (or `pixelRatio: 2.0` to
+///   keep the 1.2.0 files).
 /// - [padding] — added around the widget inside the boundary so PNG
 ///   edges have a little visual breathing room. Default
 ///   `EdgeInsets.all(8)`; pass `EdgeInsets.zero` for tightest crop.
@@ -107,7 +110,7 @@ void componentMatrixGolden(
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
-  Set<MatrixReportFormat> reportFormats = defaultReportFormats,
+  Set<MatrixReportFormat> reportFormats = const {},
   String? reportDir,
   bool skip = false,
   double? tolerance,
@@ -116,7 +119,7 @@ void componentMatrixGolden(
   bool freezeAnimations = false,
   Duration? captureAfter,
   bool detectStaleGoldens = true,
-  double pixelRatio = 2.0,
+  double pixelRatio = 1.0,
   EdgeInsets padding = const EdgeInsets.all(8),
 }) {
   validateCaptureScale(pixelRatio, 'pixelRatio');

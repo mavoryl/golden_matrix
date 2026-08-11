@@ -136,7 +136,8 @@ matrixGolden(
 ```
 
 Same parameter on `screenMatrixGolden()`. In component mode the equivalent is
-`componentMatrixGolden(pixelRatio: ...)`, which defaults to `2.0`.
+`componentMatrixGolden(pixelRatio: ...)`, which also defaults to `1.0` — both
+levels write logical-size goldens unless you ask for more.
 
 !!! warning "Changing the scale invalidates existing goldens"
     The comparator fails on differing dimensions before it ever compares

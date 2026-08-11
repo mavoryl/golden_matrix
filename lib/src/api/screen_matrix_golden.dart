@@ -58,8 +58,9 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 ///   [MatrixScenario.tags]. Not a Flutter test tag.
 /// - [fileNameBuilder] — Override the default golden file name.
 /// - [reportFormats] — Set of formats to write (`json`, `html`,
-///   `markdown`). Defaults to all three. Pass an empty set to skip
-///   reporting entirely.
+///   `markdown`, `junit`). Defaults to `const {}` — no reports are
+///   written unless you ask. Pass [defaultReportFormats] for the usual
+///   JSON + HTML + Markdown trio.
 /// - `report` — **Deprecated.** Legacy bool toggle. Use [reportFormats]
 ///   instead. When both are passed, `report` wins.
 /// - [reportDir] — Optional directory for the generated report.
@@ -121,7 +122,7 @@ void screenMatrixGolden(
   List<MatrixRule> rules = const [],
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
-  Set<MatrixReportFormat> reportFormats = defaultReportFormats,
+  Set<MatrixReportFormat> reportFormats = const {},
   String? reportDir,
   bool skip = false,
   double? tolerance,

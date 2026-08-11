@@ -20,12 +20,12 @@ void main() {
   });
 
   final defaultDir = Directory.systemTemp.createTempSync('cmg_default_');
+  final omittedDir = Directory.systemTemp.createTempSync('cmg_omitted_');
   final mdOnlyDir = Directory.systemTemp.createTempSync('cmg_md_');
-  final emptyDir = Directory.systemTemp.createTempSync('cmg_empty_');
   final junitDir = Directory.systemTemp.createTempSync('cmg_junit_');
 
   tearDownAll(() {
-    for (final d in [defaultDir, mdOnlyDir, emptyDir, junitDir]) {
+    for (final d in [defaultDir, omittedDir, mdOnlyDir, junitDir]) {
       if (d.existsSync()) d.deleteSync(recursive: true);
     }
   });
@@ -35,19 +35,39 @@ void main() {
   Widget tinyBox() =>
       const SizedBox(width: 40, height: 40, child: ColoredBox(color: Color(0xFFFF0000)));
 
-  // 1. Default formats — json + html + md all written.
+  // 1. defaultReportFormats — json + html + md all written.
   componentMatrixGolden(
     'cmg_default',
     scenarios: [MatrixScenario('s', builder: tinyBox)],
     axes: const MatrixAxes(),
     reportDir: defaultDir.path,
+    reportFormats: defaultReportFormats,
     detectStaleGoldens: false,
     printSummary: false,
   );
-  test('componentMatrixGolden default reportFormats writes all 3 files', () {
+  test('componentMatrixGolden defaultReportFormats writes all 3 files', () {
     expect(fileExists(defaultDir, 'componentmatrixgolden__cmg_default_report.json'), isTrue);
     expect(fileExists(defaultDir, 'componentmatrixgolden__cmg_default_report.html'), isTrue);
     expect(fileExists(defaultDir, 'componentmatrixgolden__cmg_default_report.md'), isTrue);
+  });
+
+  // 1a. reportFormats omitted — opt-in since 1.3.0, so nothing is written.
+  componentMatrixGolden(
+    'cmg_omitted',
+    scenarios: [MatrixScenario('s', builder: tinyBox)],
+    axes: const MatrixAxes(),
+    reportDir: omittedDir.path,
+    detectStaleGoldens: false,
+    printSummary: false,
+  );
+  test('componentMatrixGolden without reportFormats writes nothing', () {
+    for (final ext in ['json', 'html', 'md', 'xml']) {
+      expect(
+        fileExists(omittedDir, 'componentmatrixgolden__cmg_omitted_report.$ext'),
+        isFalse,
+        reason: 'reports must be opt-in; found a .$ext report',
+      );
+    }
   });
 
   // 1b. Same setup with printSummary enabled — exercises the formatSummary
@@ -85,22 +105,7 @@ void main() {
     expect(fileExists(mdOnlyDir, 'componentmatrixgolden__cmg_md_report.html'), isFalse);
   });
 
-  // 3. Empty formats — no report files written.
-  componentMatrixGolden(
-    'cmg_empty',
-    scenarios: [MatrixScenario('s', builder: tinyBox)],
-    axes: const MatrixAxes(),
-    reportFormats: const {},
-    reportDir: emptyDir.path,
-    detectStaleGoldens: false,
-    printSummary: false,
-  );
-  test('componentMatrixGolden reportFormats: {} writes nothing', () {
-    expect(fileExists(emptyDir, 'componentmatrixgolden__cmg_empty_report.json'), isFalse);
-    expect(fileExists(emptyDir, 'componentmatrixgolden__cmg_empty_report.md'), isFalse);
-  });
-
-  // 4. JUnit — .xml is written.
+  // 3. JUnit — .xml is written.
   componentMatrixGolden(
     'cmg_junit',
     scenarios: [MatrixScenario('s', builder: tinyBox)],

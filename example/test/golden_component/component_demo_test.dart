@@ -24,6 +24,7 @@ void main() {
     ],
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
     tolerance: kDemoTolerance,
+    reportFormats: defaultReportFormats,
   );
 
   componentMatrixGolden(
@@ -36,6 +37,7 @@ void main() {
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
     freezeAnimations: true, // loading uses CircularProgressIndicator
     tolerance: kDemoTolerance,
+    reportFormats: defaultReportFormats,
   );
 
   componentMatrixGolden(
@@ -47,6 +49,7 @@ void main() {
     ],
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
     tolerance: kDemoTolerance,
+    reportFormats: defaultReportFormats,
   );
 }
 

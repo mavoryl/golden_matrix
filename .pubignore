@@ -1,11 +1,32 @@
+# NOTE: the presence of this file makes pub ignore .gitignore entirely when
+# packing. Anything filtered only by .gitignore (coverage/, failures/, …) leaks
+# into the published archive unless it is repeated here.
+
 golden_matrix_plan.md
 article_medium.md
 docs/
 internal_docs/
 requirements.txt
-# Root-anchored: the README banner is not worth shipping, but example/assets/
-# holds the bracketed-font regression fixture the example's tests need.
+
+# Consumers get the package, not our test suite: `flutter test` never runs from
+# a pub cache, and pana awards nothing for shipping tests. Root-anchored on
+# purpose — a bare `test/` would also swallow example/test/, which stays because
+# example/ is the documented usage surface.
+/test/
+
+# Local run artifacts — gitignored, but see the NOTE above.
+/coverage/
+**/failures/
+# The README banner is not worth shipping, and neither is the bracketed-font
+# regression fixture: 167 KB — ~40% of the archive — for a test that only ever
+# runs in this repo's CI. Both stay in git; only the published archive loses
+# them, together with the test that would otherwise sit there without its font.
 /assets/
+example/assets/
+example/test/golden/bracketed_font_regression_test.dart
+
+# Config for the docs site, whose docs/ is already excluded above.
+mkdocs.yml
 .claude/
 build/
 example/build/

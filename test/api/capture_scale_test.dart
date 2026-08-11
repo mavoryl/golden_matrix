@@ -11,8 +11,8 @@ import '../_helpers/capturing_comparator.dart';
 /// `MatrixDevice.pixelRatio` deliberately does *not* affect it — it configures
 /// layout and MediaQuery. Screen-level captures scale via `captureScale`
 /// (default 1.0, opt-in); component-level captures scale via
-/// `componentMatrixGolden`'s own `pixelRatio` (default 2.0), which is what its
-/// documentation has always promised.
+/// `componentMatrixGolden`'s own `pixelRatio` — also 1.0 by default since
+/// 1.3.0, so both levels write logical-size goldens unless asked otherwise.
 void main() {
   final capture = CapturingGoldenComparator();
   GoldenFileComparator? saved;
@@ -37,7 +37,6 @@ void main() {
     'cap',
     scenarios: [MatrixScenario('default_scale', builder: filled)],
     axes: axes,
-    reportFormats: const {},
     detectStaleGoldens: false,
     printSummary: false,
   );
@@ -50,7 +49,6 @@ void main() {
     scenarios: [MatrixScenario('scaled_2x', builder: filled)],
     axes: axes,
     captureScale: 2.0,
-    reportFormats: const {},
     detectStaleGoldens: false,
     printSummary: false,
   );
@@ -64,7 +62,6 @@ void main() {
     axes: axes,
     captureScale: 3.0,
     appBuilder: (combination) => MaterialApp(home: filled()),
-    reportFormats: const {},
     detectStaleGoldens: false,
     printSummary: false,
   );
@@ -77,7 +74,6 @@ void main() {
     scenarios: [MatrixScenario('fractional', builder: filled)],
     axes: axes,
     captureScale: 1.5,
-    reportFormats: const {},
     detectStaleGoldens: false,
     printSummary: false,
   );
@@ -95,26 +91,24 @@ void main() {
     scenarios: [MatrixScenario('component_default', builder: box)],
     axes: const MatrixAxes(),
     padding: EdgeInsets.zero,
-    reportFormats: const {},
     detectStaleGoldens: false,
     printSummary: false,
   );
-  test('componentMatrixGolden captures at its default pixelRatio of 2.0', () {
-    expect(capture.sizeOf('component_default'), (width: 40, height: 20));
+  test('componentMatrixGolden captures at the logical size by default (pixelRatio 1.0)', () {
+    expect(capture.sizeOf('component_default'), (width: 20, height: 10));
   });
 
   componentMatrixGolden(
     'cap_component',
-    scenarios: [MatrixScenario('component_1x', builder: box)],
+    scenarios: [MatrixScenario('component_2x', builder: box)],
     axes: const MatrixAxes(),
     padding: EdgeInsets.zero,
-    pixelRatio: 1.0,
-    reportFormats: const {},
+    pixelRatio: 2.0,
     detectStaleGoldens: false,
     printSummary: false,
   );
-  test('componentMatrixGolden pixelRatio: 1.0 captures at the logical size', () {
-    expect(capture.sizeOf('component_1x'), (width: 20, height: 10));
+  test('componentMatrixGolden pixelRatio: 2.0 doubles the raster', () {
+    expect(capture.sizeOf('component_2x'), (width: 40, height: 20));
   });
 
   componentMatrixGolden(
@@ -122,8 +116,7 @@ void main() {
     scenarios: [MatrixScenario('component_padded', builder: box)],
     axes: const MatrixAxes(),
     padding: const EdgeInsets.all(5),
-    // pixelRatio left at its 2.0 default — the padded size is scaled too.
-    reportFormats: const {},
+    pixelRatio: 2.0,
     detectStaleGoldens: false,
     printSummary: false,
   );

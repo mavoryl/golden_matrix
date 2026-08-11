@@ -70,8 +70,9 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 ///   scenario (e.g. seed a different fake state per combination). When
 ///   `null`, the widget tree is identical to previous versions.
 /// - [reportFormats] — Set of report formats to write after the run.
-///   Defaults to all three (`json`, `html`, `markdown`). Pass an empty
-///   set to skip reporting entirely; pass a singleton like
+///   Defaults to `const {}` — reports are opt-in, nothing is written
+///   unless you ask. Pass [defaultReportFormats] for the usual
+///   `json` + `html` + `markdown` trio, or a singleton like
 ///   `{MatrixReportFormat.markdown}` for CI-only Markdown summaries.
 /// - `report` — **Deprecated.** Legacy bool toggle for all formats at
 ///   once. Use [reportFormats] instead. When both are passed, `report`
@@ -180,7 +181,7 @@ void matrixGolden(
   List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
   Widget Function(Widget child)? wrapChild,
   Widget Function(Widget app, MatrixCombination combination)? wrapApp,
-  Set<MatrixReportFormat> reportFormats = defaultReportFormats,
+  Set<MatrixReportFormat> reportFormats = const {},
   String? reportDir,
   bool skip = false,
   double? tolerance,

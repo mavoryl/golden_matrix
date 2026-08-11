@@ -90,7 +90,7 @@ What it does **not** do is change the size of the PNG. A `phoneSmall` golden (37
     size of every golden the call produces, so regenerate with
     `flutter test --update-goldens`; the scale is not encoded in the golden
     path. For `componentMatrixGolden()` the equivalent knob is its own
-    `pixelRatio` parameter (default `2.0`).
+    `pixelRatio` parameter (default `1.0` since 1.3.0).
 
 ## Tweaking a preset
 

@@ -20,7 +20,7 @@ It does not replace `flutter_test` or Flutter's own golden machinery; it sits on
 1.0.0 removes the APIs deprecated during 0.x:
 
 - **`report: bool`** on `matrixGolden` / `screenMatrixGolden` → use `reportFormats`:
-    - `report: true` → drop it (the default writes JSON + HTML + Markdown), or pass `reportFormats: defaultReportFormats`.
+    - `report: true` → `reportFormats: defaultReportFormats` (JSON + HTML + Markdown). Since 1.3.0 reports are opt-in, so dropping it silently turns them off.
     - `report: false` → `reportFormats: const {}`.
 - **`reportOrphanGoldenSubdirs` / `MatrixGoldenRegistry`** → removed. Per-test stale detection (`detectStaleGoldens`, on by default) already catches scenario-level orphans — see [Reports](reports.md).
 

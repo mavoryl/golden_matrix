@@ -113,7 +113,6 @@ void main() {
     'setup invoked once per combination',
     scenarios: [MatrixScenario('default', builder: () => const _CounterButton())],
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
-    reportFormats: const {},
     printSummary: false,
     fileNameBuilder: (c) => 'goldens/_postpump/setup_${c.theme.name}.png',
     setup: (tester, c) async {
@@ -142,7 +141,6 @@ void main() {
     ],
     axes: const MatrixAxes(),
     freezeAnimations: true,
-    reportFormats: const {},
     printSummary: false,
     fileNameBuilder: (c) => 'goldens/_postpump/freeze.png',
     setup: (tester, c) async {
@@ -167,7 +165,6 @@ void main() {
     scenarios: [MatrixScenario('static', builder: () => const _CounterButton())],
     axes: const MatrixAxes(),
     captureAfter: const Duration(milliseconds: 150),
-    reportFormats: const {},
     printSummary: false,
     fileNameBuilder: (c) => 'goldens/_postpump/capture_after.png',
     setup: (tester, c) async {
@@ -192,7 +189,6 @@ void main() {
     axes: const MatrixAxes(),
     freezeAnimations: true,
     captureAfter: const Duration(milliseconds: 100),
-    reportFormats: const {},
     printSummary: false,
     fileNameBuilder: (c) => 'goldens/_postpump/combined.png',
     setup: (tester, c) async {

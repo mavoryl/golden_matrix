@@ -9,7 +9,7 @@ import '../_helpers/no_op_comparator.dart';
 /// Each `matrixGolden(...)` call below writes its reports into a fresh
 /// temp directory via `reportDir:`, then a follow-up `test(...)` asserts
 /// which files actually exist there. Together they exercise the
-/// `reportFormats` dispatch (including the empty set and junit opt-in).
+/// `reportFormats` dispatch (including the opt-in default and junit).
 void main() {
   GoldenFileComparator? saved;
 
@@ -25,13 +25,13 @@ void main() {
   // Allocate dirs up-front so they're stable across the synchronous group
   // construction (matrixGolden registers groups eagerly).
   final defaultDir = Directory.systemTemp.createTempSync('rf_default_');
+  final omittedDir = Directory.systemTemp.createTempSync('rf_omitted_');
   final mdOnlyDir = Directory.systemTemp.createTempSync('rf_md_');
   final jsonHtmlDir = Directory.systemTemp.createTempSync('rf_jsonhtml_');
-  final emptyDir = Directory.systemTemp.createTempSync('rf_empty_');
   final junitOnlyDir = Directory.systemTemp.createTempSync('rf_junit_');
 
   tearDownAll(() {
-    for (final d in [defaultDir, mdOnlyDir, jsonHtmlDir, emptyDir, junitOnlyDir]) {
+    for (final d in [defaultDir, omittedDir, mdOnlyDir, jsonHtmlDir, junitOnlyDir]) {
       if (d.existsSync()) d.deleteSync(recursive: true);
     }
   });
@@ -40,19 +40,40 @@ void main() {
 
   bool fileExists(Directory dir, String name) => File('${dir.path}/$name').existsSync();
 
-  // 1. Default — all three formats.
+  // 1. defaultReportFormats — the opt-in bundle writes all three formats.
   matrixGolden(
     'rf_default',
     scenarios: [scenario()],
     axes: const MatrixAxes(),
     reportDir: defaultDir.path,
+    reportFormats: defaultReportFormats,
     detectStaleGoldens: false,
     printSummary: false,
   );
-  test('default reportFormats writes all three files', () {
+  test('defaultReportFormats writes all three files', () {
     expect(fileExists(defaultDir, 'matrixgolden__rf_default_report.json'), isTrue);
     expect(fileExists(defaultDir, 'matrixgolden__rf_default_report.html'), isTrue);
     expect(fileExists(defaultDir, 'matrixgolden__rf_default_report.md'), isTrue);
+  });
+
+  // 1b. reportFormats omitted — reports are opt-in since 1.3.0, so nothing
+  //     lands on disk.
+  matrixGolden(
+    'rf_omitted',
+    scenarios: [scenario()],
+    axes: const MatrixAxes(),
+    reportDir: omittedDir.path,
+    detectStaleGoldens: false,
+    printSummary: false,
+  );
+  test('omitting reportFormats writes no report files', () {
+    for (final ext in ['json', 'html', 'md', 'xml']) {
+      expect(
+        fileExists(omittedDir, 'matrixgolden__rf_omitted_report.$ext'),
+        isFalse,
+        reason: 'reports must be opt-in; found a .$ext report',
+      );
+    }
   });
 
   // 2. {markdown} — only .md is written.
@@ -87,23 +108,7 @@ void main() {
     expect(fileExists(jsonHtmlDir, 'matrixgolden__rf_jsonhtml_report.md'), isFalse);
   });
 
-  // 4. Empty set — nothing written.
-  matrixGolden(
-    'rf_empty',
-    scenarios: [scenario()],
-    axes: const MatrixAxes(),
-    reportDir: emptyDir.path,
-    reportFormats: const {},
-    detectStaleGoldens: false,
-    printSummary: false,
-  );
-  test('reportFormats: {} writes no report files', () {
-    expect(fileExists(emptyDir, 'matrixgolden__rf_empty_report.json'), isFalse);
-    expect(fileExists(emptyDir, 'matrixgolden__rf_empty_report.html'), isFalse);
-    expect(fileExists(emptyDir, 'matrixgolden__rf_empty_report.md'), isFalse);
-  });
-
-  // 5. {junit} — only .xml is written; .json/.html/.md absent.
+  // 4. {junit} — only .xml is written; .json/.html/.md absent.
   matrixGolden(
     'rf_junit',
     scenarios: [scenario()],
@@ -120,8 +125,8 @@ void main() {
     expect(fileExists(junitOnlyDir, 'matrixgolden__rf_junit_report.md'), isFalse);
   });
 
-  // 6. default reportFormats does NOT include junit (opt-in).
-  test('default reportFormats omits junit', () {
+  // 5. defaultReportFormats does NOT include junit (opt-in).
+  test('defaultReportFormats omits junit', () {
     expect(fileExists(defaultDir, 'matrixgolden__rf_default_report.xml'), isFalse);
   });
 }

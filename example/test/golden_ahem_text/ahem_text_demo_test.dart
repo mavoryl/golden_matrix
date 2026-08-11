@@ -31,5 +31,6 @@ void main() {
       ),
     ],
     axes: const MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
+    reportFormats: defaultReportFormats,
   );
 }

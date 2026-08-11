@@ -50,7 +50,7 @@ void runMatrixTests(
   List<MatrixRule> rules = const [],
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
-  Set<MatrixReportFormat> reportFormats = defaultReportFormats,
+  Set<MatrixReportFormat> reportFormats = const {},
   String? reportDir,
   bool skip = false,
   double? tolerance,

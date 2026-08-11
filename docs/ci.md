@@ -2,11 +2,11 @@
 
 Wire matrix golden runs into your pipeline: surface results as step summaries, JUnit checks, and stale-golden warnings.
 
-Reports are written next to your goldens after every run. Pick the formats that match your pipeline — JSON, HTML, Markdown, and JUnit XML are all toggleable per call. For full format details see [Reports](reports.md).
+Reports are opt-in since 1.3.0: pass `reportFormats` and they land next to your goldens after every run. Pick the formats that match your pipeline — JSON, HTML, Markdown, and JUnit XML are all toggleable per call. For full format details see [Reports](reports.md).
 
 ## GitHub Actions step summary (Markdown)
 
-Each run writes a `<slug>_report.md` next to the JSON and HTML reports — a summary list, a failure table, a stale-goldens list, and a link to the HTML. Pipe every Markdown report into the GitHub Actions step summary:
+With `MatrixReportFormat.markdown` enabled, each run writes a `<slug>_report.md` next to the JSON and HTML reports — a summary list, a failure table, a stale-goldens list, and a link to the HTML. Pipe every Markdown report into the GitHub Actions step summary:
 
 ```yaml
 - name: golden matrix step summary
@@ -22,7 +22,7 @@ The same file works for PR-comment bots, Slack/Discord notifiers, or any tool th
 
 ## JUnit XML for CI dashboards
 
-Opt in with `MatrixReportFormat.junit` to get a `<slug>_report.xml` next to the other reports. Each scenario becomes a `<testsuite>`, each combination a `<testcase>`; failures land as `<failure>` with the captured error message.
+Add `MatrixReportFormat.junit` to `reportFormats` to get a `<slug>_report.xml` next to the other reports. Each scenario becomes a `<testsuite>`, each combination a `<testcase>`; failures land as `<failure>` with the captured error message.
 
 ```dart
 matrixGolden(
@@ -105,7 +105,7 @@ Detection is best-effort and recognises `CI=true|1` (GitHub Actions, GitLab CI, 
 
 Per-test stale-golden detection runs automatically and catches files in a test's subdir that weren't produced by any combination — for example, a scenario was renamed and the old PNGs were left behind. See [Reports](reports.md) for the detection concept.
 
-When reports are enabled (default), stale paths appear in the JSON/HTML/Markdown/JUnit output. When you've disabled reports with `reportFormats: const {}`, stale files are printed to the console:
+When you've enabled reports via `reportFormats`, stale paths appear in the JSON/HTML/Markdown/JUnit output. With reports off — the default since 1.3.0 — stale files are printed to the console:
 
 ```
 golden_matrix: screenMatrixGolden: dialog has 2 stale golden file(s):

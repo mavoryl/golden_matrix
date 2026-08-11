@@ -25,7 +25,6 @@ void main() {
     appBuilder: (combination) => const MaterialApp(home: Scaffold(body: SizedBox.shrink())),
     axes: const MatrixAxes(),
     printSummary: false,
-    reportFormats: const {},
   );
 
   screenMatrixGolden(
@@ -36,7 +35,6 @@ void main() {
       MatrixScenario('b', builder: () => const SizedBox.shrink()),
     ],
     printSummary: false,
-    reportFormats: const {},
   );
 
   test('screenMatrixGolden delegate compiled and executed without throwing', () {

@@ -71,7 +71,7 @@ flutter test                   # run regression tests
 - **Three entry points** — `matrixGolden` (components), `screenMatrixGolden` (full screens), `componentMatrixGolden` (intrinsic-size primitives)
 - **Typed scenarios** — `MatrixScenario.typed<T>` attaches a compile-time-checked state payload, so one builder covers loading/loaded/error/empty
 - **Sampling** — `full`, `smoke`, `pairwise`, `priorityBased` to keep CI fast
-- **HTML / JSON / Markdown / JUnit XML reports** — with inline pixel-diff thumbnails on failure
+- **HTML / JSON / Markdown / JUnit XML reports** (opt-in via `reportFormats`) — with inline pixel-diff thumbnails on failure
 - **Stale + overflow detection** — orphan goldens and `RenderFlex overflow` surface automatically
 - **RTL auto-inference** for Arabic / Hebrew / Farsi
 - **20+ device presets** — modern iPhones, Android, foldables, full iPad lineup, plus custom devices

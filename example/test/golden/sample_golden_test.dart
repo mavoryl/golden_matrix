@@ -40,8 +40,9 @@ void main() {
       devices: [MatrixDevice.phoneSmall, MatrixDevice.phoneLarge],
     ),
     tolerance: 0.01 / 100, // absorb cross-macOS AA noise on CI
-    // Spike: emit JUnit XML alongside the default JSON/HTML/MD reports
-    // so GitHub Actions can render this matrix as a test tree.
+    // Reports are opt-in: `defaultReportFormats` is the JSON/HTML/MD bundle,
+    // and this call adds JUnit XML on top so GitHub Actions can render the
+    // matrix as a test tree.
     reportFormats: const {
       MatrixReportFormat.json,
       MatrixReportFormat.html,
@@ -68,6 +69,7 @@ void main() {
     ],
     preset: MatrixPreset.componentSmoke,
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -95,6 +97,7 @@ void main() {
       devices: [MatrixDevice.iphoneSE, MatrixDevice.galaxyA51],
     ),
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -126,6 +129,7 @@ void main() {
     ],
     preset: MatrixPreset.componentFull,
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -147,6 +151,7 @@ void main() {
     ],
     preset: MatrixPreset.screenSmoke,
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -180,6 +185,7 @@ void main() {
     sampling: MatrixSampling.priorityBased,
     maxCombinations: 8,
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -199,6 +205,7 @@ void main() {
       MatrixRule.exclude((c) => c.locale.languageCode != 'ar' && c.direction == TextDirection.rtl),
     ],
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -214,6 +221,7 @@ void main() {
     ),
     // Overflow stripes are AA-heavy and noisy across macOS versions.
     tolerance: 0.02 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -227,6 +235,7 @@ void main() {
       devices: [MatrixDevice.phoneSmall],
     ),
     tolerance: 0.05 / 100, // 0.05% pixel diff allowed
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -243,6 +252,7 @@ void main() {
     ),
     freezeAnimations: true,
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 
   // ---------------------------------------------------------------------------
@@ -260,5 +270,6 @@ void main() {
     ),
     captureAfter: const Duration(milliseconds: 750),
     tolerance: 0.01 / 100,
+    reportFormats: defaultReportFormats,
   );
 }

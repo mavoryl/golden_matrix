@@ -158,7 +158,7 @@ For small visual primitives — buttons, badges, chips, list tiles — captured 
 their **natural** size instead of a full device viewport. Keeps the full
 `MaterialApp` context (theme, fonts, icons, locale, overlays); the PNG is
 exactly widget-sized plus optional padding, multiplied by `pixelRatio`
-(default `2.0`). The `devices` axis is ignored.
+(default `1.0`). The `devices` axis is ignored.
 
 ```dart
 componentMatrixGolden(
@@ -186,8 +186,8 @@ componentMatrixGolden(
   the full iPad lineup, plus `copyWith()` and fully custom devices.
 - **[Capture resolution](advanced.md)** — `captureScale` for supersampled
   goldens; `MatrixDevice.pixelRatio` drives layout, not file resolution.
-- **[Reports](reports.md)** — self-contained HTML with diff thumbnails, JSON,
-  Markdown summary, and opt-in JUnit XML.
+- **[Reports](reports.md)** — opt-in via `reportFormats`: self-contained HTML
+  with diff thumbnails, JSON, Markdown summary, JUnit XML.
 - **Stale golden detection** — flags orphan PNGs after renamed scenarios or
   dropped axes, no extra code.
 - **Overflow detection** — `RenderFlex overflow` and layout errors surface as

@@ -1,12 +1,22 @@
 # Reports
 
-Every matrix run emits report artifacts alongside the golden PNGs — JSON, HTML, a Markdown summary, and (opt-in) JUnit XML — plus overflow and stale-golden diagnostics baked into each.
+A matrix run can emit report artifacts alongside the golden PNGs — JSON, HTML, a Markdown summary, and JUnit XML — plus overflow and stale-golden diagnostics baked into each. Since 1.3.0 all of them are **opt-in**: pass `reportFormats`.
 
 See also: [Sampling](sampling.md) · [Devices](devices.md) · [CI integration](ci.md) · [Advanced](advanced.md) · [Migration guide](migration.md) · [Home](index.md)
 
 ## Report formats
 
-By default each `matrixGolden` / `screenMatrixGolden` run writes JSON + HTML + Markdown reports into the test's golden directory. JUnit XML is opt-in.
+By default (`reportFormats: const {}`) a run writes **no** reports. Ask for them explicitly:
+
+```dart
+matrixGolden(
+  'ProfileCard',
+  scenarios: [...],
+  reportFormats: defaultReportFormats, // JSON + HTML + Markdown
+);
+```
+
+`defaultReportFormats` is the ready-made JSON + HTML + Markdown bundle (the pre-1.3.0 default); JUnit XML is never in it. Reports land in the test's golden directory.
 
 | Format | File | Contents |
 | --- | --- | --- |
@@ -34,7 +44,7 @@ Drop-in for a GitHub Actions step summary, PR-comment bots, or Slack/Discord not
 
 ### JUnit XML
 
-Opt in with `MatrixReportFormat.junit` to get a `<slug>_report.xml` next to the other reports. The XML follows the de-facto JUnit schema consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, and Azure DevOps test dashboards. Each scenario becomes a `<testsuite>`, each combination a `<testcase>`; failures land as `<failure>` with the captured error message.
+Add `MatrixReportFormat.junit` to get a `<slug>_report.xml` next to the other reports. The XML follows the de-facto JUnit schema consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, and Azure DevOps test dashboards. Each scenario becomes a `<testsuite>`, each combination a `<testcase>`; failures land as `<failure>` with the captured error message.
 
 ## Choosing formats per run
 
@@ -62,10 +72,10 @@ matrixGolden(
 );
 ```
 
-`reportFormats: const {}` disables reports entirely.
+`reportFormats: const {}` — the default — disables reports entirely.
 
 !!! note "Deprecated `report: bool`"
-    The legacy `report: bool` parameter still works for backward compatibility but emits a deprecation warning. `reportFormats: const {}` replaces `report: false`. When both are passed, `report:` wins.
+    The legacy `report: bool` parameter still works for backward compatibility but emits a deprecation warning. `reportFormats: defaultReportFormats` replaces `report: true`. When both are passed, `report:` wins.
 
 ## Overflow detection
 

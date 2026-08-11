@@ -1244,7 +1244,8 @@ shots, or reviewing fine detail:</p>
 </span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>Same parameter on <code>screenMatrixGolden()</code>. In component mode the equivalent is
-<code>componentMatrixGolden(pixelRatio: ...)</code>, which defaults to <code>2.0</code>.</p>
+<code>componentMatrixGolden(pixelRatio: ...)</code>, which also defaults to <code>1.0</code> — both
+levels write logical-size goldens unless you ask for more.</p>
 <div class="admonition warning">
 <p class="admonition-title">Changing the scale invalidates existing goldens</p>
 <p>The comparator fails on differing dimensions before it ever compares

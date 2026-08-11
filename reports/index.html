@@ -946,10 +946,17 @@
 
 
 <h1 id="reports">Reports<a class="headerlink" href="#reports" title="Permanent link">&para;</a></h1>
-<p>Every matrix run emits report artifacts alongside the golden PNGs — JSON, HTML, a Markdown summary, and (opt-in) JUnit XML — plus overflow and stale-golden diagnostics baked into each.</p>
+<p>A matrix run can emit report artifacts alongside the golden PNGs — JSON, HTML, a Markdown summary, and JUnit XML — plus overflow and stale-golden diagnostics baked into each. Since 1.3.0 all of them are <strong>opt-in</strong>: pass <code>reportFormats</code>.</p>
 <p>See also: <a href="../sampling/">Sampling</a> · <a href="../devices/">Devices</a> · <a href="../ci/">CI integration</a> · <a href="../advanced/">Advanced</a> · <a href="../migration/">Migration guide</a> · <a href="../">Home</a></p>
 <h2 id="report-formats">Report formats<a class="headerlink" href="#report-formats" title="Permanent link">&para;</a></h2>
-<p>By default each <code>matrixGolden</code> / <code>screenMatrixGolden</code> run writes JSON + HTML + Markdown reports into the test's golden directory. JUnit XML is opt-in.</p>
+<p>By default (<code>reportFormats: const {}</code>) a run writes <strong>no</strong> reports. Ask for them explicitly:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">matrixGolden</span><span class="p">(</span>
+</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">&#39;ProfileCard&#39;</span><span class="p">,</span>
+</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">scenarios:</span><span class="w"> </span><span class="p">[...],</span>
+</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nl">reportFormats:</span><span class="w"> </span><span class="n">defaultReportFormats</span><span class="p">,</span><span class="w"> </span><span class="c1">// JSON + HTML + Markdown</span>
+</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">);</span>
+</span></code></pre></div>
+<p><code>defaultReportFormats</code> is the ready-made JSON + HTML + Markdown bundle (the pre-1.3.0 default); JUnit XML is never in it. Reports land in the test's golden directory.</p>
 <table>
 <thead>
 <tr>
@@ -995,59 +1002,59 @@
 <p>Each run writes a <code>&lt;slug&gt;_report.md</code> next to the JSON and HTML reports. It contains a summary list, a <code>## Failed</code> table (when any), a <code>## Stale goldens</code> list (when any), and a link to the HTML.</p>
 <p>Drop-in for a GitHub Actions step summary, PR-comment bots, or Slack/Discord notifiers — anything that takes Markdown. For the workflow recipe, see <a href="../ci/">CI integration</a>.</p>
 <h3 id="junit-xml">JUnit XML<a class="headerlink" href="#junit-xml" title="Permanent link">&para;</a></h3>
-<p>Opt in with <code>MatrixReportFormat.junit</code> to get a <code>&lt;slug&gt;_report.xml</code> next to the other reports. The XML follows the de-facto JUnit schema consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, and Azure DevOps test dashboards. Each scenario becomes a <code>&lt;testsuite&gt;</code>, each combination a <code>&lt;testcase&gt;</code>; failures land as <code>&lt;failure&gt;</code> with the captured error message.</p>
+<p>Add <code>MatrixReportFormat.junit</code> to get a <code>&lt;slug&gt;_report.xml</code> next to the other reports. The XML follows the de-facto JUnit schema consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, and Azure DevOps test dashboards. Each scenario becomes a <code>&lt;testsuite&gt;</code>, each combination a <code>&lt;testcase&gt;</code>; failures land as <code>&lt;failure&gt;</code> with the captured error message.</p>
 <h2 id="choosing-formats-per-run">Choosing formats per run<a class="headerlink" href="#choosing-formats-per-run" title="Permanent link">&para;</a></h2>
 <p>Use <code>reportFormats</code> to write only what your pipeline needs:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-0-1"><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="n">matrixGolden</span><span class="p">(</span>
-</span><span id="__span-0-2"><a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">  </span><span class="s1">&#39;ProfileCard&#39;</span><span class="p">,</span>
-</span><span id="__span-0-3"><a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">  </span><span class="nl">scenarios:</span><span class="w"> </span><span class="p">[...],</span>
-</span><span id="__span-0-4"><a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="w">  </span><span class="nl">reportFormats:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">markdown</span><span class="p">},</span><span class="w"> </span><span class="c1">// step summary only</span>
-</span><span id="__span-0-5"><a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a><span class="p">);</span>
-</span></code></pre></div>
-<p>Combine formats freely:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">matrixGolden</span><span class="p">(</span>
 </span><span id="__span-1-2"><a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="s1">&#39;ProfileCard&#39;</span><span class="p">,</span>
 </span><span id="__span-1-3"><a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nl">scenarios:</span><span class="w"> </span><span class="p">[...],</span>
-</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nl">reportFormats:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
-</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">    </span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">html</span><span class="p">,</span>
-</span><span id="__span-1-6"><a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">    </span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">markdown</span><span class="p">,</span>
-</span><span id="__span-1-7"><a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">    </span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">junit</span><span class="p">,</span><span class="w"> </span><span class="c1">// opt-in</span>
-</span><span id="__span-1-8"><a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="p">},</span>
-</span><span id="__span-1-9"><a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a><span class="p">);</span>
+</span><span id="__span-1-4"><a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nl">reportFormats:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">markdown</span><span class="p">},</span><span class="w"> </span><span class="c1">// step summary only</span>
+</span><span id="__span-1-5"><a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="p">);</span>
 </span></code></pre></div>
-<p><code>reportFormats: const {}</code> disables reports entirely.</p>
+<p>Combine formats freely:</p>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="n">matrixGolden</span><span class="p">(</span>
+</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">  </span><span class="s1">&#39;ProfileCard&#39;</span><span class="p">,</span>
+</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nl">scenarios:</span><span class="w"> </span><span class="p">[...],</span>
+</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span><span class="nl">reportFormats:</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="p">{</span>
+</span><span id="__span-2-5"><a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">    </span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">html</span><span class="p">,</span>
+</span><span id="__span-2-6"><a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a><span class="w">    </span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">markdown</span><span class="p">,</span>
+</span><span id="__span-2-7"><a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="w">    </span><span class="n">MatrixReportFormat</span><span class="p">.</span><span class="n">junit</span><span class="p">,</span><span class="w"> </span><span class="c1">// opt-in</span>
+</span><span id="__span-2-8"><a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a><span class="w">  </span><span class="p">},</span>
+</span><span id="__span-2-9"><a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="p">);</span>
+</span></code></pre></div>
+<p><code>reportFormats: const {}</code> — the default — disables reports entirely.</p>
 <div class="admonition note">
 <p class="admonition-title">Deprecated <code>report: bool</code></p>
-<p>The legacy <code>report: bool</code> parameter still works for backward compatibility but emits a deprecation warning. <code>reportFormats: const {}</code> replaces <code>report: false</code>. When both are passed, <code>report:</code> wins.</p>
+<p>The legacy <code>report: bool</code> parameter still works for backward compatibility but emits a deprecation warning. <code>reportFormats: defaultReportFormats</code> replaces <code>report: true</code>. When both are passed, <code>report:</code> wins.</p>
 </div>
 <h2 id="overflow-detection">Overflow detection<a class="headerlink" href="#overflow-detection" title="Permanent link">&para;</a></h2>
 <p>golden_matrix automatically captures <code>RenderFlex overflow</code> and layout errors during rendering. Warnings appear in the JSON and HTML reports with orange badges — no configuration needed.</p>
 <h2 id="stale-golden-detection">Stale golden detection<a class="headerlink" href="#stale-golden-detection" title="Permanent link">&para;</a></h2>
 <p>After each run, the runner walks the test's golden subdirectory and reports any <code>*.png</code> files that no combination produced — orphans left behind by renamed scenarios, dropped axis values, or removed <code>matrixGolden</code> calls.</p>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-2-1"><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>matrixGolden: SampleButton
-</span><span id="__span-2-2"><a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  48 total | 48 passed | 1 stale (1.0s)
-</span><span id="__span-2-3"><a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  Stale (orphan goldens — not produced by any combination):
-</span><span id="__span-2-4"><a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    - goldens/samplebutton/old_scenario/light_en_ltr_1x_phonesmall.png
+<div class="language-text highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>matrixGolden: SampleButton
+</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  48 total | 48 passed | 1 stale (1.0s)
+</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>  Stale (orphan goldens — not produced by any combination):
+</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    - goldens/samplebutton/old_scenario/light_en_ltr_1x_phonesmall.png
 </span></code></pre></div>
 <p>JSON reports gain a <code>staleGoldens</code> field; HTML reports get a <code>Stale</code> stat card and a collapsible list. Flutter's own <code>failures/</code> diff images are excluded.</p>
 <p>Detection is <strong>on by default</strong>. Opt out per call:</p>
-<div class="language-dart highlight"><pre><span></span><code><span id="__span-3-1"><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="n">matrixGolden</span><span class="p">(</span>
-</span><span id="__span-3-2"><a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="s1">&#39;Widget&#39;</span><span class="p">,</span>
-</span><span id="__span-3-3"><a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nl">scenarios:</span><span class="w"> </span><span class="p">[...],</span>
-</span><span id="__span-3-4"><a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nl">axes:</span><span class="w"> </span><span class="n">axes</span><span class="p">,</span>
-</span><span id="__span-3-5"><a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nl">detectStaleGoldens:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="c1">// turn off for this test</span>
-</span><span id="__span-3-6"><a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="p">);</span>
+<div class="language-dart highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="n">matrixGolden</span><span class="p">(</span>
+</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="s1">&#39;Widget&#39;</span><span class="p">,</span>
+</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nl">scenarios:</span><span class="w"> </span><span class="p">[...],</span>
+</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nl">axes:</span><span class="w"> </span><span class="n">axes</span><span class="p">,</span>
+</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nl">detectStaleGoldens:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w"> </span><span class="c1">// turn off for this test</span>
+</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="p">);</span>
 </span></code></pre></div>
 <p>It is automatically skipped when <code>fileNameBuilder</code> is supplied — the default subdir assumption no longer holds. The runner <strong>never deletes files</strong>; you decide what to do with the list (<code>git rm</code>, or regenerate via <code>flutter test --update-goldens</code>).</p>
 <p>For CI-mode console output when reports are disabled, see <a href="../ci/">CI integration</a>.</p>
 <h2 id="golden-file-structure">Golden file structure<a class="headerlink" href="#golden-file-structure" title="Permanent link">&para;</a></h2>
-<div class="language-text highlight"><pre><span></span><code><span id="__span-4-1"><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>goldens/
-</span><span id="__span-4-2"><a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  mybutton/
-</span><span id="__span-4-3"><a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    default/
-</span><span id="__span-4-4"><a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>      light_en_ltr_1x_phonesmall.png
-</span><span id="__span-4-5"><a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>      dark_ar_rtl_2x_phonelarge.png
-</span><span id="__span-4-6"><a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    disabled/
-</span><span id="__span-4-7"><a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>      light_en_ltr_1x_phonesmall.png
+<div class="language-text highlight"><pre><span></span><code><span id="__span-5-1"><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>goldens/
+</span><span id="__span-5-2"><a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  mybutton/
+</span><span id="__span-5-3"><a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    default/
+</span><span id="__span-5-4"><a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>      light_en_ltr_1x_phonesmall.png
+</span><span id="__span-5-5"><a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>      dark_ar_rtl_2x_phonelarge.png
+</span><span id="__span-5-6"><a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    disabled/
+</span><span id="__span-5-7"><a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>      light_en_ltr_1x_phonesmall.png
 </span></code></pre></div>
 <p>Naming: <code>goldens/&lt;test&gt;/&lt;scenario&gt;/&lt;theme&gt;_&lt;locale&gt;_&lt;direction&gt;_&lt;textScale&gt;_&lt;device&gt;.png</code></p>
 <p>The <code>&lt;test&gt;</code> prefix prevents collisions when two <code>matrixGolden</code> calls use scenarios with the same name.</p>

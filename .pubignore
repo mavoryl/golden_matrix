@@ -30,8 +30,12 @@ mkdocs.yml
 .claude/
 build/
 example/build/
-example/test/golden/goldens/
-example/test/goldens/
+# Every goldens/ directory under example/, not just the ones that existed when
+# this file was written: golden_ahem_text/ and golden_component/ were added
+# later and leaked 32 files (176 KB) into 1.4.0 because the rules were spelled
+# out path by path. The example's *sources* are the documented usage surface;
+# its baseline PNGs and generated reports are not.
+example/**/goldens/
 *.iml
 CLAUDE.md
 .github/

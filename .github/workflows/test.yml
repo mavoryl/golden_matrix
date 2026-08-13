@@ -15,6 +15,11 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
+          # Pinned, not floating `stable`: golden PNGs are tied to the engine
+          # that rendered them, so a stable release bumping text rasterization
+          # turns every golden red on an unrelated push. Raise this
+          # deliberately, together with `flutter test --update-goldens`.
+          flutter-version: 3.44.8
           channel: stable
           cache: true
 
@@ -49,6 +54,11 @@ jobs:
 
       - uses: subosito/flutter-action@v2
         with:
+          # Pinned, not floating `stable`: golden PNGs are tied to the engine
+          # that rendered them, so a stable release bumping text rasterization
+          # turns every golden red on an unrelated push. Raise this
+          # deliberately, together with `flutter test --update-goldens`.
+          flutter-version: 3.44.8
           channel: stable
           cache: true
 

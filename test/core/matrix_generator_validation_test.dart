@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
-import 'package:golden_matrix/src/api/matrix_test_runner.dart';
+import 'package:golden_matrix/src/core/matrix_run_plan.dart';
 
 void main() {
   Widget placeholder() => const SizedBox();
@@ -60,10 +60,11 @@ void main() {
     });
   });
 
-  group('resolveCombinations names the real cause of an empty matrix', () {
+  group('MatrixRunPlan.resolve names the real cause of an empty matrix', () {
     test('a scenarioTags typo blames the tags, not the scenarios', () {
       expect(
-        () => resolveCombinations(
+        () => MatrixRunPlan.resolve(
+          name: 'test',
           scenarios: [
             MatrixScenario('test', builder: placeholder, tags: const ['smoke']),
           ],
@@ -78,14 +79,15 @@ void main() {
     });
 
     test('matching tags still resolve normally', () {
-      final result = resolveCombinations(
+      final result = MatrixRunPlan.resolve(
+        name: 'test',
         scenarios: [
           MatrixScenario('test', builder: placeholder, tags: const ['smoke']),
         ],
         scenarioTags: const ['smoke'],
       );
 
-      expect(result, isNotEmpty);
+      expect(result.combinations, isNotEmpty);
     });
   });
 

@@ -5,9 +5,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:golden_matrix/src/core/matrix_generator.dart';
 import 'package:golden_matrix/src/core/matrix_report_writer.dart';
-import 'package:golden_matrix/src/core/naming_strategy.dart';
+import 'package:golden_matrix/src/core/matrix_run_plan.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
@@ -63,13 +62,8 @@ void runMatrixTests(
 }) {
   validateCaptureScale(captureScale, 'captureScale');
   validateTolerance(tolerance);
-  final effectiveFormats = reportFormats;
-  final writeReports = effectiveFormats.isNotEmpty;
-  // Stale detection needs per-combination results too, so we record them
-  // whenever it's enabled even if no reports are being written.
-  final wantStaleDetection = detectStaleGoldens && fileNameBuilder == null;
-  final recordResults = writeReports || wantStaleDetection;
-  final combinations = resolveCombinations(
+  final plan = MatrixRunPlan.resolve(
+    name: _stripPrefix(name),
     scenarios: scenarios,
     axes: axes,
     preset: preset,
@@ -77,16 +71,16 @@ void runMatrixTests(
     rules: rules,
     scenarioTags: scenarioTags,
     maxCombinations: maxCombinations,
+    fileNameBuilder: fileNameBuilder,
   );
+  plan.warnAboutProblems();
 
-  if (combinations.isEmpty) {
-    debugPrint(
-      'golden_matrix: "$name" produced no combinations — rules or scenarioTags '
-      'filtered every one out, so no tests were registered.',
-    );
-  }
-
-  final byScenario = groupByScenario(combinations);
+  final effectiveFormats = reportFormats;
+  final writeReports = effectiveFormats.isNotEmpty;
+  // Stale detection needs per-combination results too, so we record them
+  // whenever it's enabled even if no reports are being written.
+  final wantStaleDetection = detectStaleGoldens && !plan.usesCustomPaths;
+  final recordResults = writeReports || wantStaleDetection;
 
   final List<MatrixCombinationResult> results = [];
   final stopwatch = Stopwatch()..start();
@@ -94,12 +88,10 @@ void runMatrixTests(
   group(name, () {
     _setupTolerance(tolerance);
 
-    for (final entry in byScenario.entries) {
+    for (final entry in plan.byScenario.entries) {
       group(entry.key, () {
-        for (final combination in entry.value) {
-          final goldenPath = fileNameBuilder != null
-              ? fileNameBuilder(combination)
-              : NamingStrategy.goldenPath(combination, testName: _stripPrefix(name));
+        for (final planned in entry.value) {
+          final (:combination, :goldenPath) = planned;
 
           if (skip && recordResults) {
             _recordSkipped(results, combination, goldenPath);
@@ -128,6 +120,7 @@ void runMatrixTests(
     if (recordResults) {
       _setupReportWriting(
         name,
+        plan.name,
         results,
         stopwatch,
         reportDir,
@@ -137,62 +130,6 @@ void runMatrixTests(
       );
     }
   });
-}
-
-// -- Config resolution --
-
-/// Resolves the final list of [MatrixCombination] for a given configuration.
-///
-/// Shared by the test runner and [previewMatrixGolden]. Applies preset
-/// defaults, scenario-tag filtering, exclude/includeOnly rules, the chosen
-/// sampling strategy, and the global `maxCombinations` cap.
-List<MatrixCombination> resolveCombinations({
-  required List<MatrixScenario> scenarios,
-  MatrixAxes? axes,
-  MatrixPreset? preset,
-  MatrixSampling? sampling,
-  List<MatrixRule> rules = const [],
-  List<String>? scenarioTags,
-  int? maxCombinations,
-}) {
-  final effectiveAxes = axes ?? preset?.axes ?? const MatrixAxes();
-  final effectiveSampling = sampling ?? preset?.sampling ?? MatrixSampling.full;
-  final effectiveRules = [...?preset?.rules, ...rules];
-
-  final filteredScenarios = scenarioTags != null
-      ? scenarios.where((s) => s.tags.any((t) => scenarioTags.contains(t))).toList()
-      : scenarios;
-
-  // Without this, tag filtering that matches nothing surfaces as the generator's
-  // generic "scenarios must not be empty", pointing at the wrong argument.
-  if (filteredScenarios.isEmpty && scenarios.isNotEmpty) {
-    throw ArgumentError.value(
-      scenarioTags,
-      'scenarioTags',
-      'matched none of the ${scenarios.length} scenarios '
-          '(their tags: ${scenarios.expand((s) => s.tags).toSet().join(', ')})',
-    );
-  }
-
-  return MatrixGenerator.generate(
-    scenarios: filteredScenarios,
-    axes: effectiveAxes,
-    sampling: effectiveSampling,
-    rules: effectiveRules,
-    maxCombinations: maxCombinations,
-  );
-}
-
-/// Groups [combinations] by their scenario name, preserving order.
-///
-/// Used internally by `matrixGolden` / `screenMatrixGolden` /
-/// `componentMatrixGolden`; also covered by unit tests directly.
-Map<String, List<MatrixCombination>> groupByScenario(List<MatrixCombination> combinations) {
-  final grouped = <String, List<MatrixCombination>>{};
-  for (final c in combinations) {
-    (grouped[c.scenario.name] ??= []).add(c);
-  }
-  return grouped;
 }
 
 // -- Tolerance --
@@ -363,6 +300,7 @@ void _recordSkipped(
 
 void _setupReportWriting(
   String name,
+  String testName,
   List<MatrixCombinationResult> results,
   Stopwatch stopwatch,
   String? reportDir,
@@ -374,7 +312,7 @@ void _setupReportWriting(
     stopwatch.stop();
     final stale = detectStaleGoldens
         ? await scanStaleGoldens(
-            testSlug: slugify(_stripPrefix(name)),
+            testSlug: slugify(testName),
             expectedPaths: results.map((r) => r.goldenPath).toSet(),
           )
         : <String>[];

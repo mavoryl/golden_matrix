@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:golden_matrix/src/api/matrix_test_runner.dart';
 import 'package:golden_matrix/src/core/matrix_report_writer.dart';
-import 'package:golden_matrix/src/core/naming_strategy.dart';
+import 'package:golden_matrix/src/core/matrix_run_plan.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
@@ -128,44 +128,24 @@ void componentMatrixGolden(
 }) {
   validateCaptureScale(pixelRatio, 'pixelRatio');
   validateTolerance(tolerance);
-  final effectiveFormats = reportFormats;
-  final writeReports = effectiveFormats.isNotEmpty;
-  final wantStaleDetection = detectStaleGoldens && fileNameBuilder == null;
-  final recordResults = writeReports || wantStaleDetection;
-  // Component mode renders at the widget's intrinsic size and
-  // NamingStrategy.componentGoldenPath drops the device segment, so a second
-  // device would register another test with the same description that writes
-  // and compares the very same PNG. Collapse the axis before generation, which
-  // also keeps the device out of rules, sampling and report counters.
-  final declaredAxes = axes ?? preset?.axes ?? const MatrixAxes();
-  final componentAxes = declaredAxes.devices.length > 1
-      ? declaredAxes.copyWith(devices: [declaredAxes.devices.first])
-      : declaredAxes;
-
-  final combinations = resolveCombinations(
+  final plan = MatrixRunPlan.resolve(
+    name: name,
     scenarios: scenarios,
-    axes: componentAxes,
+    axes: axes,
     preset: preset,
     sampling: sampling,
     rules: rules,
     scenarioTags: scenarioTags,
     maxCombinations: maxCombinations,
+    fileNameBuilder: fileNameBuilder,
+    pathScheme: MatrixPathScheme.component,
   );
+  plan.warnAboutProblems();
 
-  if (combinations.isEmpty) {
-    // Registering nothing looks exactly like a passing run. Component mode
-    // makes this easier to hit than it looks: the devices axis is collapsed to
-    // its first value, so a rule matching on any other device now filters
-    // everything out.
-    debugPrint(
-      'golden_matrix: "$name" produced no combinations — rules or scenarioTags '
-      'filtered every one out, so no tests were registered. Note that '
-      'componentMatrixGolden collapses the devices axis to its first value, so '
-      'rules matching on c.device only ever see that one.',
-    );
-  }
-
-  final byScenario = groupByScenario(combinations);
+  final effectiveFormats = reportFormats;
+  final writeReports = effectiveFormats.isNotEmpty;
+  final wantStaleDetection = detectStaleGoldens && !plan.usesCustomPaths;
+  final recordResults = writeReports || wantStaleDetection;
 
   final results = <MatrixCombinationResult>[];
   final stopwatch = Stopwatch()..start();
@@ -174,12 +154,10 @@ void componentMatrixGolden(
   group(groupName, () {
     _setupComponentTolerance(tolerance);
 
-    for (final entry in byScenario.entries) {
+    for (final entry in plan.byScenario.entries) {
       group(entry.key, () {
-        for (final combination in entry.value) {
-          final goldenPath = fileNameBuilder != null
-              ? fileNameBuilder(combination)
-              : NamingStrategy.componentGoldenPath(combination, testName: name);
+        for (final planned in entry.value) {
+          final (:combination, :goldenPath) = planned;
 
           if (skip && recordResults) {
             _recordSkipped(results, combination, goldenPath);

@@ -350,6 +350,19 @@ preview.duplicatePaths;       // non-empty when scenarios collide on the same pa
 
 Use it to sanity-check `scenarioTags`, estimate CI cost before adding a new axis, or catch golden-path collisions before they silently overwrite each other.
 
+To preview a `componentMatrixGolden` call instead, pass `component: true`. Component paths carry no device segment and the `devices` axis is collapsed to its first value, so the counts and paths only match the real run with that flag set:
+
+```dart
+previewMatrixGolden(
+  name: 'PrimaryButton',
+  scenarios: [MatrixScenario('default', builder: () => const PrimaryButton())],
+  component: true,
+);
+// -> goldens/primarybutton/default/light_en_ltr_1x.png   (no device)
+```
+
+The runners no longer wait for you to ask: `matrixGolden`, `screenMatrixGolden` and `componentMatrixGolden` all print a warning while registering tests when a configuration produces no combinations at all, or when two combinations claim the same golden file.
+
 ## Font loading
 
 Set up font loading once in `test/flutter_test_config.dart` so real fonts (Roboto + app fonts) render instead of Ahem squares:

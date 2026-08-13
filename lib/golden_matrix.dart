@@ -2,7 +2,6 @@
 // API
 export 'src/api/component_matrix_golden.dart';
 export 'src/api/matrix_golden.dart';
-export 'src/api/matrix_test_runner.dart' show MatrixSetupCallback;
 export 'src/api/preview_matrix_golden.dart';
 export 'src/api/screen_matrix_golden.dart';
 // Core
@@ -13,6 +12,7 @@ export 'src/core/naming_strategy.dart';
 export 'src/core/pairwise_generator.dart';
 export 'src/core/report_format.dart' show MatrixReportFormat, defaultReportFormats;
 // Flutter
+export 'src/flutter/capture_strategy.dart' show MatrixSetupCallback;
 export 'src/flutter/error_capture.dart';
 export 'src/flutter/font_loader.dart';
 export 'src/flutter/matrix_widget_wrapper.dart';

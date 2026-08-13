@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:golden_matrix/src/api/matrix_test_runner.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
+import 'package:golden_matrix/src/flutter/capture_strategy.dart';
 import 'package:golden_matrix/src/models/matrix_axes.dart';
 import 'package:golden_matrix/src/models/matrix_combination.dart';
 import 'package:golden_matrix/src/models/matrix_preset.dart';

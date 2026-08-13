@@ -16,6 +16,30 @@ import 'package:golden_matrix/src/models/matrix_result.dart';
 /// The HTML report uses golden paths as-is from [MatrixCombinationResult],
 /// so it should be opened from the same working directory where tests run.
 class MatrixReportWriter {
+  /// Writes every format in [formats], and nothing else.
+  ///
+  /// The single place that maps [MatrixReportFormat] values onto writers. The
+  /// runners used to carry a copy of this dispatch each, which is how the
+  /// markdown report ended up linking to an HTML file nobody had asked for.
+  static Future<void> writeAll(
+    MatrixResult result, {
+    required Set<MatrixReportFormat> formats,
+    String? outputDir,
+  }) async {
+    if (formats.contains(MatrixReportFormat.json)) {
+      await write(result, outputDir: outputDir);
+    }
+    if (formats.contains(MatrixReportFormat.html)) {
+      await writeHtml(result, outputDir: outputDir);
+    }
+    if (formats.contains(MatrixReportFormat.markdown)) {
+      await writeMarkdown(result, outputDir: outputDir, formats: formats);
+    }
+    if (formats.contains(MatrixReportFormat.junit)) {
+      await writeJunit(result, outputDir: outputDir);
+    }
+  }
+
   /// Writes the report as a JSON file.
   static Future<void> write(MatrixResult result, {String? outputDir}) async {
     final dir = outputDir ?? _findGoldensDir(result);

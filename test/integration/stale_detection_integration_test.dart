@@ -5,7 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
-import 'package:golden_matrix/src/api/matrix_test_runner.dart';
+import 'package:golden_matrix/src/flutter/report_pipeline.dart';
 
 /// No-op golden comparator — accepts any bytes, writes nothing. Lets us
 /// drive `matrixGolden` end-to-end without baseline PNGs on disk.

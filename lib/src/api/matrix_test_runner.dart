@@ -1,17 +1,13 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/rendering.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:golden_matrix/src/core/matrix_report_writer.dart';
 import 'package:golden_matrix/src/core/matrix_run_plan.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
-import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
 import 'package:golden_matrix/src/flutter/pump_helpers.dart';
-import 'package:golden_matrix/src/flutter/stale_scan.dart';
+import 'package:golden_matrix/src/flutter/report_pipeline.dart';
+import 'package:golden_matrix/src/flutter/tolerant_comparator.dart';
 import 'package:golden_matrix/src/models/matrix_axes.dart';
 import 'package:golden_matrix/src/models/matrix_combination.dart';
 import 'package:golden_matrix/src/models/matrix_preset.dart';
@@ -86,7 +82,7 @@ void runMatrixTests(
   final stopwatch = Stopwatch()..start();
 
   group(name, () {
-    _setupTolerance(tolerance);
+    installToleranceComparator(tolerance);
 
     for (final entry in plan.byScenario.entries) {
       group(entry.key, () {
@@ -94,7 +90,7 @@ void runMatrixTests(
           final (:combination, :goldenPath) = planned;
 
           if (skip && recordResults) {
-            _recordSkipped(results, combination, goldenPath);
+            recordSkipped(results, combination, goldenPath);
           }
 
           testWidgets(
@@ -118,45 +114,16 @@ void runMatrixTests(
     }
 
     if (recordResults) {
-      _setupReportWriting(
-        name,
-        plan.name,
-        results,
-        stopwatch,
-        reportDir,
-        printSummary,
+      installReportPipeline(
+        reportName: name,
+        testSlug: plan.name,
+        results: results,
+        stopwatch: stopwatch,
+        reportDir: reportDir,
+        printSummary: printSummary,
         formats: effectiveFormats,
         detectStaleGoldens: wantStaleDetection,
       );
-    }
-  });
-}
-
-// -- Tolerance --
-
-void _setupTolerance(double? tolerance) {
-  if (tolerance == null) return;
-
-  validateTolerance(tolerance);
-
-  GoldenFileComparator? originalComparator;
-
-  setUp(() {
-    originalComparator = goldenFileComparator;
-    final current = goldenFileComparator;
-    if (current is! LocalFileComparator) {
-      throw StateError(
-        'golden_matrix: tolerance requires goldenFileComparator to be a '
-        'LocalFileComparator, but got ${current.runtimeType}. '
-        'Custom comparators are not supported with the tolerance parameter.',
-      );
-    }
-    goldenFileComparator = _TolerantComparator(current, tolerance);
-  });
-
-  tearDown(() {
-    if (originalComparator != null) {
-      goldenFileComparator = originalComparator!;
     }
   });
 }
@@ -280,132 +247,6 @@ Future<void> _executeGoldenTest({
   );
 }
 
-// -- Result recording --
-
-void _recordSkipped(
-  List<MatrixCombinationResult> results,
-  MatrixCombination combination,
-  String goldenPath,
-) {
-  results.add(
-    MatrixCombinationResult(
-      combination: combination,
-      status: MatrixResultStatus.skipped,
-      goldenPath: goldenPath,
-    ),
-  );
-}
-
-// -- Report writing --
-
-void _setupReportWriting(
-  String name,
-  String testName,
-  List<MatrixCombinationResult> results,
-  Stopwatch stopwatch,
-  String? reportDir,
-  bool printSummary, {
-  required Set<MatrixReportFormat> formats,
-  required bool detectStaleGoldens,
-}) {
-  tearDownAll(() async {
-    stopwatch.stop();
-    final stale = detectStaleGoldens
-        ? await scanStaleGoldens(
-            testSlug: slugify(testName),
-            expectedPaths: results.map((r) => r.goldenPath).toSet(),
-          )
-        : <String>[];
-    final result = MatrixResult(
-      name: name,
-      results: results,
-      duration: stopwatch.elapsed,
-      staleGoldens: stale,
-    );
-    final dir = reportDir ?? _resolveDefaultReportDir();
-    if (formats.contains(MatrixReportFormat.json)) {
-      await MatrixReportWriter.write(result, outputDir: dir);
-    }
-    if (formats.contains(MatrixReportFormat.html)) {
-      await MatrixReportWriter.writeHtml(result, outputDir: dir);
-    }
-    if (formats.contains(MatrixReportFormat.markdown)) {
-      await MatrixReportWriter.writeMarkdown(result, outputDir: dir, formats: formats);
-    }
-    if (formats.contains(MatrixReportFormat.junit)) {
-      await MatrixReportWriter.writeJunit(result, outputDir: dir);
-    }
-    if (printSummary) {
-      debugPrint(formatSummary(result));
-    }
-    // When no reports are written, surface stale goldens to the console so
-    // users who deliberately disable reports still see correctness issues.
-    if (formats.isEmpty && stale.isNotEmpty) {
-      debugPrint('golden_matrix: $name has ${stale.length} stale golden file(s):');
-      for (final path in stale) {
-        debugPrint('  - $path');
-      }
-    }
-  });
-}
-
-/// Resolves the default report directory when [reportDir] is omitted.
-///
-/// Derives the goldens root from the active golden comparator's `basedir`
-/// (`<test-file-dir>/goldens`) — the authoritative location next to the
-/// golden PNGs, regardless of what the test file's directory is named. This
-/// replaces the old prefix-guessing heuristic, which only knew `test/`,
-/// `test/golden/`, and `test/goldens/` and dumped reports into a stray
-/// top-level `goldens/` for any other layout. Returns null for non-local
-/// comparators so the writer falls back to its own heuristic.
-String? _resolveDefaultReportDir() {
-  final comparator = goldenFileComparator;
-  if (comparator is! LocalFileComparator) return null;
-  return joinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
-}
-
-/// Formats a human-readable summary of a [MatrixResult] for console output.
-///
-/// Includes counts, duration, and a list of failed combinations.
-String formatSummary(MatrixResult result) {
-  final buf = StringBuffer();
-  buf.writeln(result.name);
-
-  final parts = <String>[
-    '${result.total} total',
-    '${result.passed} passed',
-    if (result.failed > 0) '${result.failed} failed',
-    if (result.skipped > 0) '${result.skipped} skipped',
-    if (result.warningCount > 0) '${result.warningCount} warnings',
-    if (result.staleGoldens.isNotEmpty) '${result.staleGoldens.length} stale',
-  ];
-  final duration = result.duration.inMilliseconds < 1000
-      ? '${result.duration.inMilliseconds}ms'
-      : '${result.duration.inSeconds}s';
-  buf.writeln('  ${parts.join(' | ')} ($duration)');
-
-  final failed = result.results.where((r) => r.status == MatrixResultStatus.failed);
-  if (failed.isNotEmpty) {
-    buf.writeln('  Failed:');
-    for (final f in failed) {
-      final c = f.combination;
-      final dir = c.direction == TextDirection.ltr ? 'ltr' : 'rtl';
-      buf.writeln(
-        '    - ${c.scenario.name} | ${c.theme.name} ${c.locale} $dir ${c.textScale}x ${c.device.name}',
-      );
-    }
-  }
-
-  if (result.staleGoldens.isNotEmpty) {
-    buf.writeln('  Stale (orphan goldens — not produced by any combination):');
-    for (final path in result.staleGoldens) {
-      buf.writeln('    - $path');
-    }
-  }
-
-  return buf.toString().trimRight();
-}
-
 // -- Helpers --
 
 /// Strips the public API prefix ('matrixGolden: ' or 'screenMatrixGolden: ')
@@ -421,36 +262,4 @@ String _stripPrefix(String name) {
 String _testDescription(MatrixCombination c) {
   final dir = c.direction == TextDirection.ltr ? 'ltr' : 'rtl';
   return '${c.theme.name} ${c.locale} $dir ${c.textScale}x ${c.device.name}';
-}
-
-/// A [LocalFileComparator] wrapper that allows a percentage of pixels to differ.
-///
-/// The base `LocalFileComparator(Uri testFile)` constructor expects a test
-/// file URI and derives `basedir` via `dirname(testFile)`. Passing
-/// `delegate.basedir` directly would shift the basedir one directory up
-/// (golden lookups would silently miss). We append a placeholder segment
-/// so `dirname` strips it and leaves the original basedir intact.
-class _TolerantComparator extends LocalFileComparator {
-  _TolerantComparator(LocalFileComparator delegate, this._tolerance)
-      : super(delegate.basedir.resolve('_golden_matrix_tolerance_anchor.dart'));
-  final double _tolerance;
-
-  @override
-  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
-      imageBytes,
-      await getGoldenBytes(golden),
-    );
-
-    if (!result.passed && result.diffPercent <= _tolerance) {
-      return true;
-    }
-
-    if (!result.passed) {
-      final error = await generateFailureOutput(result, golden, basedir);
-      throw FlutterError(error);
-    }
-
-    return result.passed;
-  }
 }

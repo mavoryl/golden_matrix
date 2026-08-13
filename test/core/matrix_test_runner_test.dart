@@ -1,8 +1,8 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
-import 'package:golden_matrix/src/api/matrix_test_runner.dart';
 import 'package:golden_matrix/src/core/matrix_run_plan.dart';
+import 'package:golden_matrix/src/flutter/report_pipeline.dart';
 
 void main() {
   Widget placeholder() => const SizedBox();

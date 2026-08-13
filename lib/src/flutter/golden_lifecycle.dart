@@ -165,3 +165,21 @@ Future<void> runGoldenLifecycle({
     onFinally?.call();
   }
 }
+
+/// Records a combination that never ran because the caller passed `skip: true`.
+///
+/// Lives next to [runGoldenLifecycle] so every result in a report — passed,
+/// failed or skipped — is appended from one place.
+void recordSkipped(
+  List<MatrixCombinationResult> results,
+  MatrixCombination combination,
+  String goldenPath,
+) {
+  results.add(
+    MatrixCombinationResult(
+      combination: combination,
+      status: MatrixResultStatus.skipped,
+      goldenPath: goldenPath,
+    ),
+  );
+}

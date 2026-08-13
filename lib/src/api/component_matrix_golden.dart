@@ -1,17 +1,13 @@
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:golden_matrix/src/api/matrix_test_runner.dart';
-import 'package:golden_matrix/src/core/matrix_report_writer.dart';
 import 'package:golden_matrix/src/core/matrix_run_plan.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
-import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
-import 'package:golden_matrix/src/flutter/stale_scan.dart';
+import 'package:golden_matrix/src/flutter/report_pipeline.dart';
+import 'package:golden_matrix/src/flutter/tolerant_comparator.dart';
 import 'package:golden_matrix/src/models/matrix_axes.dart';
 import 'package:golden_matrix/src/models/matrix_combination.dart';
 import 'package:golden_matrix/src/models/matrix_preset.dart';
@@ -152,7 +148,7 @@ void componentMatrixGolden(
   final groupName = 'componentMatrixGolden: $name';
 
   group(groupName, () {
-    _setupComponentTolerance(tolerance);
+    installToleranceComparator(tolerance);
 
     for (final entry in plan.byScenario.entries) {
       group(entry.key, () {
@@ -160,7 +156,7 @@ void componentMatrixGolden(
           final (:combination, :goldenPath) = planned;
 
           if (skip && recordResults) {
-            _recordSkipped(results, combination, goldenPath);
+            recordSkipped(results, combination, goldenPath);
           }
 
           testWidgets(
@@ -185,13 +181,13 @@ void componentMatrixGolden(
     }
 
     if (recordResults) {
-      _setupComponentTearDown(
-        groupName,
-        name,
-        results,
-        stopwatch,
-        reportDir,
-        printSummary,
+      installReportPipeline(
+        reportName: groupName,
+        testSlug: plan.name,
+        results: results,
+        stopwatch: stopwatch,
+        reportDir: reportDir,
+        printSummary: printSummary,
         formats: effectiveFormats,
         detectStaleGoldens: wantStaleDetection,
       );
@@ -323,137 +319,10 @@ Widget _buildComponentTree({
   );
 }
 
-// -- Helpers (mostly duplicated from matrix_test_runner.dart so component
-//    mode stays self-contained; consolidate when both APIs stabilize). --
+// -- Helpers --
 
 String _componentTestDescription(MatrixCombination c) {
   final dir = c.direction == TextDirection.ltr ? 'ltr' : 'rtl';
   final scale = c.textScale % 1 == 0 ? '${c.textScale.toInt()}.0x' : '${c.textScale}x';
   return '${c.scenario.name} ${c.theme.name} ${c.locale.toLanguageTag()} $dir $scale';
-}
-
-void _recordSkipped(
-  List<MatrixCombinationResult> results,
-  MatrixCombination combination,
-  String goldenPath,
-) {
-  results.add(
-    MatrixCombinationResult(
-      combination: combination,
-      status: MatrixResultStatus.skipped,
-      goldenPath: goldenPath,
-    ),
-  );
-}
-
-void _setupComponentTolerance(double? tolerance) {
-  if (tolerance == null) return;
-
-  validateTolerance(tolerance);
-
-  GoldenFileComparator? originalComparator;
-
-  setUp(() {
-    originalComparator = goldenFileComparator;
-    final current = goldenFileComparator;
-    if (current is! LocalFileComparator) {
-      throw StateError(
-        'golden_matrix: tolerance requires goldenFileComparator to be a '
-        'LocalFileComparator, but got ${current.runtimeType}. '
-        'Custom comparators are not supported with the tolerance parameter.',
-      );
-    }
-    goldenFileComparator = _TolerantComponentComparator(current, tolerance);
-  });
-
-  tearDown(() {
-    if (originalComparator != null) {
-      goldenFileComparator = originalComparator!;
-    }
-  });
-}
-
-void _setupComponentTearDown(
-  String groupName,
-  String testName,
-  List<MatrixCombinationResult> results,
-  Stopwatch stopwatch,
-  String? reportDir,
-  bool printSummary, {
-  required Set<MatrixReportFormat> formats,
-  required bool detectStaleGoldens,
-}) {
-  tearDownAll(() async {
-    stopwatch.stop();
-    final stale = detectStaleGoldens
-        ? await scanStaleGoldens(
-            testSlug: slugify(testName),
-            expectedPaths: results.map((r) => r.goldenPath).toSet(),
-          )
-        : <String>[];
-    final result = MatrixResult(
-      name: groupName,
-      results: results,
-      duration: stopwatch.elapsed,
-      staleGoldens: stale,
-    );
-    final dir = reportDir ?? _resolveComponentDefaultReportDir();
-    if (formats.contains(MatrixReportFormat.json)) {
-      await MatrixReportWriter.write(result, outputDir: dir);
-    }
-    if (formats.contains(MatrixReportFormat.html)) {
-      await MatrixReportWriter.writeHtml(result, outputDir: dir);
-    }
-    if (formats.contains(MatrixReportFormat.markdown)) {
-      await MatrixReportWriter.writeMarkdown(result, outputDir: dir, formats: formats);
-    }
-    if (formats.contains(MatrixReportFormat.junit)) {
-      await MatrixReportWriter.writeJunit(result, outputDir: dir);
-    }
-    if (printSummary) {
-      debugPrint(formatSummary(result));
-    }
-    if (formats.isEmpty && stale.isNotEmpty) {
-      debugPrint('golden_matrix: $groupName has ${stale.length} stale golden file(s):');
-      for (final path in stale) {
-        debugPrint('  - $path');
-      }
-    }
-  });
-}
-
-/// Resolves the default report directory when `reportDir` is omitted.
-///
-/// Like the screen/component runner, derives `<test-file-dir>/goldens` from
-/// the active comparator's `basedir` so reports land next to the golden PNGs
-/// for any test layout. Returns null for non-local comparators.
-String? _resolveComponentDefaultReportDir() {
-  final comparator = goldenFileComparator;
-  if (comparator is! LocalFileComparator) return null;
-  return joinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
-}
-
-// -- Tolerant comparator (duplicated from matrix_test_runner.dart) --
-
-class _TolerantComponentComparator extends LocalFileComparator {
-  _TolerantComponentComparator(LocalFileComparator delegate, this._tolerance)
-      : super(delegate.basedir.resolve('_golden_matrix_tolerance_anchor.dart'));
-
-  final double _tolerance;
-
-  @override
-  Future<bool> compare(Uint8List imageBytes, Uri golden) async {
-    final result = await GoldenFileComparator.compareLists(
-      imageBytes,
-      await getGoldenBytes(golden),
-    );
-    if (!result.passed && result.diffPercent <= _tolerance) {
-      return true;
-    }
-    if (!result.passed) {
-      final error = await generateFailureOutput(result, golden, basedir);
-      throw FlutterError(error);
-    }
-    return result.passed;
-  }
 }

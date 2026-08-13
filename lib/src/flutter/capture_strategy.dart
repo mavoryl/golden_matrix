@@ -127,8 +127,14 @@ class IntrinsicCaptureStrategy extends CaptureStrategy {
   @override
   void configureView(WidgetTester tester, MatrixCombination combination) {
     // Generous virtual surface; the widget sizes itself inside the Align.
+    //
+    // physicalSize is in *physical* pixels, so it has to be scaled by the
+    // ratio to keep [surface] logical points available. A fixed 800×800 meant
+    // 400×400 logical at ratio 2.0 and ~267×267 at 3.0 — a capture-density
+    // knob quietly squeezing anything wider, and the golden then recorded the
+    // squeezed layout.
     tester.view.devicePixelRatio = pixelRatio;
-    tester.view.physicalSize = surface * 1.0;
+    tester.view.physicalSize = surface * pixelRatio;
   }
 
   @override

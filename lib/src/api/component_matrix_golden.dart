@@ -87,6 +87,10 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 ///   1.3.0 the default is `1.0` — same size as pre-1.2.0, so 1.2.0 users
 ///   need one `flutter test --update-goldens` (or `pixelRatio: 2.0` to
 ///   keep the 1.2.0 files).
+///   It affects density only: the widget always lays itself out in the
+///   same 800×800 logical surface. Up to 1.4.0 that surface was 800
+///   *physical* pixels, so a higher ratio shrank it (400×400 at `2.0`,
+///   ~267×267 at `3.0`) and quietly squeezed anything wider.
 /// - [padding] — added around the widget inside the boundary so PNG
 ///   edges have a little visual breathing room. Default
 ///   `EdgeInsets.all(8)`; pass `EdgeInsets.zero` for tightest crop.

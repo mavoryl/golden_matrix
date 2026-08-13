@@ -2,65 +2,64 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
 
+MatrixCombination _combo({bool dark = false, double textScale = 1.0}) => MatrixCombination(
+      scenario: MatrixScenario('s', builder: () => const SizedBox.shrink()),
+      theme: dark ? MatrixTheme.dark : MatrixTheme.light,
+      locale: const Locale('en'),
+      textScale: textScale,
+      device: MatrixDevice.phoneSmall,
+      direction: TextDirection.ltr,
+    );
+
+// Top-level predicates: the docs on MatrixPreset recommend these precisely so
+// the rule can be `const`.
+bool isDarkAndLarge(MatrixCombination c) => c.theme.isDark && c.textScale >= 1.5;
+bool isLight(MatrixCombination c) => !c.theme.isDark;
+
+// A const rule must be usable in a const preset — that is the whole point of
+// the recommendation in matrix_preset.dart.
+const _darkLargeExcluded = MatrixRule.exclude(isDarkAndLarge);
+const _lightOnly = MatrixRule.includeOnly(isLight);
+
 void main() {
-  Widget placeholder() => const SizedBox();
-
-  group('MatrixRule', () {
-    test('exclude rule has correct type', () {
-      final rule = MatrixRule.exclude((c) => c.theme.name == 'dark');
-      expect(rule.type, MatrixRuleType.exclude);
+  group('MatrixRule is const-constructible', () {
+    test('exclude keeps its type and predicate', () {
+      expect(_darkLargeExcluded.type, MatrixRuleType.exclude);
+      expect(_darkLargeExcluded.predicate(_combo(dark: true, textScale: 2.0)), isTrue);
+      expect(_darkLargeExcluded.predicate(_combo()), isFalse);
     });
 
-    test('exclude predicate matches correctly', () {
-      final rule = MatrixRule.exclude((c) => c.theme.name == 'dark');
-
-      final darkCombo = MatrixCombination(
-        scenario: MatrixScenario('test', builder: placeholder),
-        theme: MatrixTheme.dark,
-        locale: const Locale('en'),
-        textScale: 1.0,
-        device: MatrixDevice.phoneSmall,
-        direction: TextDirection.ltr,
-      );
-
-      final lightCombo = MatrixCombination(
-        scenario: MatrixScenario('test', builder: placeholder),
-        theme: MatrixTheme.light,
-        locale: const Locale('en'),
-        textScale: 1.0,
-        device: MatrixDevice.phoneSmall,
-        direction: TextDirection.ltr,
-      );
-
-      expect(rule.predicate(darkCombo), isTrue);
-      expect(rule.predicate(lightCombo), isFalse);
+    test('includeOnly keeps its type and predicate', () {
+      expect(_lightOnly.type, MatrixRuleType.includeOnly);
+      expect(_lightOnly.predicate(_combo()), isTrue);
+      expect(_lightOnly.predicate(_combo(dark: true)), isFalse);
     });
 
-    test('exclude rule for RTL + non-Arabic locale', () {
-      final rule = MatrixRule.exclude(
-        (c) => c.locale.languageCode != 'ar' && c.direction == TextDirection.rtl,
+    test('identical const rules are canonicalized to the same instance', () {
+      const again = MatrixRule.exclude(isDarkAndLarge);
+      expect(identical(_darkLargeExcluded, again), isTrue);
+    });
+
+    test('a const rule works inside a const preset', () {
+      const preset = MatrixPreset(
+        axes: MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
+        rules: [_darkLargeExcluded],
       );
 
-      final enRtl = MatrixCombination(
-        scenario: MatrixScenario('test', builder: placeholder),
-        theme: MatrixTheme.light,
-        locale: const Locale('en'),
-        textScale: 1.0,
-        device: MatrixDevice.phoneSmall,
-        direction: TextDirection.rtl,
+      final combinations = MatrixGenerator.generate(
+        scenarios: [MatrixScenario('s', builder: () => const SizedBox.shrink())],
+        axes: preset.axes,
+        rules: preset.rules,
       );
 
-      final arRtl = MatrixCombination(
-        scenario: MatrixScenario('test', builder: placeholder),
-        theme: MatrixTheme.light,
-        locale: const Locale('ar'),
-        textScale: 1.0,
-        device: MatrixDevice.phoneSmall,
-        direction: TextDirection.rtl,
-      );
+      expect(combinations.any((c) => c.theme.isDark), isTrue);
+      expect(combinations.any((c) => c.theme.isDark && c.textScale >= 1.5), isFalse);
+    });
 
-      expect(rule.predicate(enRtl), isTrue); // excluded: en + RTL
-      expect(rule.predicate(arRtl), isFalse); // kept: ar + RTL
+    test('non-const call sites keep working', () {
+      final local = MatrixRule.exclude((c) => c.theme.isDark);
+      expect(local.type, MatrixRuleType.exclude);
+      expect(local.predicate(_combo(dark: true)), isTrue);
     });
   });
 }

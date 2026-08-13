@@ -42,8 +42,8 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 /// - [appBuilder] — Required builder that returns the full app widget
 ///   for the given [MatrixCombination]. This is the key difference from
 ///   [matrixGolden].
-/// - [axes] — Matrix dimensions. Ignored when [preset] supplies its own
-///   axes.
+/// - [axes] — Matrix dimensions. Takes precedence over [preset]'s axes; see
+///   the precedence table on [matrixGolden].
 /// - [preset] — Reusable [MatrixPreset]. See [MatrixPreset.screenSmoke].
 /// - [states] — Optional list of [MatrixScenario]s representing distinct
 ///   screen states (e.g. `loading`, `empty`, `error`, `populated`). Each
@@ -61,8 +61,6 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 ///   `markdown`, `junit`). Defaults to `const {}` — no reports are
 ///   written unless you ask. Pass [defaultReportFormats] for the usual
 ///   JSON + HTML + Markdown trio.
-/// - `report` — **Deprecated.** Legacy bool toggle. Use [reportFormats]
-///   instead. When both are passed, `report` wins.
 /// - [reportDir] — Optional directory for the generated report.
 /// - [skip] — When `true`, all generated tests are skipped.
 /// - [tolerance] — Optional pixel-difference tolerance for the matcher.

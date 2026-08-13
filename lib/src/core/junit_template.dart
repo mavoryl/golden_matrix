@@ -87,7 +87,7 @@ class JunitTemplate {
         final msg = r.errorMessage ?? 'failed';
         final firstLine = msg.split('\n').first.trim();
         buf.write('      <failure');
-        _attr(buf, 'type', 'PixelMismatch');
+        _attr(buf, 'type', _failureType(r.failurePhase));
         _attr(buf, 'message', firstLine);
         buf.writeln('>');
         buf.writeln(_escText(msg));
@@ -101,6 +101,19 @@ class JunitTemplate {
         return;
     }
   }
+
+  /// Maps a failure phase to a JUnit `<failure type>`.
+  ///
+  /// Every failure used to be reported as `PixelMismatch`, including builder
+  /// throws and layout errors that happened before a single pixel was compared,
+  /// which sent CI dashboards chasing the wrong cause.
+  static String _failureType(MatrixFailurePhase? phase) => switch (phase) {
+        MatrixFailurePhase.build => 'BuildError',
+        MatrixFailurePhase.pump => 'PumpError',
+        MatrixFailurePhase.setup => 'SetupError',
+        MatrixFailurePhase.comparison => 'GoldenMismatch',
+        null => 'Failure',
+      };
 
   /// Append ` name="value"` with attribute-context XML escaping.
   static void _attr(StringBuffer buf, String name, String value) {

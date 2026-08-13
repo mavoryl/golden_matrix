@@ -10,9 +10,9 @@ import 'package:golden_matrix/src/core/matrix_report_writer.dart';
 import 'package:golden_matrix/src/core/naming_strategy.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
-import 'package:golden_matrix/src/core/stale_detector.dart';
-import 'package:golden_matrix/src/flutter/error_capture.dart';
+import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
 import 'package:golden_matrix/src/flutter/pump_helpers.dart';
+import 'package:golden_matrix/src/flutter/stale_scan.dart';
 import 'package:golden_matrix/src/models/matrix_axes.dart';
 import 'package:golden_matrix/src/models/matrix_combination.dart';
 import 'package:golden_matrix/src/models/matrix_preset.dart';
@@ -62,6 +62,7 @@ void runMatrixTests(
   double captureScale = 1.0,
 }) {
   validateCaptureScale(captureScale, 'captureScale');
+  validateTolerance(tolerance);
   final effectiveFormats = reportFormats;
   final writeReports = effectiveFormats.isNotEmpty;
   // Stale detection needs per-combination results too, so we record them
@@ -77,6 +78,13 @@ void runMatrixTests(
     scenarioTags: scenarioTags,
     maxCombinations: maxCombinations,
   );
+
+  if (combinations.isEmpty) {
+    debugPrint(
+      'golden_matrix: "$name" produced no combinations — rules or scenarioTags '
+      'filtered every one out, so no tests were registered.',
+    );
+  }
 
   final byScenario = groupByScenario(combinations);
 
@@ -155,6 +163,17 @@ List<MatrixCombination> resolveCombinations({
       ? scenarios.where((s) => s.tags.any((t) => scenarioTags.contains(t))).toList()
       : scenarios;
 
+  // Without this, tag filtering that matches nothing surfaces as the generator's
+  // generic "scenarios must not be empty", pointing at the wrong argument.
+  if (filteredScenarios.isEmpty && scenarios.isNotEmpty) {
+    throw ArgumentError.value(
+      scenarioTags,
+      'scenarioTags',
+      'matched none of the ${scenarios.length} scenarios '
+          '(their tags: ${scenarios.expand((s) => s.tags).toSet().join(', ')})',
+    );
+  }
+
   return MatrixGenerator.generate(
     scenarios: filteredScenarios,
     axes: effectiveAxes,
@@ -181,9 +200,7 @@ Map<String, List<MatrixCombination>> groupByScenario(List<MatrixCombination> com
 void _setupTolerance(double? tolerance) {
   if (tolerance == null) return;
 
-  if (tolerance < 0.0 || tolerance > 1.0) {
-    throw ArgumentError.value(tolerance, 'tolerance', 'must be in range 0.0..1.0');
-  }
+  validateTolerance(tolerance);
 
   GoldenFileComparator? originalComparator;
 
@@ -255,6 +272,19 @@ void validateCaptureScale(double value, String name) {
   }
 }
 
+/// Validates the `tolerance` parameter of the public test functions.
+///
+/// Called before the enclosing `group()` is declared so the error surfaces at
+/// the call site instead of mid-run. `isFinite` matters as much as the range:
+/// NaN passes every `< 0 || > 1` check, and then `diffPercent <= NaN` is false
+/// for any diff, failing every golden with no explanation.
+void validateTolerance(double? value) {
+  if (value == null) return;
+  if (!value.isFinite || value < 0.0 || value > 1.0) {
+    throw ArgumentError.value(value, 'tolerance', 'must be a finite value in range 0.0..1.0');
+  }
+}
+
 // -- Test execution --
 
 Future<void> _executeGoldenTest({
@@ -270,86 +300,47 @@ Future<void> _executeGoldenTest({
   double captureScale = 1.0,
 }) async {
   PumpHelpers.configureView(tester, combination.device);
-  final capture = ErrorCapture()..start();
-  try {
-    final widget = RepaintBoundary(
+
+  await runGoldenLifecycle(
+    tester: tester,
+    combination: combination,
+    goldenPath: goldenPath,
+    record: report,
+    results: results,
+    build: () => RepaintBoundary(
       key: _goldenBoundaryKey,
       child: TickerMode(enabled: !freezeAnimations, child: widgetBuilder(combination)),
-    );
+    ),
+    pump: (widget) async {
+      await tester.pumpWidget(widget);
 
-    await tester.pumpWidget(widget);
-
-    // Initial settle. When captureAfter is set, use pump(duration) instead
-    // of pumpAndSettle — pumpAndSettle would hang on infinite animations
-    // (the very use case captureAfter exists for).
-    if (captureAfter != null) {
-      await tester.pump(captureAfter);
-    } else {
-      await tester.pumpAndSettle();
-    }
-
-    if (setup != null) {
-      await setup(tester, combination);
+      // Initial settle. When captureAfter is set, use pump(duration) instead
+      // of pumpAndSettle — pumpAndSettle would hang on infinite animations
+      // (the very use case captureAfter exists for).
       if (captureAfter != null) {
         await tester.pump(captureAfter);
       } else {
         await tester.pumpAndSettle();
       }
-    }
-
-    capture.stop();
-
-    if (report) {
-      Object? capturedError;
-      try {
-        await expectMatchesGolden(
-          tester,
-          _goldenBoundaryKey,
-          goldenPath,
-          captureScale: captureScale,
-        );
-      } catch (e) {
-        capturedError = e;
-      }
-
-      // Pixel-mismatch failures from the golden comparator are routed
-      // through `runAsync` and reported via `FlutterError.reportError`
-      // rather than propagated through the matcher's await chain. The
-      // binding stashes them and `takeException()` pulls them out (and
-      // clears the slot). Without this check, `await expectLater(...)`
-      // returns cleanly and we'd mistakenly record `status: passed`
-      // even though flutter_test will later mark the test as failed.
-      // See: TestWidgetsFlutterBinding._reportExceptionNoticed.
-      capturedError ??= tester.binding.takeException();
-
-      if (capturedError != null) {
-        results.add(
-          MatrixCombinationResult(
-            combination: combination,
-            status: MatrixResultStatus.failed,
-            goldenPath: goldenPath,
-            errorMessage: capturedError.toString(),
-            warnings: List.unmodifiable(capture.warnings),
-          ),
-        );
-        throw capturedError;
-      }
-
-      results.add(
-        MatrixCombinationResult(
-          combination: combination,
-          status: MatrixResultStatus.passed,
-          goldenPath: goldenPath,
-          warnings: List.unmodifiable(capture.warnings),
-        ),
-      );
-    } else {
-      await expectMatchesGolden(tester, _goldenBoundaryKey, goldenPath, captureScale: captureScale);
-    }
-  } finally {
-    capture.stop();
-    PumpHelpers.resetView(tester);
-  }
+    },
+    setup: setup == null
+        ? null
+        : () async {
+            await setup(tester, combination);
+            if (captureAfter != null) {
+              await tester.pump(captureAfter);
+            } else {
+              await tester.pumpAndSettle();
+            }
+          },
+    compare: () => expectMatchesGolden(
+      tester,
+      _goldenBoundaryKey,
+      goldenPath,
+      captureScale: captureScale,
+    ),
+    onFinally: () => PumpHelpers.resetView(tester),
+  );
 }
 
 // -- Result recording --
@@ -381,7 +372,12 @@ void _setupReportWriting(
 }) {
   tearDownAll(() async {
     stopwatch.stop();
-    final stale = detectStaleGoldens ? await _detectStaleGoldensSafe(name, results) : <String>[];
+    final stale = detectStaleGoldens
+        ? await scanStaleGoldens(
+            testSlug: slugify(_stripPrefix(name)),
+            expectedPaths: results.map((r) => r.goldenPath).toSet(),
+          )
+        : <String>[];
     final result = MatrixResult(
       name: name,
       results: results,
@@ -396,7 +392,7 @@ void _setupReportWriting(
       await MatrixReportWriter.writeHtml(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.markdown)) {
-      await MatrixReportWriter.writeMarkdown(result, outputDir: dir);
+      await MatrixReportWriter.writeMarkdown(result, outputDir: dir, formats: formats);
     }
     if (formats.contains(MatrixReportFormat.junit)) {
       await MatrixReportWriter.writeJunit(result, outputDir: dir);
@@ -427,33 +423,7 @@ void _setupReportWriting(
 String? _resolveDefaultReportDir() {
   final comparator = goldenFileComparator;
   if (comparator is! LocalFileComparator) return null;
-  return _joinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
-}
-
-/// Detects stale goldens for this test's subdirectory, swallowing IO
-/// errors so a misbehaving filesystem can't break the test report.
-Future<List<String>> _detectStaleGoldensSafe(
-  String name,
-  List<MatrixCombinationResult> results,
-) async {
-  try {
-    final comparator = goldenFileComparator;
-    if (comparator is! LocalFileComparator) return const [];
-
-    final basedir = Directory.fromUri(comparator.basedir);
-    final goldensRoot = Directory(_joinPath(basedir.path, 'goldens'));
-    final testSlug = slugify(_stripPrefix(name));
-    final testSubdir = Directory(_joinPath(goldensRoot.path, testSlug));
-
-    final expected = results.map((r) => r.goldenPath).toSet();
-    return await findStaleGoldens(
-      expectedPaths: expected,
-      testSubdir: testSubdir,
-      goldensRoot: goldensRoot,
-    );
-  } catch (_) {
-    return const [];
-  }
+  return joinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
 }
 
 /// Formats a human-readable summary of a [MatrixResult] for console output.
@@ -499,16 +469,6 @@ String formatSummary(MatrixResult result) {
 }
 
 // -- Helpers --
-
-/// Joins two path segments with a single platform separator, regardless of
-/// whether [base] ends in one. `Directory.fromUri(...).path` for a directory
-/// URI commonly contains a trailing separator, which would otherwise produce
-/// `foo//bar`-style paths in user-visible output.
-String _joinPath(String base, String leaf) {
-  final sep = Platform.pathSeparator;
-  final trimmed = base.endsWith(sep) ? base.substring(0, base.length - sep.length) : base;
-  return '$trimmed$sep$leaf';
-}
 
 /// Strips the public API prefix ('matrixGolden: ' or 'screenMatrixGolden: ')
 /// from a test name to get just the user-provided identifier.

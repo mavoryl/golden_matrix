@@ -37,15 +37,18 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 ///   widget states (e.g. `default`, `disabled`, `loading`). Each scenario
 ///   is expanded across the matrix.
 /// - [axes] — Defines the dimensions of the matrix (themes, locales, text
-///   scales, devices, directions). Ignored when [preset] is supplied with
-///   its own axes; otherwise sensible defaults are used.
+///   scales, devices, directions). Takes precedence over [preset]'s axes;
+///   when neither is given, sensible defaults are used.
 /// - [preset] — A reusable [MatrixPreset] bundling [axes], [sampling], and
 ///   [rules]. See [MatrixPreset.componentSmoke] and
-///   [MatrixPreset.componentFull].
+///   [MatrixPreset.componentFull]. Precedence is described below the parameter
+///   list.
 /// - [sampling] — A [MatrixSampling] strategy used to reduce the full
 ///   Cartesian product. Defaults to [MatrixSampling.full].
-/// - [maxCombinations] — Hard cap on the number of combinations. Most
-///   useful with [MatrixSampling.priorityBased].
+/// - [maxCombinations] — Hard cap on the number of combinations, at least 1.
+///   Most useful with [MatrixSampling.priorityBased], which orders by risk
+///   before truncating. With [MatrixSampling.pairwise] a cap below the covering
+///   array size drops the all-pairs guarantee and logs a warning.
 /// - [rules] — A list of [MatrixRule]s applied after the Cartesian
 ///   product. Exclude rules drop combinations; includeOnly rules keep
 ///   only matching combinations.
@@ -74,9 +77,6 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 ///   unless you ask. Pass [defaultReportFormats] for the usual
 ///   `json` + `html` + `markdown` trio, or a singleton like
 ///   `{MatrixReportFormat.markdown}` for CI-only Markdown summaries.
-/// - `report` — **Deprecated.** Legacy bool toggle for all formats at
-///   once. Use [reportFormats] instead. When both are passed, `report`
-///   wins for backward compatibility.
 /// - [reportDir] — Directory for the generated report. Defaults to the
 ///   package's standard `goldens` report location.
 /// - [skip] — When `true`, all generated tests are skipped.
@@ -113,6 +113,19 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 /// - [captureScale] — Physical pixels per logical pixel in the captured
 ///   PNG. Default `1.0` (goldens at the device's logical size). See
 ///   *Capture resolution* below; this is **not** `MatrixDevice.pixelRatio`.
+///
+/// ## Precedence with a preset
+///
+/// | Setting            | Winner                                            |
+/// |--------------------|---------------------------------------------------|
+/// | [axes]             | [axes] → `preset.axes` → `const MatrixAxes()`     |
+/// | [sampling]         | [sampling] → `preset.sampling` → `full`           |
+/// | [rules]            | **merged**: `preset.rules` first, then [rules]    |
+/// | [maxCombinations]  | [maxCombinations] only — presets carry no cap     |
+///
+/// Only [rules] merge; every other setting is a straight override, so passing
+/// [axes] next to a preset replaces the preset's axes rather than extending
+/// them. Use `preset.axes.copyWith(...)` to extend a single axis.
 ///
 /// ## Example
 ///

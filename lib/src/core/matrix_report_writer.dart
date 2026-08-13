@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:golden_matrix/src/core/html_template.dart';
 import 'package:golden_matrix/src/core/junit_template.dart';
 import 'package:golden_matrix/src/core/markdown_template.dart';
+import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/models/matrix_result.dart';
 
@@ -36,9 +37,13 @@ class MatrixReportWriter {
   /// Writes the report as a Markdown summary file suitable for CI step
   /// summaries (e.g. GitHub Actions `$GITHUB_STEP_SUMMARY`), PR comment
   /// bots, and Slack notifications.
-  static Future<void> writeMarkdown(MatrixResult result, {String? outputDir}) async {
+  static Future<void> writeMarkdown(
+    MatrixResult result, {
+    String? outputDir,
+    Set<MatrixReportFormat> formats = const {MatrixReportFormat.html},
+  }) async {
     final dir = outputDir ?? _findGoldensDir(result);
-    final md = MarkdownTemplate.render(result);
+    final md = MarkdownTemplate.render(result, formats: formats);
     final file = File('$dir/${_slug(result.name)}_report.md');
     await file.parent.create(recursive: true);
     await file.writeAsString(md);

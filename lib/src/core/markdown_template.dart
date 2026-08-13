@@ -1,4 +1,5 @@
 import 'package:flutter/widgets.dart';
+import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/models/matrix_result.dart';
 
@@ -11,16 +12,26 @@ import 'package:golden_matrix/src/models/matrix_result.dart';
 /// - `## Summary` bullet list with counts + duration
 /// - `## Failed` table when there are failures
 /// - `## Stale goldens` bullet list when non-empty
-/// - Trailing link to the sibling HTML report
+/// - Trailing link to the sibling HTML report, when html is among [formats]
 class MarkdownTemplate {
   /// Renders [result] as a GitHub-Flavored Markdown report.
-  static String render(MatrixResult result) {
+  ///
+  /// [formats] is the set of report formats the run actually writes; it decides
+  /// whether the footer links to the HTML report. Without it the footer used to
+  /// link to a file that was never written whenever markdown was requested on
+  /// its own.
+  static String render(
+    MatrixResult result, {
+    Set<MatrixReportFormat> formats = const {MatrixReportFormat.html},
+  }) {
     final buf = StringBuffer();
     _writeHeader(buf, result);
     _writeSummary(buf, result);
     _writeFailed(buf, result);
     _writeStale(buf, result);
-    _writeHtmlLink(buf, result);
+    if (formats.contains(MatrixReportFormat.html)) {
+      _writeHtmlLink(buf, result);
+    }
     return '${buf.toString().trimRight()}\n';
   }
 

@@ -10,8 +10,8 @@ import 'package:golden_matrix/src/core/matrix_report_writer.dart';
 import 'package:golden_matrix/src/core/naming_strategy.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
-import 'package:golden_matrix/src/core/stale_detector.dart';
-import 'package:golden_matrix/src/flutter/error_capture.dart';
+import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
+import 'package:golden_matrix/src/flutter/stale_scan.dart';
 import 'package:golden_matrix/src/models/matrix_axes.dart';
 import 'package:golden_matrix/src/models/matrix_combination.dart';
 import 'package:golden_matrix/src/models/matrix_preset.dart';
@@ -68,6 +68,9 @@ const _componentBoundaryKey = ValueKey('__golden_matrix_component_boundary__');
 /// - The `devices` axis of [MatrixAxes] is **ignored** in component
 ///   mode (intrinsic size does not depend on device geometry).
 ///   The capture pixel density comes from the [pixelRatio] parameter.
+///   A multi-device axis is collapsed to its first value before generation,
+///   so it multiplies neither tests nor report counters, and rules matching
+///   on `c.device` see only that first value.
 ///
 /// ## Parameters
 ///
@@ -76,7 +79,8 @@ const _componentBoundaryKey = ValueKey('__golden_matrix_component_boundary__');
 ///   paths.
 /// - [scenarios] — non-empty list of [MatrixScenario]s to render.
 /// - [axes] / [preset] — themes, locales, text scales, directions. The
-///   `devices` field is ignored.
+///   `devices` field is collapsed to a single value, so
+///   [MatrixPreset.componentFull] yields 8 combinations here instead of 16.
 /// - [sampling] / [maxCombinations] / [rules] / [scenarioTags] — same
 ///   semantics as [matrixGolden].
 /// - [pixelRatio] — capture density (default `1.0`, i.e. goldens are
@@ -123,19 +127,43 @@ void componentMatrixGolden(
   EdgeInsets padding = const EdgeInsets.all(8),
 }) {
   validateCaptureScale(pixelRatio, 'pixelRatio');
+  validateTolerance(tolerance);
   final effectiveFormats = reportFormats;
   final writeReports = effectiveFormats.isNotEmpty;
   final wantStaleDetection = detectStaleGoldens && fileNameBuilder == null;
   final recordResults = writeReports || wantStaleDetection;
+  // Component mode renders at the widget's intrinsic size and
+  // NamingStrategy.componentGoldenPath drops the device segment, so a second
+  // device would register another test with the same description that writes
+  // and compares the very same PNG. Collapse the axis before generation, which
+  // also keeps the device out of rules, sampling and report counters.
+  final declaredAxes = axes ?? preset?.axes ?? const MatrixAxes();
+  final componentAxes = declaredAxes.devices.length > 1
+      ? declaredAxes.copyWith(devices: [declaredAxes.devices.first])
+      : declaredAxes;
+
   final combinations = resolveCombinations(
     scenarios: scenarios,
-    axes: axes,
+    axes: componentAxes,
     preset: preset,
     sampling: sampling,
     rules: rules,
     scenarioTags: scenarioTags,
     maxCombinations: maxCombinations,
   );
+
+  if (combinations.isEmpty) {
+    // Registering nothing looks exactly like a passing run. Component mode
+    // makes this easier to hit than it looks: the devices axis is collapsed to
+    // its first value, so a rule matching on any other device now filters
+    // everything out.
+    debugPrint(
+      'golden_matrix: "$name" produced no combinations — rules or scenarioTags '
+      'filtered every one out, so no tests were registered. Note that '
+      'componentMatrixGolden collapses the devices axis to its first value, so '
+      'rules matching on c.device only ever see that one.',
+    );
+  }
 
   final byScenario = groupByScenario(combinations);
 
@@ -212,82 +240,48 @@ Future<void> _executeComponentGoldenTest({
   tester.view.devicePixelRatio = pixelRatio;
   tester.view.physicalSize = const Size(800, 800) * 1.0;
 
-  final capture = ErrorCapture()..start();
-  try {
-    final widget = _buildComponentTree(
+  await runGoldenLifecycle(
+    tester: tester,
+    combination: combination,
+    goldenPath: goldenPath,
+    record: record,
+    results: results,
+    build: () => _buildComponentTree(
       combination: combination,
       padding: padding,
       extraLocalizationsDelegates: extraLocalizationsDelegates,
       freezeAnimations: freezeAnimations,
-    );
+    ),
+    pump: (widget) async {
+      await tester.pumpWidget(widget);
 
-    await tester.pumpWidget(widget);
-
-    if (captureAfter != null) {
-      await tester.pump(captureAfter);
-    } else {
-      await tester.pumpAndSettle();
-    }
-
-    if (setup != null) {
-      await setup(tester, combination);
       if (captureAfter != null) {
         await tester.pump(captureAfter);
       } else {
         await tester.pumpAndSettle();
       }
-    }
-
-    capture.stop();
-
-    if (record) {
-      Object? capturedError;
-      try {
-        await expectMatchesGolden(
-          tester,
-          _componentBoundaryKey,
-          goldenPath,
-          captureScale: pixelRatio,
-        );
-      } catch (e) {
-        capturedError = e;
-      }
-      capturedError ??= tester.binding.takeException();
-
-      if (capturedError != null) {
-        results.add(
-          MatrixCombinationResult(
-            combination: combination,
-            status: MatrixResultStatus.failed,
-            goldenPath: goldenPath,
-            errorMessage: capturedError.toString(),
-            warnings: List.unmodifiable(capture.warnings),
-          ),
-        );
-        throw capturedError;
-      }
-
-      results.add(
-        MatrixCombinationResult(
-          combination: combination,
-          status: MatrixResultStatus.passed,
-          goldenPath: goldenPath,
-          warnings: List.unmodifiable(capture.warnings),
-        ),
-      );
-    } else {
-      await expectMatchesGolden(
-        tester,
-        _componentBoundaryKey,
-        goldenPath,
-        captureScale: pixelRatio,
-      );
-    }
-  } finally {
-    capture.stop();
-    addTearDown(tester.view.resetPhysicalSize);
-    addTearDown(tester.view.resetDevicePixelRatio);
-  }
+    },
+    setup: setup == null
+        ? null
+        : () async {
+            await setup(tester, combination);
+            if (captureAfter != null) {
+              await tester.pump(captureAfter);
+            } else {
+              await tester.pumpAndSettle();
+            }
+          },
+    compare: () => expectMatchesGolden(
+      tester,
+      _componentBoundaryKey,
+      goldenPath,
+      captureScale: pixelRatio,
+    ),
+    onFinally: () {
+      addTearDown(tester.view.resetPhysicalSize);
+      addTearDown(tester.view.resetDevicePixelRatio);
+    },
+  );
 }
 
 Widget _buildComponentTree({
@@ -377,9 +371,7 @@ void _recordSkipped(
 void _setupComponentTolerance(double? tolerance) {
   if (tolerance == null) return;
 
-  if (tolerance < 0.0 || tolerance > 1.0) {
-    throw ArgumentError.value(tolerance, 'tolerance', 'must be in range 0.0..1.0');
-  }
+  validateTolerance(tolerance);
 
   GoldenFileComparator? originalComparator;
 
@@ -415,8 +407,12 @@ void _setupComponentTearDown(
 }) {
   tearDownAll(() async {
     stopwatch.stop();
-    final stale =
-        detectStaleGoldens ? await _detectComponentStaleGoldensSafe(testName, results) : <String>[];
+    final stale = detectStaleGoldens
+        ? await scanStaleGoldens(
+            testSlug: slugify(testName),
+            expectedPaths: results.map((r) => r.goldenPath).toSet(),
+          )
+        : <String>[];
     final result = MatrixResult(
       name: groupName,
       results: results,
@@ -431,7 +427,7 @@ void _setupComponentTearDown(
       await MatrixReportWriter.writeHtml(result, outputDir: dir);
     }
     if (formats.contains(MatrixReportFormat.markdown)) {
-      await MatrixReportWriter.writeMarkdown(result, outputDir: dir);
+      await MatrixReportWriter.writeMarkdown(result, outputDir: dir, formats: formats);
     }
     if (formats.contains(MatrixReportFormat.junit)) {
       await MatrixReportWriter.writeJunit(result, outputDir: dir);
@@ -456,36 +452,7 @@ void _setupComponentTearDown(
 String? _resolveComponentDefaultReportDir() {
   final comparator = goldenFileComparator;
   if (comparator is! LocalFileComparator) return null;
-  return _componentJoinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
-}
-
-Future<List<String>> _detectComponentStaleGoldensSafe(
-  String testName,
-  List<MatrixCombinationResult> results,
-) async {
-  try {
-    final comparator = goldenFileComparator;
-    if (comparator is! LocalFileComparator) return const [];
-
-    final basedir = Directory.fromUri(comparator.basedir);
-    final goldensRoot = Directory(_componentJoinPath(basedir.path, 'goldens'));
-    final testSubdir = Directory(_componentJoinPath(goldensRoot.path, slugify(testName)));
-
-    final expected = results.map((r) => r.goldenPath).toSet();
-    return await findStaleGoldens(
-      expectedPaths: expected,
-      testSubdir: testSubdir,
-      goldensRoot: goldensRoot,
-    );
-  } catch (_) {
-    return const [];
-  }
-}
-
-String _componentJoinPath(String base, String leaf) {
-  final sep = Platform.pathSeparator;
-  final trimmed = base.endsWith(sep) ? base.substring(0, base.length - sep.length) : base;
-  return '$trimmed$sep$leaf';
+  return joinPath(Directory.fromUri(comparator.basedir).path, 'goldens');
 }
 
 // -- Tolerant comparator (duplicated from matrix_test_runner.dart) --

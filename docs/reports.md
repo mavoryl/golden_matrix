@@ -46,6 +46,18 @@ Drop-in for a GitHub Actions step summary, PR-comment bots, or Slack/Discord not
 
 Add `MatrixReportFormat.junit` to get a `<slug>_report.xml` next to the other reports. The XML follows the de-facto JUnit schema consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, and Azure DevOps test dashboards. Each scenario becomes a `<testsuite>`, each combination a `<testcase>`; failures land as `<failure>` with the captured error message.
 
+The `<failure type>` says which phase broke, so a dashboard does not blame the pixels for a layout error:
+
+| Phase | `type` | What threw |
+| --- | --- | --- |
+| `build` | `BuildError` | The scenario's widget builder |
+| `pump` | `PumpError` | `pumpWidget` / `pumpAndSettle` — layout errors, settle timeouts |
+| `setup` | `SetupError` | The `setup:` callback or the settle after it |
+| `comparison` | `GoldenMismatch` | The golden comparison itself |
+| unclassified | `Failure` | Recorded without a phase |
+
+The same value appears as `"phase"` in the JSON report for failed combinations, and as `MatrixCombinationResult.failurePhase` if you consume results programmatically.
+
 ## Choosing formats per run
 
 Use `reportFormats` to write only what your pipeline needs:
@@ -74,8 +86,8 @@ matrixGolden(
 
 `reportFormats: const {}` — the default — disables reports entirely.
 
-!!! note "Deprecated `report: bool`"
-    The legacy `report: bool` parameter still works for backward compatibility but emits a deprecation warning. `reportFormats: defaultReportFormats` replaces `report: true`. When both are passed, `report:` wins.
+!!! note "Removed `report: bool`"
+    The legacy `report: bool` parameter was removed in 1.3.0. `reportFormats: defaultReportFormats` replaces `report: true`, and reports are opt-in since that release — the default writes nothing.
 
 ## Overflow detection
 

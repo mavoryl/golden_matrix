@@ -61,5 +61,14 @@ enum MatrixSampling {
   ///
   /// Recommended default for CI matrices with three or more multi-value
   /// axes.
+  ///
+  /// The coverage guarantee holds over the **feasible** set: when exclusion
+  /// rules leave only a sparse set of tuples, selection runs over the surviving
+  /// combinations rather than over per-axis domains.
+  ///
+  /// A `maxCombinations` cap below what the covering array needs cannot be
+  /// honoured together with the guarantee — the cap wins, the guarantee is lost,
+  /// and a warning is printed. Use [priorityBased] when a hard budget matters
+  /// more than pair coverage.
   pairwise,
 }

@@ -18,8 +18,11 @@ import 'package:golden_matrix/src/models/matrix_theme.dart';
 /// | Preset            | Sampling | Approx. tests / scenario | Best for          |
 /// |-------------------|----------|--------------------------|-------------------|
 /// | `componentSmoke`  | smoke    | ~2                       | Fast CI checks    |
-/// | `componentFull`   | full     | 16                       | Full coverage     |
+/// | `componentFull`   | full     | 16 (8 in component mode) | Full coverage     |
 /// | `screenSmoke`     | smoke    | ~5                       | Screen-level CI   |
+///
+/// `componentMatrixGolden` collapses the `devices` axis, so the two devices in
+/// `componentFull` do not multiply its combinations.
 ///
 /// ## Example: using a built-in preset
 ///
@@ -85,6 +88,9 @@ class MatrixPreset {
   /// RTL) × 2 text scales (`1.0`, `2.0`) × 2 devices
   /// ([MatrixDevice.phoneSmall], [MatrixDevice.tablet]) = 16
   /// combinations per scenario. Sampling: [MatrixSampling.full].
+  ///
+  /// In `componentMatrixGolden` the devices axis is collapsed to its first
+  /// value, so this preset yields 8 combinations there, not 16.
   ///
   /// Use for flagship widgets where the cost of exhaustive coverage is
   /// justified.

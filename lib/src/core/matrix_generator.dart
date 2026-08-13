@@ -47,12 +47,43 @@ class MatrixGenerator {
     List<MatrixRule> rules = const [],
     int? maxCombinations,
   }) {
-    // 0. Validate inputs
-    assert(scenarios.isNotEmpty, 'scenarios must not be empty');
-    assert(axes.themes.isNotEmpty, 'axes.themes must not be empty');
-    assert(axes.locales.isNotEmpty, 'axes.locales must not be empty');
-    assert(axes.textScales.isNotEmpty, 'axes.textScales must not be empty');
-    assert(axes.devices.isNotEmpty, 'axes.devices must not be empty');
+    // 0. Validate inputs. ArgumentError rather than assert: asserts vanish
+    // outside debug builds and carry no argument context, and an invalid cap
+    // used to surface as a RangeError from `sublist` far from its cause.
+    _requireNotEmpty(scenarios, 'scenarios');
+    _requireNotEmpty(axes.themes, 'axes.themes');
+    _requireNotEmpty(axes.locales, 'axes.locales');
+    _requireNotEmpty(axes.textScales, 'axes.textScales');
+    _requireNotEmpty(axes.devices, 'axes.devices');
+
+    for (final scale in axes.textScales) {
+      if (!scale.isFinite || scale <= 0) {
+        throw ArgumentError.value(
+          scale,
+          'axes.textScales',
+          'text scales must be finite and > 0',
+        );
+      }
+    }
+
+    for (final device in axes.devices) {
+      final size = device.logicalSize;
+      if (!size.width.isFinite || !size.height.isFinite || size.width <= 0 || size.height <= 0) {
+        throw ArgumentError.value(
+          size,
+          'axes.devices',
+          'device "${device.name}" needs a finite logicalSize with width and height > 0',
+        );
+      }
+    }
+
+    if (maxCombinations != null && maxCombinations < 1) {
+      throw ArgumentError.value(
+        maxCombinations,
+        'maxCombinations',
+        'must be at least 1 — a capped run still has to produce a test',
+      );
+    }
 
     // 1. Generate full Cartesian product
     var combinations = _generateCartesian(scenarios, axes);
@@ -82,10 +113,41 @@ class MatrixGenerator {
     // 5. Apply maxCombinations as a global cap for any strategy.
     // (priorityBased already truncates internally, but reapply for consistency.)
     if (maxCombinations != null && combinations.length > maxCombinations) {
+      // A cap silently undoes what these two strategies were asked to do:
+      // pairwise loses the all-pairs guarantee, and smoke drops the per-axis
+      // deltas that are its entire content. `priorityBased` truncates by design
+      // — that is what the cap is for — and `full` promises no reduction to
+      // begin with, so capping it is a plain, explicit budget.
+      switch (sampling) {
+        case MatrixSampling.pairwise:
+          debugPrint(
+            'golden_matrix: maxCombinations ($maxCombinations) is below the '
+            '${combinations.length} combinations pairwise needs here, so the '
+            'truncated matrix no longer covers every pair. Raise the cap, or '
+            'switch to MatrixSampling.priorityBased if a hard budget matters '
+            'more than pair coverage.',
+          );
+        case MatrixSampling.smoke:
+          debugPrint(
+            'golden_matrix: maxCombinations ($maxCombinations) is below the '
+            '${combinations.length} combinations smoke sampling produced, so '
+            'some per-axis delta combinations are dropped. Raise the cap, or '
+            'switch to MatrixSampling.priorityBased to choose what survives.',
+          );
+        case MatrixSampling.full:
+        case MatrixSampling.priorityBased:
+          break;
+      }
       combinations = combinations.sublist(0, maxCombinations);
     }
 
     return combinations;
+  }
+
+  static void _requireNotEmpty(List<Object?> values, String name) {
+    if (values.isEmpty) {
+      throw ArgumentError.value(values, name, 'must not be empty');
+    }
   }
 
   /// Returns the text direction for a given locale.
@@ -340,7 +402,7 @@ class MatrixGenerator {
       final isRtl = c.direction == TextDirection.rtl;
       final isSmallestDevice = c.device == smallestDevice;
       final isNonFirstLocale = c.locale != firstLocale;
-      final isNonFirstDevice = c.device.name != firstDevice.name;
+      final isNonFirstDevice = c.device != firstDevice;
 
       if (isDark && isLargeText) s += 3;
       if (isRtl && isSmallestDevice) s += 3;
@@ -350,7 +412,19 @@ class MatrixGenerator {
       return s;
     }
 
-    final scored = combinations.toList()..sort((a, b) => score(b).compareTo(score(a)));
+    // `List.sort` is not guaranteed to be stable — Dart only sorts stably below
+    // 32 elements — so equal scores must be broken by the declared order
+    // explicitly. Without it, which combinations survive `maxCombinations`
+    // depends on the matrix size and the SDK's sort implementation.
+    final indexed = [
+      for (var i = 0; i < combinations.length; i++)
+        (index: i, score: score(combinations[i]), combination: combinations[i]),
+    ];
+    indexed.sort((a, b) {
+      final byScore = b.score.compareTo(a.score);
+      return byScore != 0 ? byScore : a.index.compareTo(b.index);
+    });
+    final scored = [for (final e in indexed) e.combination];
 
     if (maxCombinations != null && scored.length > maxCombinations) {
       return scored.sublist(0, maxCombinations);
@@ -429,6 +503,28 @@ class MatrixGenerator {
         continue;
       }
 
+      // When rules left the feasible set sparse, the abstract covering array
+      // addresses tuples that no longer exist, and mapping back would silently
+      // drop them along with the pairs they were covering. Select greedily over
+      // the surviving combinations instead. The full-Cartesian case keeps going
+      // through PairwiseGenerator below, so golden names stay unchanged for
+      // matrices whose rules are axis-aligned (or absent).
+      final feasibleTupleCount = paramSizes.fold(1, (a, b) => a * b);
+      if (scenarioCombos.length < feasibleTupleCount) {
+        result.addAll(
+          _constraintAwarePairwise(
+            scenarioCombos,
+            activeParams,
+            themes: themes,
+            locales: locales,
+            textScales: textScales,
+            devices: devices,
+            directions: directions,
+          ),
+        );
+        continue;
+      }
+
       final testCases = PairwiseGenerator.generate(activeParamSizes);
 
       for (final testCase in testCases) {
@@ -477,5 +573,86 @@ class MatrixGenerator {
     }
 
     return result;
+  }
+
+  /// Pairwise selection over a sparse feasible set.
+  ///
+  /// Builds the set of pairs that actually occur in [combos], then greedily
+  /// picks the combination covering the most still-uncovered pairs until every
+  /// feasible pair is covered. Ties are broken by the original order of
+  /// [combos], so the result is deterministic.
+  ///
+  /// [activeParams] are the axis indices with more than one surviving value,
+  /// in the same encoding used by [_applyPairwiseSampling]: 0 theme, 1 locale,
+  /// 2 textScale, 3 device, 4 direction.
+  static List<MatrixCombination> _constraintAwarePairwise(
+    List<MatrixCombination> combos,
+    List<int> activeParams, {
+    required List<MatrixTheme> themes,
+    required List<Locale> locales,
+    required List<double> textScales,
+    required List<MatrixDevice> devices,
+    required List<TextDirection> directions,
+  }) {
+    int valueIndex(MatrixCombination c, int axis) => switch (axis) {
+          0 => themes.indexOf(c.theme),
+          1 => locales.indexOf(c.locale),
+          2 => textScales.indexOf(c.textScale),
+          3 => devices.indexOf(c.device),
+          _ => directions.indexOf(c.direction),
+        };
+
+    // Index vector per combination, one entry per active axis.
+    final vectors = [
+      for (final c in combos) [for (final axis in activeParams) valueIndex(c, axis)],
+    ];
+
+    String pairKey(int i, int vi, int j, int vj) => '$i:$vi|$j:$vj';
+
+    final uncovered = <String>{};
+    for (final v in vectors) {
+      for (var i = 0; i < v.length; i++) {
+        for (var j = i + 1; j < v.length; j++) {
+          uncovered.add(pairKey(i, v[i], j, v[j]));
+        }
+      }
+    }
+
+    final selected = <MatrixCombination>[];
+    final candidates = List<int>.generate(combos.length, (i) => i);
+
+    while (uncovered.isNotEmpty) {
+      var bestIdx = -1;
+      var bestScore = 0;
+
+      for (final idx in candidates) {
+        final v = vectors[idx];
+        var score = 0;
+        for (var i = 0; i < v.length; i++) {
+          for (var j = i + 1; j < v.length; j++) {
+            if (uncovered.contains(pairKey(i, v[i], j, v[j]))) score++;
+          }
+        }
+        if (score > bestScore) {
+          bestScore = score;
+          bestIdx = idx;
+        }
+      }
+
+      // No remaining combination covers anything new: every reachable pair is
+      // already covered and the rest of `uncovered` is unreachable.
+      if (bestIdx < 0) break;
+
+      final v = vectors[bestIdx];
+      for (var i = 0; i < v.length; i++) {
+        for (var j = i + 1; j < v.length; j++) {
+          uncovered.remove(pairKey(i, v[i], j, v[j]));
+        }
+      }
+      selected.add(combos[bestIdx]);
+      candidates.remove(bestIdx);
+    }
+
+    return selected;
   }
 }

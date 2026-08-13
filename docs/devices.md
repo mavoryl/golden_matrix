@@ -118,7 +118,7 @@ final rtl = combination.copyWith(direction: TextDirection.rtl);
 ```
 
 !!! note "Intrinsic-size captures ignore the device axis"
-    In `componentMatrixGolden` (see [Home](index.md)) the widget is anchored at its **natural** size, so the `devices` field of `MatrixAxes` is ignored and no device segment appears in the golden path.
+    In `componentMatrixGolden` (see [Home](index.md)) the widget is anchored at its **natural** size, so the `devices` field of `MatrixAxes` is ignored and no device segment appears in the golden path. A multi-device axis is collapsed to its first value before generation, so extra devices add neither tests nor report rows — `MatrixPreset.componentFull` yields 8 combinations there, not 16.
 
 ## See also
 

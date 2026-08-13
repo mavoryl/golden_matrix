@@ -158,7 +158,8 @@ For small visual primitives — buttons, badges, chips, list tiles — captured 
 their **natural** size instead of a full device viewport. Keeps the full
 `MaterialApp` context (theme, fonts, icons, locale, overlays); the PNG is
 exactly widget-sized plus optional padding, multiplied by `pixelRatio`
-(default `1.0`). The `devices` axis is ignored.
+(default `1.0`). The `devices` axis is ignored — a multi-device axis collapses to
+its first value, so it does not multiply tests.
 
 ```dart
 componentMatrixGolden(

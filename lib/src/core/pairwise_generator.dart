@@ -21,6 +21,19 @@ class PairwiseGenerator {
   /// Returns a list of test cases. Each test case is a `List<int>` where
   /// the i-th element is the chosen value index for parameter i.
   static List<List<int>> generate(List<int> parameterSizes) {
+    // A zero-sized domain has no valid value index, but the greedy builder
+    // would still emit 0 for it (`bestValue` starts at 0 and the value loop
+    // never runs), addressing a value that does not exist.
+    for (final size in parameterSizes) {
+      if (size < 1) {
+        throw ArgumentError.value(
+          parameterSizes,
+          'parameterSizes',
+          'every parameter needs at least one value, got $size',
+        );
+      }
+    }
+
     if (parameterSizes.isEmpty) return [];
     if (parameterSizes.length == 1) {
       // Single parameter: one test case per value

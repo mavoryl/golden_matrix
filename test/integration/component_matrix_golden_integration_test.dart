@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -158,6 +159,89 @@ void main() {
   test('componentMatrixGolden padding param drives the runner without crashing', () {
     expect(fileExists(padDir, 'componentmatrixgolden__cmg_pad_report.md'), isTrue);
     padDir.deleteSync(recursive: true);
+  });
+
+  // 6a. Device axis is documented as ignored in component mode: it must not
+  //     multiply tests, because componentGoldenPath drops the device segment
+  //     and every extra device would write and compare the same PNG.
+  final devicesDir = Directory.systemTemp.createTempSync('cmg_devices_');
+  componentMatrixGolden(
+    'cmg_devices',
+    scenarios: [MatrixScenario('s', builder: tinyBox)],
+    axes: const MatrixAxes(
+      devices: [MatrixDevice.phoneSmall, MatrixDevice.tablet, MatrixDevice.androidMedium],
+    ),
+    reportDir: devicesDir.path,
+    reportFormats: const {MatrixReportFormat.json},
+    detectStaleGoldens: false,
+    printSummary: false,
+  );
+  test('componentMatrixGolden collapses a multi-device axis to one combination', () {
+    final json = jsonDecode(
+      File('${devicesDir.path}/componentmatrixgolden__cmg_devices_report.json').readAsStringSync(),
+    ) as Map<String, dynamic>;
+
+    expect(json['total'], 1);
+    devicesDir.deleteSync(recursive: true);
+  });
+
+  // 6b. MatrixPreset.componentFull carries two devices, so it triggers the
+  //     collision by construction: 16 combinations over 8 distinct paths.
+  final presetDir = Directory.systemTemp.createTempSync('cmg_preset_');
+  componentMatrixGolden(
+    'cmg_preset',
+    scenarios: [MatrixScenario('s', builder: tinyBox)],
+    preset: MatrixPreset.componentFull,
+    reportDir: presetDir.path,
+    reportFormats: const {MatrixReportFormat.json},
+    detectStaleGoldens: false,
+    printSummary: false,
+  );
+  test('componentMatrixGolden gives every componentFull combination its own golden', () {
+    final json = jsonDecode(
+      File('${presetDir.path}/componentmatrixgolden__cmg_preset_report.json').readAsStringSync(),
+    ) as Map<String, dynamic>;
+
+    final results = (json['results'] as List).cast<Map<String, dynamic>>();
+    final paths = results.map((r) => r['goldenPath'] as String).toSet();
+
+    // 2 themes × 2 locales × 2 scales, device axis collapsed.
+    expect(json['total'], 8);
+    expect(paths.length, results.length);
+    presetDir.deleteSync(recursive: true);
+  });
+
+  // 6c. Collapsing the device axis means a rule matching on a device that is
+  //     not the first one now filters everything out. Registering zero tests in
+  //     silence looks like a passing run, so it has to be said out loud.
+  // The warning is emitted while the group is being declared, so the capture
+  // has to wrap the declaration itself — componentMatrixGolden cannot be called
+  // from inside a test().
+  final emptyMatrixOutput = <String>[];
+  final savedDebugPrint = debugPrint;
+  debugPrint = (String? message, {int? wrapWidth}) {
+    if (message != null) emptyMatrixOutput.add(message);
+  };
+  componentMatrixGolden(
+    'cmg_empty',
+    scenarios: [MatrixScenario('s', builder: tinyBox)],
+    axes: const MatrixAxes(devices: [MatrixDevice.tablet, MatrixDevice.phoneSmall]),
+    rules: [MatrixRule.exclude((c) => c.device == MatrixDevice.tablet)],
+    detectStaleGoldens: false,
+    printSummary: false,
+  );
+  debugPrint = savedDebugPrint;
+
+  test('componentMatrixGolden warns when rules leave no combinations', () {
+    expect(
+      emptyMatrixOutput.join('\n'),
+      allOf(
+        contains('golden_matrix'),
+        contains('cmg_empty'),
+        contains('no combinations'),
+        contains('collapses the devices axis'),
+      ),
+    );
   });
 
   // 7. Skip parameter — combination recorded as skipped, no rendering.

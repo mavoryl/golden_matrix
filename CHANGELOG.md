@@ -1,3 +1,91 @@
+## 1.4.0
+
+Bug-fix release across sampling, component mode and reporting. No signature
+changes; the additions are `MatrixFailurePhase`,
+`MatrixCombinationResult.failurePhase` and a `formats` parameter on the Markdown
+writer.
+
+### Fixed
+
+- **`MatrixSampling.pairwise` lost pair coverage under correlated rules.** Axis
+  domains were collected independently from the surviving combinations, and
+  tuples that no longer existed were dropped in silence. On a 2×2×2 matrix, 154
+  of 255 possible rule subsets lost coverage — in the worst case 1 selected
+  combination out of 2 feasible, with a green CI. Selection now runs a
+  constraint-aware greedy over the surviving combinations whenever rules made
+  the feasible set sparse.
+
+  **Migration:** matrices with no rules, or with rules that remove a whole axis
+  value, keep going through the previous code path and select exactly the same
+  combinations — nothing to do. Only matrices whose rules correlate two or more
+  axes (e.g. "dark only with `en`") get a different, larger set, so some goldens
+  are new and some become stale. Run `flutter test --update-goldens` and delete
+  what the stale report lists.
+
+- **`componentMatrixGolden` did not ignore the `devices` axis it documents as
+  ignored.** Since the golden path has no device segment, N devices registered N
+  tests with identical descriptions writing and comparing the same PNG.
+  `MatrixPreset.componentFull` triggered this by construction: 16 tests over 8
+  files. The axis is now collapsed to its first value before generation, so it
+  affects neither rules, sampling, nor report counters.
+
+  **Migration:** golden file names are unchanged. Component runs with a
+  multi-device axis simply register fewer tests — `componentFull` yields 8
+  combinations there instead of 16. Rules matching on `c.device` now only ever
+  see the first device; a matrix that ends up empty because of one is reported.
+
+- **Failures before the golden comparison never reached the report.** A throw
+  from the widget builder, `pumpWidget`, `pumpAndSettle` or `setup` escaped
+  through `finally` with no result recorded, so reports undercounted
+  `total`/`failed`, JUnit lost the `testcase` entirely, and the stale detector
+  flagged the live golden of a failing combination as an orphan. Both runners
+  now share one lifecycle that records exactly one result per combination and
+  rethrows with `Error.throwWithStackTrace`, keeping the original stack.
+
+- **Reports named the wrong cause.** Every JUnit failure was
+  `type="PixelMismatch"`, including builder throws and layout errors raised
+  before a pixel was compared, and the Markdown footer always linked to an HTML
+  report even when only Markdown was requested.
+
+- **`MatrixSampling.priorityBased` was not reproducible across matrix sizes.**
+  `List.sort` is only stable below 32 elements, so above that the order of
+  equal-score combinations scrambled and `maxCombinations` kept a different
+  subset depending on matrix size and SDK version. Equal scores now break by
+  declared order.
+
+- **Stale-golden scan failures were indistinguishable from "nothing is stale".**
+  A permission error silently disabled stale detection; it is now reported.
+
+### Added
+
+- **`MatrixFailurePhase`** (`build`, `pump`, `setup`, `comparison`) and
+  `MatrixCombinationResult.failurePhase`, written to JSON as `phase` and mapped
+  in JUnit to `BuildError` / `PumpError` / `SetupError` / `GoldenMismatch`, with
+  a neutral `Failure` when unclassified.
+
+  **Migration:** CI dashboards filtering on `type="PixelMismatch"` need updating
+  — that value is no longer emitted.
+
+- **`const MatrixRule`.** `MatrixRule.exclude` / `includeOnly` are generative
+  const constructors, so a `const MatrixPreset` with rules is finally possible —
+  which the docs had been recommending all along. Existing call sites with
+  closures compile unchanged.
+
+- **Warnings for silently degraded runs** — a `maxCombinations` cap that breaks
+  pairwise coverage or eats smoke's per-axis deltas, and a matrix that rules or
+  `scenarioTags` filtered down to nothing.
+
+### Changed
+
+- **Input validation throws `ArgumentError` instead of asserting.** Asserts
+  vanish outside debug builds and carry no argument context. Newly rejected:
+  non-finite or non-positive `textScales`, non-finite `tolerance` (NaN passed
+  every range check and then failed every golden), device `logicalSize` with
+  non-positive extents, `maxCombinations` below 1 (it used to surface as a
+  `RangeError` from `sublist`), and zero-sized `PairwiseGenerator` domains. A
+  `scenarioTags` value matching no scenario now says so instead of blaming
+  `scenarios`.
+
 ## 1.3.0
 
 - **BREAKING — `componentMatrixGolden`'s `pixelRatio` now defaults to `1.0`.**

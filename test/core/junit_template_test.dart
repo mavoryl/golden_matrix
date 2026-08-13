@@ -24,11 +24,17 @@ MatrixCombinationResult _passed(MatrixCombination c) => MatrixCombinationResult(
       goldenPath: 'goldens/x/${c.scenario.name}/x.png',
     );
 
-MatrixCombinationResult _failed(MatrixCombination c, String err) => MatrixCombinationResult(
+MatrixCombinationResult _failed(
+  MatrixCombination c,
+  String err, {
+  MatrixFailurePhase? phase = MatrixFailurePhase.comparison,
+}) =>
+    MatrixCombinationResult(
       combination: c,
       status: MatrixResultStatus.failed,
       goldenPath: 'goldens/x/${c.scenario.name}/x.png',
       errorMessage: err,
+      failurePhase: phase,
     );
 
 MatrixCombinationResult _skipped(MatrixCombination c) => MatrixCombinationResult(
@@ -69,7 +75,10 @@ void main() {
       final xml = JunitTemplate.render(result);
       expect(xml, contains('failures="1"'));
       expect(xml, contains('<failure'));
-      expect(xml, contains('type="PixelMismatch"'));
+      // A comparison-phase failure is a golden mismatch. It used to be labelled
+      // PixelMismatch regardless of what actually broke — see the phase-mapping
+      // tests in report_honesty_test.dart.
+      expect(xml, contains('type="GoldenMismatch"'));
       expect(xml, contains('message="Pixel test failed, 1.56%"'));
       expect(xml, contains('Pixel test failed, 1.56%'));
     });

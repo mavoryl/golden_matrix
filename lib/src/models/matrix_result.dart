@@ -14,6 +14,28 @@ enum MatrixResultStatus {
   skipped,
 }
 
+/// Where in a combination's lifecycle a failure happened.
+///
+/// `status: failed` plus a message cannot express this, which is why reports
+/// used to label every failure a pixel mismatch even when the widget never
+/// rendered. Reported in the JSON `phase` field and mapped to the JUnit
+/// `<failure type>`.
+enum MatrixFailurePhase {
+  /// The scenario's widget builder threw before anything was pumped.
+  build,
+
+  /// `pumpWidget`, `pump` or `pumpAndSettle` threw — layout errors and settle
+  /// timeouts land here.
+  pump,
+
+  /// The `setup:` callback threw, or the settle that follows it did.
+  setup,
+
+  /// The golden comparison itself failed: pixels differ, the golden is missing,
+  /// or the framework surfaced an error at comparison time.
+  comparison,
+}
+
 /// Result of a single combination's golden test.
 ///
 /// One [MatrixCombinationResult] is produced for every
@@ -28,6 +50,7 @@ class MatrixCombinationResult {
     required this.goldenPath,
     this.errorMessage,
     this.warnings = const [],
+    this.failurePhase,
   });
 
   /// The combination that produced this result.
@@ -44,6 +67,12 @@ class MatrixCombinationResult {
 
   /// Non-fatal warnings captured during the test (e.g. RenderFlex overflows).
   final List<String> warnings;
+
+  /// Which lifecycle phase failed, when [status] is [MatrixResultStatus.failed].
+  ///
+  /// `null` for passing and skipped combinations, and for failures recorded by
+  /// callers that do not classify them.
+  final MatrixFailurePhase? failurePhase;
 
   /// Serializes this result to a JSON-compatible map.
   ///
@@ -73,6 +102,7 @@ class MatrixCombinationResult {
         'status': status.name,
         'goldenPath': goldenPath,
         if (errorMessage != null) 'error': errorMessage,
+        if (failurePhase != null) 'phase': failurePhase!.name,
         if (warnings.isNotEmpty) 'warnings': warnings,
       };
 }

@@ -40,7 +40,10 @@ Covers every pair of parameter values across axes with the minimal number of tes
 Orders combinations by value and keeps the top `maxCombinations`. Use when you have a hard budget on how many goldens CI may render and want the most important ones first.
 
 !!! note
-    `maxCombinations` only applies to `priorityBased` — it sets the cap on how many combinations survive sampling.
+    `maxCombinations` is applied to **every** strategy as a final cap, not only to `priorityBased`. It is most useful here because this strategy sorts by risk first, so the surviving combinations are the informative ones. It must be at least 1.
+
+!!! warning "A cap and pairwise coverage are mutually exclusive"
+    Capping `pairwise` below the size of its covering array truncates the finished set, so the all-pairs guarantee is gone — the run stays green while covering less than it claims. golden_matrix prints a warning when this happens. Raise the cap, or use `priorityBased` when the budget matters more than pair coverage.
 
 ## When to reach for each
 

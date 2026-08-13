@@ -46,22 +46,23 @@ enum MatrixRuleType {
 /// );
 /// ```
 class MatrixRule {
-  const MatrixRule._(this.predicate, this.type);
-
   /// Creates a rule that excludes combinations matching the [predicate].
   ///
   /// Combinations for which [predicate] returns `true` are removed from
   /// the matrix.
-  factory MatrixRule.exclude(bool Function(MatrixCombination) predicate) =>
-      MatrixRule._(predicate, MatrixRuleType.exclude);
+  ///
+  /// `const` when [predicate] is a top-level or static function, which is what
+  /// makes a `const MatrixPreset` with rules possible.
+  const MatrixRule.exclude(this.predicate) : type = MatrixRuleType.exclude;
 
   /// Creates a rule that keeps only combinations matching the [predicate].
   ///
   /// Combinations for which [predicate] returns `false` are removed
   /// from the matrix. Multiple `includeOnly` rules compose as logical
   /// AND.
-  factory MatrixRule.includeOnly(bool Function(MatrixCombination) predicate) =>
-      MatrixRule._(predicate, MatrixRuleType.includeOnly);
+  ///
+  /// `const` under the same condition as [MatrixRule.exclude].
+  const MatrixRule.includeOnly(this.predicate) : type = MatrixRuleType.includeOnly;
 
   /// The predicate used to evaluate each [MatrixCombination].
   final bool Function(MatrixCombination) predicate;

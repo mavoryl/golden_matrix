@@ -1003,6 +1003,44 @@
 <p>Drop-in for a GitHub Actions step summary, PR-comment bots, or Slack/Discord notifiers — anything that takes Markdown. For the workflow recipe, see <a href="../ci/">CI integration</a>.</p>
 <h3 id="junit-xml">JUnit XML<a class="headerlink" href="#junit-xml" title="Permanent link">&para;</a></h3>
 <p>Add <code>MatrixReportFormat.junit</code> to get a <code>&lt;slug&gt;_report.xml</code> next to the other reports. The XML follows the de-facto JUnit schema consumed natively by GitHub Actions, GitLab CI, CircleCI, Jenkins, Buildkite, and Azure DevOps test dashboards. Each scenario becomes a <code>&lt;testsuite&gt;</code>, each combination a <code>&lt;testcase&gt;</code>; failures land as <code>&lt;failure&gt;</code> with the captured error message.</p>
+<p>The <code>&lt;failure type&gt;</code> says which phase broke, so a dashboard does not blame the pixels for a layout error:</p>
+<table>
+<thead>
+<tr>
+<th>Phase</th>
+<th><code>type</code></th>
+<th>What threw</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>build</code></td>
+<td><code>BuildError</code></td>
+<td>The scenario's widget builder</td>
+</tr>
+<tr>
+<td><code>pump</code></td>
+<td><code>PumpError</code></td>
+<td><code>pumpWidget</code> / <code>pumpAndSettle</code> — layout errors, settle timeouts</td>
+</tr>
+<tr>
+<td><code>setup</code></td>
+<td><code>SetupError</code></td>
+<td>The <code>setup:</code> callback or the settle after it</td>
+</tr>
+<tr>
+<td><code>comparison</code></td>
+<td><code>GoldenMismatch</code></td>
+<td>The golden comparison itself</td>
+</tr>
+<tr>
+<td>unclassified</td>
+<td><code>Failure</code></td>
+<td>Recorded without a phase</td>
+</tr>
+</tbody>
+</table>
+<p>The same value appears as <code>"phase"</code> in the JSON report for failed combinations, and as <code>MatrixCombinationResult.failurePhase</code> if you consume results programmatically.</p>
 <h2 id="choosing-formats-per-run">Choosing formats per run<a class="headerlink" href="#choosing-formats-per-run" title="Permanent link">&para;</a></h2>
 <p>Use <code>reportFormats</code> to write only what your pipeline needs:</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-1-1"><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="n">matrixGolden</span><span class="p">(</span>
@@ -1024,8 +1062,8 @@
 </span></code></pre></div>
 <p><code>reportFormats: const {}</code> — the default — disables reports entirely.</p>
 <div class="admonition note">
-<p class="admonition-title">Deprecated <code>report: bool</code></p>
-<p>The legacy <code>report: bool</code> parameter still works for backward compatibility but emits a deprecation warning. <code>reportFormats: defaultReportFormats</code> replaces <code>report: true</code>. When both are passed, <code>report:</code> wins.</p>
+<p class="admonition-title">Removed <code>report: bool</code></p>
+<p>The legacy <code>report: bool</code> parameter was removed in 1.3.0. <code>reportFormats: defaultReportFormats</code> replaces <code>report: true</code>, and reports are opt-in since that release — the default writes nothing.</p>
 </div>
 <h2 id="overflow-detection">Overflow detection<a class="headerlink" href="#overflow-detection" title="Permanent link">&para;</a></h2>
 <p>golden_matrix automatically captures <code>RenderFlex overflow</code> and layout errors during rendering. Warnings appear in the JSON and HTML reports with orange badges — no configuration needed.</p>

@@ -1213,7 +1213,8 @@ custom themes, full-screen flows.</p>
 their <strong>natural</strong> size instead of a full device viewport. Keeps the full
 <code>MaterialApp</code> context (theme, fonts, icons, locale, overlays); the PNG is
 exactly widget-sized plus optional padding, multiplied by <code>pixelRatio</code>
-(default <code>1.0</code>). The <code>devices</code> axis is ignored.</p>
+(default <code>1.0</code>). The <code>devices</code> axis is ignored — a multi-device axis collapses to
+its first value, so it does not multiply tests.</p>
 <div class="language-dart highlight"><pre><span></span><code><span id="__span-8-1"><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="n">componentMatrixGolden</span><span class="p">(</span>
 </span><span id="__span-8-2"><a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">  </span><span class="s1">&#39;ShadButton&#39;</span><span class="p">,</span>
 </span><span id="__span-8-3"><a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">  </span><span class="nl">scenarios:</span><span class="w"> </span><span class="p">[</span>

@@ -1252,7 +1252,7 @@ path. For <code>componentMatrixGolden()</code> the equivalent knob is its own
 </span></code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Intrinsic-size captures ignore the device axis</p>
-<p>In <code>componentMatrixGolden</code> (see <a href="../">Home</a>) the widget is anchored at its <strong>natural</strong> size, so the <code>devices</code> field of <code>MatrixAxes</code> is ignored and no device segment appears in the golden path.</p>
+<p>In <code>componentMatrixGolden</code> (see <a href="../">Home</a>) the widget is anchored at its <strong>natural</strong> size, so the <code>devices</code> field of <code>MatrixAxes</code> is ignored and no device segment appears in the golden path. A multi-device axis is collapsed to its first value before generation, so extra devices add neither tests nor report rows — <code>MatrixPreset.componentFull</code> yields 8 combinations there, not 16.</p>
 </div>
 <h2 id="see-also">See also<a class="headerlink" href="#see-also" title="Permanent link">&para;</a></h2>
 <ul>

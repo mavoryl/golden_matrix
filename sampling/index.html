@@ -973,7 +973,11 @@
 <p>Orders combinations by value and keeps the top <code>maxCombinations</code>. Use when you have a hard budget on how many goldens CI may render and want the most important ones first.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p><code>maxCombinations</code> only applies to <code>priorityBased</code> — it sets the cap on how many combinations survive sampling.</p>
+<p><code>maxCombinations</code> is applied to <strong>every</strong> strategy as a final cap, not only to <code>priorityBased</code>. It is most useful here because this strategy sorts by risk first, so the surviving combinations are the informative ones. It must be at least 1.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">A cap and pairwise coverage are mutually exclusive</p>
+<p>Capping <code>pairwise</code> below the size of its covering array truncates the finished set, so the all-pairs guarantee is gone — the run stays green while covering less than it claims. golden_matrix prints a warning when this happens. Raise the cap, or use <code>priorityBased</code> when the budget matters more than pair coverage.</p>
 </div>
 <h2 id="when-to-reach-for-each">When to reach for each<a class="headerlink" href="#when-to-reach-for-each" title="Permanent link">&para;</a></h2>
 <table>

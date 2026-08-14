@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:golden_matrix/src/api/matrix_run_config.dart';
 import 'package:golden_matrix/src/api/matrix_test_runner.dart';
 import 'package:golden_matrix/src/core/matrix_run_plan.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
@@ -72,6 +73,10 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 ///   in the test output and as the leading path segment in golden file
 ///   paths.
 /// - [scenarios] — non-empty list of [MatrixScenario]s to render.
+/// - [config] — A reusable [MatrixRunConfig] carrying the sixteen options every
+///   entry point shares. Any argument passed directly to this function
+///   overrides the same field of the config — see the precedence table on
+///   [matrixGolden].
 /// - [axes] / [preset] — themes, locales, text scales, directions. The
 ///   `devices` field is collapsed to a single value, so
 ///   [MatrixPreset.componentFull] yields 8 combinations here instead of 16.
@@ -104,66 +109,88 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 void componentMatrixGolden(
   String name, {
   required List<MatrixScenario> scenarios,
+  MatrixRunConfig? config,
   MatrixAxes? axes,
   MatrixPreset? preset,
   MatrixSampling? sampling,
   int? maxCombinations,
-  List<MatrixRule> rules = const [],
+  List<MatrixRule>? rules,
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
-  Set<MatrixReportFormat> reportFormats = const {},
+  Set<MatrixReportFormat>? reportFormats,
   String? reportDir,
-  bool skip = false,
+  bool? skip,
   double? tolerance,
-  bool printSummary = true,
+  bool? printSummary,
   MatrixSetupCallback? setup,
-  bool freezeAnimations = false,
+  bool? freezeAnimations,
   Duration? captureAfter,
-  bool detectStaleGoldens = true,
+  bool? detectStaleGoldens,
   double pixelRatio = 1.0,
   EdgeInsets padding = const EdgeInsets.all(8),
 }) {
   validateCaptureScale(pixelRatio, 'pixelRatio');
-  validateTolerance(tolerance);
+  // Explicit arguments fold over the caller's config, so they win.
+  final effective = (config ?? const MatrixRunConfig()).merge(
+    MatrixRunConfig(
+      axes: axes,
+      preset: preset,
+      sampling: sampling,
+      maxCombinations: maxCombinations,
+      rules: rules,
+      scenarioTags: scenarioTags,
+      fileNameBuilder: fileNameBuilder,
+      reportFormats: reportFormats,
+      reportDir: reportDir,
+      skip: skip,
+      tolerance: tolerance,
+      printSummary: printSummary,
+      setup: setup,
+      freezeAnimations: freezeAnimations,
+      captureAfter: captureAfter,
+      detectStaleGoldens: detectStaleGoldens,
+    ),
+  );
+  validateTolerance(effective.tolerance);
   final plan = MatrixRunPlan.resolve(
     name: name,
     scenarios: scenarios,
-    axes: axes,
-    preset: preset,
-    sampling: sampling,
-    rules: rules,
-    scenarioTags: scenarioTags,
-    maxCombinations: maxCombinations,
-    fileNameBuilder: fileNameBuilder,
+    axes: effective.axes,
+    preset: effective.preset,
+    sampling: effective.sampling,
+    rules: effective.resolvedRules,
+    scenarioTags: effective.scenarioTags,
+    maxCombinations: effective.maxCombinations,
+    fileNameBuilder: effective.fileNameBuilder,
     pathScheme: MatrixPathScheme.component,
   );
   plan.warnAboutProblems();
 
-  final effectiveFormats = reportFormats;
-  final writeReports = effectiveFormats.isNotEmpty;
-  final wantStaleDetection = detectStaleGoldens && !plan.usesCustomPaths;
-  final recordResults = writeReports || wantStaleDetection;
+  final formats = effective.resolvedReportFormats;
+  final skipTests = effective.resolvedSkip;
+  final wantStaleDetection = effective.resolvedDetectStaleGoldens && !plan.usesCustomPaths;
+  final recordResults = formats.isNotEmpty || wantStaleDetection;
 
   final results = <MatrixCombinationResult>[];
   final stopwatch = Stopwatch()..start();
   final groupName = 'componentMatrixGolden: $name';
 
   group(groupName, () {
-    installToleranceComparator(tolerance);
+    installToleranceComparator(effective.tolerance);
 
     for (final entry in plan.byScenario.entries) {
       group(entry.key, () {
         for (final planned in entry.value) {
           final (:combination, :goldenPath) = planned;
 
-          if (skip && recordResults) {
+          if (skipTests && recordResults) {
             recordSkipped(results, combination, goldenPath);
           }
 
           testWidgets(
             _componentTestDescription(combination),
-            skip: skip,
+            skip: skipTests,
             (tester) => executeCapture(
               tester: tester,
               combination: combination,
@@ -172,12 +199,12 @@ void componentMatrixGolden(
                 pixelRatio: pixelRatio,
                 padding: padding,
                 extraLocalizationsDelegates: extraLocalizationsDelegates,
-                freezeAnimations: freezeAnimations,
+                freezeAnimations: effective.resolvedFreezeAnimations,
               ),
               record: recordResults,
               results: results,
-              setup: setup,
-              captureAfter: captureAfter,
+              setup: effective.setup,
+              captureAfter: effective.captureAfter,
             ),
           );
         }
@@ -190,9 +217,9 @@ void componentMatrixGolden(
         testSlug: plan.name,
         results: results,
         stopwatch: stopwatch,
-        reportDir: reportDir,
-        printSummary: printSummary,
-        formats: effectiveFormats,
+        reportDir: effective.reportDir,
+        printSummary: effective.resolvedPrintSummary,
+        formats: formats,
         detectStaleGoldens: wantStaleDetection,
       );
     }

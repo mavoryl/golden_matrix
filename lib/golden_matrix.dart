@@ -2,6 +2,7 @@
 // API
 export 'src/api/component_matrix_golden.dart';
 export 'src/api/matrix_golden.dart';
+export 'src/api/matrix_run_config.dart';
 export 'src/api/preview_matrix_golden.dart';
 export 'src/api/screen_matrix_golden.dart';
 // Core

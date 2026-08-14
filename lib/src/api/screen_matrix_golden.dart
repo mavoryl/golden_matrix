@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:golden_matrix/src/api/matrix_run_config.dart';
 import 'package:golden_matrix/src/api/matrix_test_runner.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/flutter/capture_strategy.dart';
@@ -42,6 +43,10 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 ///   prevent collisions across screen tests.
 /// - [appBuilder] — Required builder that returns the full app widget
 ///   for the given [MatrixCombination]. This is the key difference from
+///   [matrixGolden].
+/// - [config] — A reusable [MatrixRunConfig] carrying the sixteen options every
+///   entry point shares. Any argument passed directly to this function
+///   overrides the same field of the config — see the precedence table on
 ///   [matrixGolden].
 /// - [axes] — Matrix dimensions. Takes precedence over [preset]'s axes; see
 ///   the precedence table on [matrixGolden].
@@ -113,23 +118,24 @@ typedef MatrixAppBuilder = Widget Function(MatrixCombination combination);
 void screenMatrixGolden(
   String name, {
   required MatrixAppBuilder appBuilder,
+  MatrixRunConfig? config,
   MatrixAxes? axes,
   MatrixPreset? preset,
   List<MatrixScenario>? states,
   MatrixSampling? sampling,
   int? maxCombinations,
-  List<MatrixRule> rules = const [],
+  List<MatrixRule>? rules,
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
-  Set<MatrixReportFormat> reportFormats = const {},
+  Set<MatrixReportFormat>? reportFormats,
   String? reportDir,
-  bool skip = false,
+  bool? skip,
   double? tolerance,
-  bool printSummary = true,
+  bool? printSummary,
   MatrixSetupCallback? setup,
-  bool freezeAnimations = false,
+  bool? freezeAnimations,
   Duration? captureAfter,
-  bool detectStaleGoldens = true,
+  bool? detectStaleGoldens,
   double captureScale = 1.0,
 }) {
   final scenarios = states ?? [MatrixScenario('default', builder: () => const SizedBox.shrink())];
@@ -138,22 +144,27 @@ void screenMatrixGolden(
     'screenMatrixGolden: $name',
     scenarios: scenarios,
     widgetBuilder: appBuilder,
-    axes: axes,
-    preset: preset,
-    sampling: sampling,
-    maxCombinations: maxCombinations,
-    rules: rules,
-    scenarioTags: scenarioTags,
-    fileNameBuilder: fileNameBuilder,
-    reportFormats: reportFormats,
-    reportDir: reportDir,
-    skip: skip,
-    tolerance: tolerance,
-    printSummary: printSummary,
-    setup: setup,
-    freezeAnimations: freezeAnimations,
-    captureAfter: captureAfter,
-    detectStaleGoldens: detectStaleGoldens,
+    config: (config ?? const MatrixRunConfig()).merge(
+      // Explicit arguments fold over the caller's config, so they win.
+      MatrixRunConfig(
+        axes: axes,
+        preset: preset,
+        sampling: sampling,
+        maxCombinations: maxCombinations,
+        rules: rules,
+        scenarioTags: scenarioTags,
+        fileNameBuilder: fileNameBuilder,
+        reportFormats: reportFormats,
+        reportDir: reportDir,
+        skip: skip,
+        tolerance: tolerance,
+        printSummary: printSummary,
+        setup: setup,
+        freezeAnimations: freezeAnimations,
+        captureAfter: captureAfter,
+        detectStaleGoldens: detectStaleGoldens,
+      ),
+    ),
     captureScale: captureScale,
   );
 }

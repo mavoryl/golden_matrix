@@ -1,73 +1,58 @@
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:golden_matrix/src/api/matrix_run_config.dart';
 import 'package:golden_matrix/src/core/matrix_run_plan.dart';
-import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/flutter/capture_strategy.dart';
 import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
 import 'package:golden_matrix/src/flutter/report_pipeline.dart';
 import 'package:golden_matrix/src/flutter/tolerant_comparator.dart';
-import 'package:golden_matrix/src/models/matrix_axes.dart';
 import 'package:golden_matrix/src/models/matrix_combination.dart';
-import 'package:golden_matrix/src/models/matrix_preset.dart';
 import 'package:golden_matrix/src/models/matrix_result.dart';
-import 'package:golden_matrix/src/models/matrix_rule.dart';
-import 'package:golden_matrix/src/models/matrix_sampling.dart';
 import 'package:golden_matrix/src/models/matrix_scenario.dart';
 
 /// Builds a widget tree for a given [MatrixCombination].
 typedef MatrixWidgetBuilder = CaptureWidgetBuilder;
 
 /// Internal test runner shared by [matrixGolden] and [screenMatrixGolden].
+///
+/// Takes the already-merged [config] — the entry points fold their explicit
+/// arguments over the caller's config before getting here, so precedence is
+/// decided in exactly one place.
 void runMatrixTests(
   String name, {
   required List<MatrixScenario> scenarios,
   required MatrixWidgetBuilder widgetBuilder,
-  MatrixAxes? axes,
-  MatrixPreset? preset,
-  MatrixSampling? sampling,
-  int? maxCombinations,
-  List<MatrixRule> rules = const [],
-  List<String>? scenarioTags,
-  String Function(MatrixCombination)? fileNameBuilder,
-  Set<MatrixReportFormat> reportFormats = const {},
-  String? reportDir,
-  bool skip = false,
-  double? tolerance,
-  bool printSummary = true,
-  MatrixSetupCallback? setup,
-  bool freezeAnimations = false,
-  Duration? captureAfter,
-  bool detectStaleGoldens = true,
+  required MatrixRunConfig config,
   double captureScale = 1.0,
 }) {
   validateCaptureScale(captureScale, 'captureScale');
-  validateTolerance(tolerance);
+  validateTolerance(config.tolerance);
   final plan = MatrixRunPlan.resolve(
     name: _stripPrefix(name),
     scenarios: scenarios,
-    axes: axes,
-    preset: preset,
-    sampling: sampling,
-    rules: rules,
-    scenarioTags: scenarioTags,
-    maxCombinations: maxCombinations,
-    fileNameBuilder: fileNameBuilder,
+    axes: config.axes,
+    preset: config.preset,
+    sampling: config.sampling,
+    rules: config.resolvedRules,
+    scenarioTags: config.scenarioTags,
+    maxCombinations: config.maxCombinations,
+    fileNameBuilder: config.fileNameBuilder,
   );
   plan.warnAboutProblems();
 
-  final effectiveFormats = reportFormats;
-  final writeReports = effectiveFormats.isNotEmpty;
+  final formats = config.resolvedReportFormats;
+  final skip = config.resolvedSkip;
   // Stale detection needs per-combination results too, so we record them
   // whenever it's enabled even if no reports are being written.
-  final wantStaleDetection = detectStaleGoldens && !plan.usesCustomPaths;
-  final recordResults = writeReports || wantStaleDetection;
+  final wantStaleDetection = config.resolvedDetectStaleGoldens && !plan.usesCustomPaths;
+  final recordResults = formats.isNotEmpty || wantStaleDetection;
 
   final List<MatrixCombinationResult> results = [];
   final stopwatch = Stopwatch()..start();
 
   group(name, () {
-    installToleranceComparator(tolerance);
+    installToleranceComparator(config.tolerance);
 
     for (final entry in plan.byScenario.entries) {
       group(entry.key, () {
@@ -87,13 +72,13 @@ void runMatrixTests(
               goldenPath: goldenPath,
               strategy: ViewportCaptureStrategy(
                 widgetBuilder: widgetBuilder,
-                freezeAnimations: freezeAnimations,
+                freezeAnimations: config.resolvedFreezeAnimations,
                 captureScale: captureScale,
               ),
               record: recordResults,
               results: results,
-              setup: setup,
-              captureAfter: captureAfter,
+              setup: config.setup,
+              captureAfter: config.captureAfter,
             ),
           );
         }
@@ -106,9 +91,9 @@ void runMatrixTests(
         testSlug: plan.name,
         results: results,
         stopwatch: stopwatch,
-        reportDir: reportDir,
-        printSummary: printSummary,
-        formats: effectiveFormats,
+        reportDir: config.reportDir,
+        printSummary: config.resolvedPrintSummary,
+        formats: formats,
         detectStaleGoldens: wantStaleDetection,
       );
     }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:golden_matrix/src/api/matrix_run_config.dart';
 import 'package:golden_matrix/src/api/matrix_test_runner.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/flutter/capture_strategy.dart';
@@ -37,6 +38,9 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 /// - [scenarios] — One or more [MatrixScenario]s describing distinct
 ///   widget states (e.g. `default`, `disabled`, `loading`). Each scenario
 ///   is expanded across the matrix.
+/// - [config] — A reusable [MatrixRunConfig] carrying the sixteen options every
+///   entry point shares. Any argument passed directly to this function
+///   overrides the same field of the config; see *Precedence* below.
 /// - [axes] — Defines the dimensions of the matrix (themes, locales, text
 ///   scales, devices, directions). Takes precedence over [preset]'s axes;
 ///   when neither is given, sensible defaults are used.
@@ -115,18 +119,29 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 ///   PNG. Default `1.0` (goldens at the device's logical size). See
 ///   *Capture resolution* below; this is **not** `MatrixDevice.pixelRatio`.
 ///
-/// ## Precedence with a preset
+/// ## Precedence
 ///
-/// | Setting            | Winner                                            |
-/// |--------------------|---------------------------------------------------|
-/// | [axes]             | [axes] → `preset.axes` → `const MatrixAxes()`     |
-/// | [sampling]         | [sampling] → `preset.sampling` → `full`           |
-/// | [rules]            | **merged**: `preset.rules` first, then [rules]    |
-/// | [maxCombinations]  | [maxCombinations] only — presets carry no cap     |
+/// Three layers can supply the same setting: an argument here, [config], and
+/// [preset]. They resolve left to right.
 ///
-/// Only [rules] merge; every other setting is a straight override, so passing
-/// [axes] next to a preset replaces the preset's axes rather than extending
-/// them. Use `preset.axes.copyWith(...)` to extend a single axis.
+/// | Setting            | Winner                                                          |
+/// |--------------------|-----------------------------------------------------------------|
+/// | [axes]             | [axes] → `config.axes` → `preset.axes` → `const MatrixAxes()`   |
+/// | [sampling]         | [sampling] → `config.sampling` → `preset.sampling` → `full`     |
+/// | [rules]            | [rules] → `config.rules`, **merged after** `preset.rules`       |
+/// | [maxCombinations]  | [maxCombinations] → `config.maxCombinations` — presets carry no cap |
+/// | everything else    | argument → [config] → the parameter's default                   |
+///
+/// Only [rules] merge, and only with the preset's: `preset.rules` run first,
+/// then whichever list won between the argument and the config. Everything else
+/// is a straight override, so passing [axes] next to a preset replaces the
+/// preset's axes rather than extending them — use `preset.axes.copyWith(...)`
+/// to extend a single axis.
+///
+/// An argument beats the config even when it repeats the parameter's own
+/// default: `skip: false` next to a config with `skip: true` runs the tests.
+/// That is why the shared parameters are nullable — null means "not specified",
+/// which is what lets the config show through.
 ///
 /// ## Example
 ///
@@ -185,25 +200,26 @@ import 'package:golden_matrix/src/models/matrix_scenario.dart';
 void matrixGolden(
   String name, {
   required List<MatrixScenario> scenarios,
+  MatrixRunConfig? config,
   MatrixAxes? axes,
   MatrixPreset? preset,
   MatrixSampling? sampling,
   int? maxCombinations,
-  List<MatrixRule> rules = const [],
+  List<MatrixRule>? rules,
   List<String>? scenarioTags,
   String Function(MatrixCombination)? fileNameBuilder,
   List<LocalizationsDelegate<dynamic>> extraLocalizationsDelegates = const [],
   Widget Function(Widget child)? wrapChild,
   Widget Function(Widget app, MatrixCombination combination)? wrapApp,
-  Set<MatrixReportFormat> reportFormats = const {},
+  Set<MatrixReportFormat>? reportFormats,
   String? reportDir,
-  bool skip = false,
+  bool? skip,
   double? tolerance,
-  bool printSummary = true,
+  bool? printSummary,
   MatrixSetupCallback? setup,
-  bool freezeAnimations = false,
+  bool? freezeAnimations,
   Duration? captureAfter,
-  bool detectStaleGoldens = true,
+  bool? detectStaleGoldens,
   double captureScale = 1.0,
 }) {
   runMatrixTests(
@@ -215,22 +231,27 @@ void matrixGolden(
       wrapChild: wrapChild,
       wrapApp: wrapApp,
     ),
-    axes: axes,
-    preset: preset,
-    sampling: sampling,
-    maxCombinations: maxCombinations,
-    rules: rules,
-    scenarioTags: scenarioTags,
-    fileNameBuilder: fileNameBuilder,
-    reportFormats: reportFormats,
-    reportDir: reportDir,
-    skip: skip,
-    tolerance: tolerance,
-    printSummary: printSummary,
-    setup: setup,
-    freezeAnimations: freezeAnimations,
-    captureAfter: captureAfter,
-    detectStaleGoldens: detectStaleGoldens,
+    config: (config ?? const MatrixRunConfig()).merge(
+      // Explicit arguments fold over the caller's config, so they win.
+      MatrixRunConfig(
+        axes: axes,
+        preset: preset,
+        sampling: sampling,
+        maxCombinations: maxCombinations,
+        rules: rules,
+        scenarioTags: scenarioTags,
+        fileNameBuilder: fileNameBuilder,
+        reportFormats: reportFormats,
+        reportDir: reportDir,
+        skip: skip,
+        tolerance: tolerance,
+        printSummary: printSummary,
+        setup: setup,
+        freezeAnimations: freezeAnimations,
+        captureAfter: captureAfter,
+        detectStaleGoldens: detectStaleGoldens,
+      ),
+    ),
     captureScale: captureScale,
   );
 }

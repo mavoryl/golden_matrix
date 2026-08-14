@@ -22,7 +22,7 @@ HTML + JUnit reports for CI.
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^1.4.0
+  golden_matrix: ^1.5.0
 ```
 
 ```dart
@@ -77,7 +77,8 @@ flutter test                   # run regression tests
 - **20+ device presets** — modern iPhones, Android, foldables, full iPad lineup, plus custom devices
 - **Capture resolution** — `captureScale` for supersampled goldens (2×/3× rasters); device `pixelRatio` stays layout-only
 - **DI-friendly** — `wrapApp` / `wrapChild` hooks for Riverpod / Bloc / Provider
-- **Dry-run preview** — inspect counts, paths, and collisions without rendering
+- **Shared run config** — `MatrixRunConfig` declares the options once; a direct argument still overrides it
+- **Dry-run preview** — inspect counts, paths, and collisions without rendering; runners warn about empty matrices and colliding golden paths on their own
 - **Zero external dependencies** — only the Flutter SDK
 
 **[Read the full docs →](https://mavoryl.github.io/golden_matrix/)**

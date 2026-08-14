@@ -1,3 +1,75 @@
+## 1.5.0
+
+Internal restructuring plus one behaviour fix and one new public class. No
+signature is removed; the six shared parameters that used to have non-null
+defaults are now nullable, which is source-compatible — `skip: true` and
+`rules: [...]` compile exactly as before.
+
+### Added
+
+- **`MatrixRunConfig`** — the sixteen options every entry point shares, in one
+  reusable, `const`-constructible object:
+
+  ```dart
+  const ciRun = MatrixRunConfig(
+    axes: MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
+    reportFormats: {MatrixReportFormat.json, MatrixReportFormat.junit},
+    tolerance: 0.001,
+    printSummary: false,
+  );
+
+  matrixGolden('PrimaryButton', scenarios: [...], config: ciRun);
+  matrixGolden('Badge', scenarios: [...], config: ciRun, skip: true);
+  ```
+
+  An argument passed directly to the function always overrides the same field of
+  the config — including when it repeats the parameter's own default, which is
+  why those parameters are nullable now. Mode-specific options (`captureScale`,
+  `pixelRatio`, `padding`, `extraLocalizationsDelegates`, `wrapChild`,
+  `wrapApp`, `appBuilder`) stay on their own functions rather than becoming
+  fields two of three entry points would ignore.
+
+- **`previewMatrixGolden(component: true)`** — previews a `componentMatrixGolden`
+  call: device segment dropped from paths, `devices` axis collapsed. Without it,
+  a component run's path collisions were invisible, because the default scheme
+  keeps the device that makes every path unique.
+
+### Changed
+
+- **All three runners now warn before they run.** A configuration that produces
+  no combinations at all registers zero tests, which reads exactly like a
+  passing run; two combinations claiming the same golden file mean the second
+  overwrites the first, so the first is never really compared. Both were
+  previously visible only through `previewMatrixGolden`. Both now print a
+  warning while the tests are being registered.
+
+### Fixed
+
+- **`pixelRatio` no longer shrinks the component layout surface.**
+  `tester.view.physicalSize` is in physical pixels, so a fixed 800×800 left the
+  widget 400×400 logical points at `pixelRatio: 2.0` and ~267×267 at `3.0`. A
+  parameter documented as capture density was deciding how much room the
+  component had to lay itself out in, and anything wider was silently
+  constrained. The surface is now 800×800 logical at every ratio.
+
+  **Migration:** affects `componentMatrixGolden` only, and only where
+  `pixelRatio != 1.0` left a component squeezed — those goldens need one
+  `flutter test --update-goldens`. The default `1.0` path is byte-identical.
+
+### Internal
+
+- One `MatrixRunPlan` behind all three runners and the preview: config
+  resolution, matrix generation, the component device-axis collapse and golden
+  path assignment happen in one place instead of three that had already drifted.
+- One `CaptureStrategy` pipeline: the viewport and intrinsic modes shared a
+  pump/settle/setup/compare sequence written out twice and now differ only in
+  view setup, widget tree, boundary key and capture scale. Parity tests run one
+  combination through both and compare results, skip behaviour, failure phase,
+  `setup` and `captureAfter`.
+- One tolerant comparator and one report pipeline instead of a copy per runner.
+  Neither copy of the comparator had ever been covered by a test — every
+  tolerance test stopped at argument validation.
+
 ## 1.4.0
 
 Bug-fix release across sampling, component mode and reporting. No signature

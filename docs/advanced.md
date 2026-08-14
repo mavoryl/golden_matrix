@@ -1,8 +1,41 @@
 # Advanced
 
-Deep configuration for `golden_matrix`: typed scenarios, filtering rules, RTL, tolerance, skipping, wrappers, dependency injection, post-pump state, custom theme data, dry-run previews, and font loading.
+Deep configuration for `golden_matrix`: shared run configs, typed scenarios, filtering rules, RTL, tolerance, skipping, wrappers, dependency injection, post-pump state, custom theme data, dry-run previews, and font loading.
 
 See also: [Sampling](sampling.md) · [Devices](devices.md) · [Reports](reports.md) · [CI integration](ci.md) · [Migration guide](migration.md) · [Home](index.md).
+
+## Shared run config (`MatrixRunConfig`)
+
+`matrixGolden`, `screenMatrixGolden` and `componentMatrixGolden` accept the same sixteen options. Declare them once and reuse:
+
+```dart
+const ciRun = MatrixRunConfig(
+  axes: MatrixAxes(themes: [MatrixTheme.light, MatrixTheme.dark]),
+  reportFormats: {MatrixReportFormat.json, MatrixReportFormat.junit},
+  tolerance: 0.001,
+  printSummary: false,
+);
+
+matrixGolden('PrimaryButton', scenarios: [...], config: ciRun);
+matrixGolden('Badge', scenarios: [...], config: ciRun, skip: true);
+componentMatrixGolden('Chip', scenarios: [...], config: ciRun);
+```
+
+The config is `const`-constructible, so it can live next to your `MatrixPreset`.
+
+**Precedence.** An argument passed directly to the function always wins over the same field of the config — including when it repeats the parameter's own default. `skip: false` next to a config with `skip: true` runs the tests. Three layers resolve left to right:
+
+| Setting | Winner |
+|---|---|
+| `axes` | argument → `config.axes` → `preset.axes` → `const MatrixAxes()` |
+| `sampling` | argument → `config.sampling` → `preset.sampling` → `full` |
+| `rules` | argument → `config.rules`, **merged after** `preset.rules` |
+| `maxCombinations` | argument → `config.maxCombinations` — presets carry no cap |
+| everything else | argument → config → the parameter's default |
+
+Only `rules` merge, and only with the preset's. Between argument and config a list **replaces**: merging would make it impossible to narrow a shared config down.
+
+**What the config does not carry.** Mode-specific options stay on their own functions: `captureScale` (viewport capture), `pixelRatio` and `padding` (intrinsic capture), `extraLocalizationsDelegates`, `wrapChild` / `wrapApp`, `appBuilder`. A field that two of three entry points quietly ignore is worse than a slightly longer call site.
 
 ## Typed scenarios
 

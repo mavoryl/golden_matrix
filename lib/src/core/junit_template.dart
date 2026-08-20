@@ -1,3 +1,4 @@
+import 'package:golden_matrix/src/core/markup_escape.dart';
 import 'package:golden_matrix/src/models/matrix_result.dart';
 
 /// Renders a [MatrixResult] as JUnit XML — the de-facto industry-standard
@@ -91,7 +92,7 @@ class JunitTemplate {
         _attr(buf, 'type', _failureType(r.failurePhase));
         _attr(buf, 'message', firstLine);
         buf.writeln('>');
-        buf.writeln(_escText(msg));
+        buf.writeln(escapeMarkupText(msg));
         buf.writeln('      </failure>');
         buf.writeln('    </testcase>');
         return;
@@ -118,19 +119,8 @@ class JunitTemplate {
 
   /// Append ` name="value"` with attribute-context XML escaping.
   static void _attr(StringBuffer buf, String name, String value) {
-    buf.write(' $name="${_escAttr(value)}"');
+    buf.write(' $name="${escapeXmlAttribute(value)}"');
   }
-
-  static String _escAttr(String s) => s
-      .replaceAll('&', '&amp;')
-      .replaceAll('<', '&lt;')
-      .replaceAll('>', '&gt;')
-      .replaceAll('"', '&quot;')
-      .replaceAll('\n', '&#10;')
-      .replaceAll('\r', '');
-
-  static String _escText(String s) =>
-      s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
   static String _seconds(Duration d) {
     final ms = d.inMilliseconds;

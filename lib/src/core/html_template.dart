@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 
+import 'package:golden_matrix/src/core/markup_escape.dart';
 import 'package:golden_matrix/src/models/matrix_result.dart';
 
 /// Renders a self-contained HTML report from a [MatrixResult].
@@ -25,7 +26,7 @@ class HtmlTemplate {
     buf.writeln('<head>');
     buf.writeln('<meta charset="UTF-8">');
     buf.writeln('<meta name="viewport" content="width=device-width, initial-scale=1.0">');
-    buf.writeln('<title>${_esc(title)} — Golden Matrix Report</title>');
+    buf.writeln('<title>${escapeHtmlAttribute(title)} — Golden Matrix Report</title>');
     buf.writeln('<style>');
     buf.writeln(_css);
     buf.writeln('</style>');
@@ -44,7 +45,7 @@ class HtmlTemplate {
         ':${_pad(result.timestamp.second)}';
 
     buf.writeln('<header>');
-    buf.writeln('<h1>${_esc(result.name)}</h1>');
+    buf.writeln('<h1>${escapeHtmlAttribute(result.name)}</h1>');
     buf.writeln('<p class="meta">$time &middot; $duration</p>');
     buf.writeln('<div class="summary">');
     buf.writeln(
@@ -93,7 +94,7 @@ class HtmlTemplate {
     );
     buf.writeln('<ul class="stale-list">');
     for (final path in result.staleGoldens) {
-      buf.writeln('<li><code>${_esc(path)}</code></li>');
+      buf.writeln('<li><code>${escapeHtmlAttribute(path)}</code></li>');
     }
     buf.writeln('</ul>');
     buf.writeln('</details>');
@@ -110,21 +111,21 @@ class HtmlTemplate {
     buf.writeln('<label>Scenario <select id="filter-scenario" onchange="filterCards()">');
     buf.writeln('<option value="all">All</option>');
     for (final s in scenarios) {
-      buf.writeln('<option value="${_esc(s)}">${_esc(s)}</option>');
+      buf.writeln('<option value="${escapeHtmlAttribute(s)}">${escapeHtmlAttribute(s)}</option>');
     }
     buf.writeln('</select></label>');
     // Theme filter
     buf.writeln('<label>Theme <select id="filter-theme" onchange="filterCards()">');
     buf.writeln('<option value="all">All</option>');
     for (final t in themes) {
-      buf.writeln('<option value="${_esc(t)}">${_esc(t)}</option>');
+      buf.writeln('<option value="${escapeHtmlAttribute(t)}">${escapeHtmlAttribute(t)}</option>');
     }
     buf.writeln('</select></label>');
     // Status filter
     buf.writeln('<label>Status <select id="filter-status" onchange="filterCards()">');
     buf.writeln('<option value="all">All</option>');
     for (final s in statuses) {
-      buf.writeln('<option value="${_esc(s)}">${_esc(s)}</option>');
+      buf.writeln('<option value="${escapeHtmlAttribute(s)}">${escapeHtmlAttribute(s)}</option>');
     }
     buf.writeln('</select></label>');
     buf.writeln('</div>');
@@ -142,9 +143,12 @@ class HtmlTemplate {
       final passCount = results.where((r) => r.status == MatrixResultStatus.passed).length;
       final failCount = results.where((r) => r.status == MatrixResultStatus.failed).length;
 
-      buf.writeln('<details open class="scenario-section" data-scenario="${_esc(scenarioName)}">');
+      buf.writeln(
+        '<details open class="scenario-section" '
+        'data-scenario="${escapeHtmlAttribute(scenarioName)}">',
+      );
       buf.writeln('<summary>');
-      buf.writeln('<span class="scenario-name">${_esc(scenarioName)}</span>');
+      buf.writeln('<span class="scenario-name">${escapeHtmlAttribute(scenarioName)}</span>');
       buf.writeln('<span class="scenario-count">${results.length} tests');
       if (failCount > 0) {
         buf.writeln(' &middot; <span class="text-fail">$failCount failed</span>');
@@ -178,30 +182,34 @@ class HtmlTemplate {
     };
 
     buf.writeln(
-      '<div class="card" data-scenario="${_esc(c.scenario.name)}" '
-      'data-theme="${_esc(c.theme.name)}" data-status="${r.status.name}">',
+      '<div class="card" data-scenario="${escapeHtmlAttribute(c.scenario.name)}" '
+      'data-theme="${escapeHtmlAttribute(c.theme.name)}" data-status="${r.status.name}">',
     );
-    buf.writeln('<a href="${_esc(imgSrc)}" target="_blank">');
+    buf.writeln('<a href="${escapeHtmlAttribute(imgSrc)}" target="_blank">');
     buf.writeln(
-      '<img src="${_esc(imgSrc)}" loading="lazy" '
-      'alt="${_esc(c.scenario.name)}" '
+      '<img src="${escapeHtmlAttribute(imgSrc)}" loading="lazy" '
+      'alt="${escapeHtmlAttribute(c.scenario.name)}" '
       'onerror="this.style.display=\'none\';this.nextElementSibling.style.display=\'flex\'">',
     );
     buf.writeln('<div class="img-placeholder" style="display:none">No image</div>');
     buf.writeln('</a>');
     buf.writeln('<div class="card-meta">');
     buf.writeln('<span class="$statusClass">${r.status.name}</span>');
-    buf.writeln('<span class="tag">${_esc(c.theme.name)}</span>');
-    buf.writeln('<span class="tag">${_esc(locale)}</span>');
+    buf.writeln('<span class="tag">${escapeHtmlAttribute(c.theme.name)}</span>');
+    buf.writeln('<span class="tag">${escapeHtmlAttribute(locale)}</span>');
     buf.writeln('<span class="tag">$dir</span>');
     buf.writeln('<span class="tag">$scale</span>');
-    buf.writeln('<span class="tag">${_esc(c.device.name)}</span>');
+    buf.writeln('<span class="tag">${escapeHtmlAttribute(c.device.name)}</span>');
     buf.writeln('</div>');
     if (r.errorMessage != null) {
-      buf.writeln('<div class="error">${_esc(r.errorMessage!)}</div>');
+      buf.writeln('<div class="error">${escapeHtmlAttribute(r.errorMessage!)}</div>');
     }
     if (r.warnings.isNotEmpty) {
-      buf.writeln('<div class="warning">${r.warnings.map((w) => _esc(w)).join('<br>')}</div>');
+      buf.writeln(
+        '<div class="warning">'
+        '${r.warnings.map(escapeHtmlAttribute).join('<br>')}'
+        '</div>',
+      );
     }
     if (r.status == MatrixResultStatus.failed) {
       _writeDiffThumbs(buf, r.goldenPath);
@@ -240,9 +248,9 @@ class HtmlTemplate {
     for (final t in tiles) {
       final src = '../failures/$base${t.suffix}.png';
       buf.writeln('<figure class="diff-tile">');
-      buf.writeln('<a href="${_esc(src)}" target="_blank">');
+      buf.writeln('<a href="${escapeHtmlAttribute(src)}" target="_blank">');
       buf.writeln(
-        '<img src="${_esc(src)}" loading="lazy" alt="${t.label}" '
+        '<img src="${escapeHtmlAttribute(src)}" loading="lazy" alt="${t.label}" '
         'onerror="this.closest(\'figure\').style.display=\'none\'">',
       );
       buf.writeln('</a>');
@@ -277,15 +285,6 @@ function filterCards() {
 }
 ''');
     buf.writeln('</script>');
-  }
-
-  static String _esc(String text) {
-    return text
-        .replaceAll('&', '&amp;')
-        .replaceAll('<', '&lt;')
-        .replaceAll('>', '&gt;')
-        .replaceAll('"', '&quot;')
-        .replaceAll("'", '&#39;');
   }
 
   static String _pad(int n) => n.toString().padLeft(2, '0');

@@ -150,4 +150,29 @@ void main() {
       expect(warnings.single, contains('FontManifest.json'));
     });
   });
+
+  group('fontBytes', () {
+    test('wraps exactly the bytes it was given, not their whole buffer', () {
+      // `ByteData.view(bytes.buffer)` ignores the list's offset and length, so
+      // a Uint8List that is a *view* into a larger buffer was handed to
+      // `FontLoader` as the entire buffer — a font file with garbage glued to
+      // both ends. `readAsBytes` happens to return offset-0 lists today, which
+      // is why nothing caught fire; the cast was still wrong.
+      final buffer = Uint8List.fromList(List<int>.generate(16, (i) => i));
+      final slice = Uint8List.sublistView(buffer, 4, 12);
+
+      final data = fontBytes(slice);
+
+      expect(data.lengthInBytes, 8);
+      expect(data.getUint8(0), 4);
+      expect(data.getUint8(7), 11);
+    });
+
+    test('a standalone list round-trips unchanged', () {
+      final bytes = Uint8List.fromList(const [1, 2, 3]);
+
+      expect(fontBytes(bytes).lengthInBytes, 3);
+      expect(fontBytes(bytes).getUint8(0), 1);
+    });
+  });
 }

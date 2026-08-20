@@ -8,13 +8,13 @@ import 'package:golden_matrix/src/core/join_path.dart';
 import 'package:golden_matrix/src/core/warn.dart';
 
 /// Well-known system fonts that should not be namespaced with a package prefix.
-const _overridableFonts = [
+const _overridableFonts = {
   'Roboto',
   '.SF UI Display',
   '.SF UI Text',
   '.SF Pro Text',
   '.SF Pro Display',
-];
+};
 
 /// Loads fonts declared in the app's pubspec.yaml and its dependencies.
 ///
@@ -319,7 +319,7 @@ Future<bool> _loadRobotoFromSdk() async {
 
   final fontLoader = FontLoader('Roboto');
   final bytes = await robotoFile.readAsBytes();
-  fontLoader.addFont(Future.value(ByteData.view(bytes.buffer)));
+  fontLoader.addFont(Future.value(fontBytes(bytes)));
   await fontLoader.load();
   return true;
 }
@@ -342,10 +342,20 @@ Future<bool> _loadMaterialIconsFromSdk() async {
 
   final fontLoader = FontLoader('MaterialIcons');
   final bytes = await iconsFile.readAsBytes();
-  fontLoader.addFont(Future.value(ByteData.view(bytes.buffer)));
+  fontLoader.addFont(Future.value(fontBytes(bytes)));
   await fontLoader.load();
   return true;
 }
+
+/// Wraps exactly [bytes] for [FontLoader].
+///
+/// `ByteData.view(bytes.buffer)` ignored the list's offset and length, so a
+/// Uint8List that is a *view* into a larger buffer was handed over as the whole
+/// buffer — a font file with garbage glued to both ends. `readAsBytes` returns
+/// offset-0 lists today, which is why nothing caught fire; the cast was still
+/// wrong.
+@visibleForTesting
+ByteData fontBytes(Uint8List bytes) => ByteData.sublistView(bytes);
 
 /// `<root>/bin/cache/artifacts/material_fonts`, joined for this platform.
 String _materialFontsDir(String flutterRoot) => ['bin', 'cache', 'artifacts', 'material_fonts']

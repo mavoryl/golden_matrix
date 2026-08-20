@@ -29,17 +29,17 @@ import 'package:golden_matrix/src/models/matrix_theme.dart';
 /// ## Direction inference
 ///
 /// When `axes.directions` is empty, [TextDirection] is inferred per
-/// combination from the locale's language code: `ar`, `he`, `fa`, `ur`,
-/// `ps`, `ku`, and `yi` are mapped to [TextDirection.rtl]; everything
-/// else to [TextDirection.ltr]. Pass an explicit `directions` list on
-/// [MatrixAxes] to override this behavior.
+/// combination by [directionForLocale]: the locale's script subtag when it has
+/// one, otherwise its language's default script. Override it either way —
+/// `MatrixAxes.directionResolver` answers "which way does this locale read",
+/// while an explicit `MatrixAxes.directions` list enumerates both directions
+/// regardless of locale.
 class MatrixGenerator {
   /// Generates a list of [MatrixCombination]s based on the given parameters.
   ///
   /// Pipeline: full Cartesian → exclude rules → includeOnly rules →
-  /// sampling. When `axes.directions` is empty, text direction is
-  /// inferred from each locale (RTL for `ar`, `he`, `fa`, `ur`, `ps`,
-  /// `ku`, `yi`; LTR otherwise).
+  /// sampling. When `axes.directions` is empty, text direction comes from
+  /// `axes.directionResolver`, or [directionForLocale] when that is null.
   static List<MatrixCombination> generate({
     required List<MatrixScenario> scenarios,
     required MatrixAxes axes,
@@ -150,11 +150,79 @@ class MatrixGenerator {
     }
   }
 
+  /// Scripts written right to left, by ISO 15924 code.
+  ///
+  /// Checked before the language, because a script subtag is the locale
+  /// *saying* which way it reads: Azerbaijani in Arabic script is RTL even
+  /// though `az` is not, and romanised Arabic (`ar-Latn`) is LTR even though
+  /// `ar` is.
+  static const _rtlScripts = {
+    'Adlm', // Adlam
+    'Arab', // Arabic
+    'Aran', // Nastaliq
+    'Hebr', // Hebrew
+    'Mand', // Mandaic
+    'Mend', // Mende Kikakui
+    'Nkoo', // N'Ko
+    'Rohg', // Hanifi Rohingya
+    'Samr', // Samaritan
+    'Syrc', // Syriac
+    'Thaa', // Thaana
+    'Yezi', // Yezidi
+  };
+
+  /// Languages whose default script is written right to left.
+  ///
+  /// Only consulted when the locale carries no script subtag.
+  static const _rtlLanguages = {
+    'ar', // Arabic
+    'arc', // Aramaic
+    'bal', // Baluchi
+    'bgn', // Western Balochi
+    'brh', // Brahui
+    'ckb', // Central Kurdish (Sorani) — the Arabic-script Kurdish
+    'dv', // Divehi
+    'fa', // Persian
+    'glk', // Gilaki
+    'he', // Hebrew
+    'iw', // Hebrew, legacy code
+    'ji', // Yiddish, legacy code
+    'khw', // Khowar
+    'ks', // Kashmiri
+    'lrc', // Northern Luri
+    'mzn', // Mazanderani
+    'nqo', // N'Ko
+    'prs', // Dari
+    'ps', // Pashto
+    'sd', // Sindhi
+    'sdh', // Southern Kurdish
+    'syr', // Syriac
+    'ug', // Uyghur
+    'ur', // Urdu
+    'yi', // Yiddish
+  };
+
   /// Returns the text direction for a given locale.
+  ///
+  /// The script subtag wins when present; otherwise the language's default
+  /// script decides. This used to be seven hardcoded language codes with
+  /// `scriptCode` ignored outright, which got two things wrong at once:
+  /// Sindhi, Uyghur, Divehi, Sorani Kurdish, Syriac and N'Ko were laid out
+  /// left to right — a mirrored screenshot that passed as correct — while
+  /// `ku` was forced right to left even though Kurmanji Kurdish, which is
+  /// what `ku` means, is written in the Latin alphabet.
   static TextDirection directionForLocale(Locale locale) {
-    const rtlLanguages = {'ar', 'he', 'fa', 'ur', 'ps', 'ku', 'yi'};
-    return rtlLanguages.contains(locale.languageCode) ? TextDirection.rtl : TextDirection.ltr;
+    final script = locale.scriptCode;
+    if (script != null) {
+      return _rtlScripts.contains(script) ? TextDirection.rtl : TextDirection.ltr;
+    }
+    return _rtlLanguages.contains(locale.languageCode) ? TextDirection.rtl : TextDirection.ltr;
   }
+
+  /// The direction of [locale] under [axes] — the caller's resolver when it
+  /// supplied one, otherwise [directionForLocale].
+  static TextDirection _directionFor(MatrixAxes axes, Locale locale) =>
+      (axes.directionResolver ?? directionForLocale)(locale);
 
   // -- Private helpers --
 
@@ -170,7 +238,7 @@ class MatrixGenerator {
           for (final textScale in axes.textScales) {
             for (final device in axes.devices) {
               if (axes.directions.isEmpty) {
-                final direction = directionForLocale(locale);
+                final direction = _directionFor(axes, locale);
                 combinations.add(
                   MatrixCombination(
                     scenario: scenario,
@@ -234,7 +302,7 @@ class MatrixGenerator {
       final baseTextScale = axes.textScales.first;
       final baseDevice = axes.devices.first;
       final baseDirection =
-          axes.directions.isEmpty ? directionForLocale(baseLocale) : axes.directions.first;
+          axes.directions.isEmpty ? _directionFor(axes, baseLocale) : axes.directions.first;
 
       // Find the base combination
       final base = scenarioCombos.where(
@@ -271,7 +339,7 @@ class MatrixGenerator {
 
       if (axes.locales.length > 1) {
         final altLocale = axes.locales.firstWhere((l) => l != baseLocale, orElse: () => baseLocale);
-        final altDir = axes.directions.isEmpty ? directionForLocale(altLocale) : baseDirection;
+        final altDir = axes.directions.isEmpty ? _directionFor(axes, altLocale) : baseDirection;
         _addDelta(
           result,
           scenarioCombos,
@@ -555,7 +623,7 @@ class MatrixGenerator {
         final device = devices[deviceIdx];
 
         // When direction is not a pairwise parameter, it's derived from locale.
-        final direction = directionIsParam ? directions[directionIdx] : directionForLocale(locale);
+        final direction = directionIsParam ? directions[directionIdx] : _directionFor(axes, locale);
 
         final match = scenarioCombos.where(
           (c) =>

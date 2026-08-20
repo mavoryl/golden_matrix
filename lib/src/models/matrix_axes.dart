@@ -15,6 +15,7 @@ class MatrixAxes {
     this.textScales = const [1.0],
     this.devices = const [MatrixDevice.phoneSmall],
     this.directions = const [],
+    this.directionResolver,
   });
 
   /// Themes to render each scenario against.
@@ -33,6 +34,28 @@ class MatrixAxes {
   /// the locale (RTL languages auto-inferred).
   final List<TextDirection> directions;
 
+  /// Decides the text direction of a locale, replacing the built-in inference.
+  ///
+  /// Ignored when [directions] is non-empty — that axis enumerates directions
+  /// regardless of locale, which is a different question from "which way does
+  /// this locale read".
+  ///
+  /// The default is `MatrixGenerator.directionForLocale`, a table over CLDR's
+  /// right-to-left languages and scripts. Any table is wrong for someone: a
+  /// custom language subtag, a private-use locale, or a design that mirrors on
+  /// an app flag rather than on the locale. Before this existed the only escape
+  /// was enumerating [directions] and losing per-locale inference entirely.
+  ///
+  /// Pass a top-level or static function to keep the axes `const`:
+  ///
+  /// ```dart
+  /// TextDirection myDirection(Locale locale) =>
+  ///     locale.languageCode == 'xx' ? TextDirection.rtl : TextDirection.ltr;
+  ///
+  /// const axes = MatrixAxes(directionResolver: myDirection);
+  /// ```
+  final TextDirection Function(Locale locale)? directionResolver;
+
   /// Returns a copy of these axes with selected fields replaced.
   ///
   /// Useful for tweaking a preset's axes — e.g. take a preset's
@@ -50,6 +73,7 @@ class MatrixAxes {
     List<double>? textScales,
     List<MatrixDevice>? devices,
     List<TextDirection>? directions,
+    TextDirection Function(Locale locale)? directionResolver,
   }) {
     return MatrixAxes(
       themes: themes ?? this.themes,
@@ -57,6 +81,7 @@ class MatrixAxes {
       textScales: textScales ?? this.textScales,
       devices: devices ?? this.devices,
       directions: directions ?? this.directions,
+      directionResolver: directionResolver ?? this.directionResolver,
     );
   }
 }

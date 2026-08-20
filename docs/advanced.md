@@ -143,11 +143,49 @@ matrixGolden(
 
 ## Direction / RTL auto-inference
 
-Arabic, Hebrew, and Farsi locales automatically get `TextDirection.rtl` — no manual setup. Combinations expose `c.direction`, which you can read in rules (see above) or flip on a one-off combination with `copyWith`:
+Right-to-left locales get `TextDirection.rtl` with no manual setup. The rule is
+the locale's **script subtag** when it has one, and its language's default
+script otherwise — so `ar`, `he`, `fa`, `ur`, `ps`, `sd`, `ug`, `dv`, `ckb`,
+`syr`, `nqo` and the rest of CLDR's RTL languages are RTL, `az-Arab` is RTL
+because of its script, and `ar-Latn` (romanised Arabic) is LTR for the same
+reason.
+
+Combinations expose `c.direction`, which you can read in rules (see above) or
+flip on a one-off combination with `copyWith`:
 
 ```dart
 final rtl = combination.copyWith(direction: TextDirection.rtl);
 ```
+
+### Deciding direction yourself
+
+Any table over locales is wrong for someone: a custom language subtag, a
+private-use locale, or a design that mirrors on an app flag rather than on the
+locale. `MatrixAxes.directionResolver` replaces the built-in inference:
+
+```dart
+TextDirection myDirection(Locale locale) =>
+    locale.languageCode == 'xx' ? TextDirection.rtl : TextDirection.ltr;
+
+matrixGolden(
+  'Button',
+  scenarios: [...],
+  axes: const MatrixAxes(
+    locales: [Locale('en'), Locale('xx')],
+    directionResolver: myDirection,   // top-level fn keeps the axes const
+  ),
+);
+```
+
+An explicit `directions` list still wins: that axis enumerates both directions
+regardless of locale, which is a different question from "which way does this
+locale read".
+
+!!! warning "`ku` changed direction in 1.6.0"
+    `ku` used to be hardcoded RTL. Kurmanji Kurdish — what `ku` means in CLDR —
+    is written in the Latin alphabet; the Arabic-script variant is `ckb`. If you
+    test `ku`, its goldens are renamed from `_rtl_` to `_ltr_` and need
+    `--update-goldens` once.
 
 ## Capture resolution (`captureScale`)
 

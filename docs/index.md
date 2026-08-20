@@ -178,7 +178,7 @@ componentMatrixGolden(
   directions), get all combinations automatically.
 - **Smart defaults** — `MatrixAxes()` with no arguments produces one valid test
   (light, en, 1.0x, phoneSmall).
-- **RTL auto-inference** — Arabic, Hebrew, Farsi automatically get RTL.
+- **RTL auto-inference** — CLDR right-to-left languages and scripts get RTL automatically; override with `MatrixAxes.directionResolver`.
 - **[Typed scenarios](advanced.md)** — `MatrixScenario.typed<T>` attaches a
   compile-time-checked state payload so one builder covers all states.
 - **[Sampling](sampling.md)** — `full`, `smoke`, `pairwise`, `priorityBased`

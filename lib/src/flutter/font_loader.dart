@@ -310,7 +310,7 @@ bool isIconFamily(String family) {
 /// Attempts to load the Roboto font from the Flutter SDK's cached artifacts.
 /// Returns `true` if the font was loaded, `false` otherwise.
 Future<bool> _loadRobotoFromSdk() async {
-  final flutterRoot = _findFlutterRoot();
+  final flutterRoot = findFlutterRoot();
   if (flutterRoot == null) return false;
 
   final robotoFile = File(joinPath(_materialFontsDir(flutterRoot), 'Roboto-Regular.ttf'));
@@ -333,7 +333,7 @@ Future<bool> _loadRobotoFromSdk() async {
 /// see empty boxes. With this fallback, icon glyphs render in goldens
 /// regardless of project configuration.
 Future<bool> _loadMaterialIconsFromSdk() async {
-  final flutterRoot = _findFlutterRoot();
+  final flutterRoot = findFlutterRoot();
   if (flutterRoot == null) return false;
 
   final iconsFile = File(joinPath(_materialFontsDir(flutterRoot), 'MaterialIcons-Regular.otf'));
@@ -398,29 +398,42 @@ String? flutterRootFromExecutable(String executablePath, {String? separator}) {
   return parts.sublist(0, parts.length - 2).join(sep);
 }
 
-/// Finds the Flutter SDK root by checking common indicators.
-String? _findFlutterRoot() {
-  // Check FLUTTER_ROOT environment variable
-  final envRoot = Platform.environment['FLUTTER_ROOT'];
-  if (envRoot != null && Directory(envRoot).existsSync()) {
-    return envRoot;
-  }
+/// Finds the Flutter SDK root: `FLUTTER_ROOT` when it names a real directory,
+/// otherwise the `flutter` launcher on `PATH` resolved back to its SDK.
+///
+/// The lookup used to shell out to `which flutter` — not a command on Windows —
+/// and derive the root by splitting on the literal `'/bin/flutter'`. Walking
+/// `PATH` here needs no subprocess and no per-platform command name.
+///
+/// Every filesystem touch is a parameter so the walk itself is testable; all of
+/// them default to the real thing, and production calls this with no arguments.
+@visibleForTesting
+String? findFlutterRoot({
+  Map<String, String>? environment,
+  bool Function(String path)? fileExists,
+  bool Function(String path)? directoryExists,
+  String Function(String path)? resolveSymlink,
+  List<String>? executableNames,
+}) {
+  final env = environment ?? Platform.environment;
+  final isFile = fileExists ?? (path) => File(path).existsSync();
+  final isDir = directoryExists ?? (path) => Directory(path).existsSync();
+  final resolve = resolveSymlink ?? (path) => File(path).resolveSymbolicLinksSync();
+  final names = executableNames ?? flutterExecutableNames();
 
-  // Walk PATH ourselves rather than shelling out: no `which`/`where` split by
-  // platform, no subprocess, and the launcher's name comes from
-  // [flutterExecutableNames].
-  for (final dir in splitSearchPath(Platform.environment['PATH'])) {
-    for (final name in flutterExecutableNames()) {
-      final candidate = File(joinPath(dir, name));
-      if (!candidate.existsSync()) continue;
+  final envRoot = env['FLUTTER_ROOT'];
+  if (envRoot != null && isDir(envRoot)) return envRoot;
+
+  for (final dir in splitSearchPath(env['PATH'])) {
+    for (final name in names) {
+      final candidate = joinPath(dir, name);
+      if (!isFile(candidate)) continue;
       try {
-        final root = flutterRootFromExecutable(candidate.resolveSymbolicLinksSync());
-        if (root != null && Directory(joinPath(joinPath(root, 'bin'), 'cache')).existsSync()) {
-          return root;
-        }
+        final root = flutterRootFromExecutable(resolve(candidate));
+        if (root != null && isDir(joinPath(joinPath(root, 'bin'), 'cache'))) return root;
       } catch (_) {
-        // A broken symlink or a permission error here just means this PATH
-        // entry is not the SDK; keep looking.
+        // A broken symlink or a permission error just means this PATH entry is
+        // not the SDK; keep looking.
       }
     }
   }

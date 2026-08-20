@@ -175,4 +175,81 @@ void main() {
       expect(fontBytes(bytes).getUint8(0), 1);
     });
   });
+
+  group('findFlutterRoot', () {
+    // A fake SDK layout: /opt/flutter/bin/flutter, /opt/flutter/bin/cache.
+    const sdk = '/opt/flutter';
+    const launcher = '$sdk/bin/flutter';
+    const cache = '$sdk/bin/cache';
+
+    String? locate({
+      Map<String, String> environment = const {},
+      Set<String> files = const {launcher},
+      Set<String> dirs = const {cache},
+      Map<String, String> links = const {},
+      Set<String> unresolvable = const {},
+    }) =>
+        findFlutterRoot(
+          environment: environment,
+          fileExists: files.contains,
+          directoryExists: dirs.contains,
+          resolveSymlink: (path) {
+            if (unresolvable.contains(path)) {
+              throw const FileSystemException('broken link');
+            }
+            return links[path] ?? path;
+          },
+        );
+
+    test('FLUTTER_ROOT wins when it points at a real directory', () {
+      expect(
+        locate(environment: const {'FLUTTER_ROOT': sdk}, dirs: const {sdk, cache}),
+        sdk,
+      );
+    });
+
+    test('a FLUTTER_ROOT that does not exist is ignored, not trusted', () {
+      expect(
+        locate(environment: const {'FLUTTER_ROOT': '/nope', 'PATH': '$sdk/bin'}),
+        sdk,
+      );
+    });
+
+    test('the launcher is found by walking PATH', () {
+      // This replaced `Process.runSync('which', ...)`, which does not exist on
+      // Windows at all.
+      expect(locate(environment: const {'PATH': '/usr/bin:$sdk/bin'}), sdk);
+    });
+
+    test('a symlinked launcher resolves to the real SDK', () {
+      // The common Homebrew/asdf layout: a shim on PATH pointing into the SDK.
+      expect(
+        locate(
+          environment: const {'PATH': '/usr/local/bin'},
+          files: const {'/usr/local/bin/flutter'},
+          links: const {'/usr/local/bin/flutter': launcher},
+        ),
+        sdk,
+      );
+    });
+
+    test('a launcher with no bin/cache next to it is not an SDK', () {
+      expect(locate(environment: const {'PATH': '$sdk/bin'}, dirs: const {}), isNull);
+    });
+
+    test('a broken symlink moves on to the next PATH entry', () {
+      expect(
+        locate(
+          environment: const {'PATH': '/broken:$sdk/bin'},
+          files: const {'/broken/flutter', launcher},
+          unresolvable: const {'/broken/flutter'},
+        ),
+        sdk,
+      );
+    });
+
+    test('no PATH and no FLUTTER_ROOT means no SDK', () {
+      expect(locate(files: const {}), isNull);
+    });
+  });
 }

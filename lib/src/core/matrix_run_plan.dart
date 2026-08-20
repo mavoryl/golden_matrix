@@ -1,7 +1,6 @@
-import 'package:flutter/widgets.dart';
-
 import 'package:golden_matrix/src/core/matrix_generator.dart';
 import 'package:golden_matrix/src/core/naming_strategy.dart';
+import 'package:golden_matrix/src/core/warn.dart';
 import 'package:golden_matrix/src/models/matrix_axes.dart';
 import 'package:golden_matrix/src/models/matrix_combination.dart';
 import 'package:golden_matrix/src/models/matrix_preset.dart';
@@ -241,6 +240,6 @@ class MatrixRunPlan {
   /// Prints [describeProblems] to the console when there is something to say.
   void warnAboutProblems() {
     final problem = describeProblems();
-    if (problem != null) debugPrint('golden_matrix: $problem');
+    if (problem != null) warnGoldenMatrix(problem);
   }
 }

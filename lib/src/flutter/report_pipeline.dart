@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import 'package:golden_matrix/src/core/join_path.dart';
 import 'package:golden_matrix/src/core/matrix_report_writer.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/run_clock.dart';
@@ -38,6 +39,9 @@ void installReportPipeline({
   required Set<MatrixReportFormat> formats,
   required bool detectStaleGoldens,
 }) {
+  // At declaration time, so a name collision surfaces next to the offending
+  // call site instead of after the whole suite has run.
+  MatrixReportWriter.claimReportName(reportName);
   setUpAll(clock.start);
   tearDownAll(
     () => finishRun(

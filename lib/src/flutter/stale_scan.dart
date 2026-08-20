@@ -1,8 +1,9 @@
 import 'dart:io';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:golden_matrix/src/core/join_path.dart';
 import 'package:golden_matrix/src/core/stale_detector.dart';
+import 'package:golden_matrix/src/core/warn.dart';
 
 /// Scans the golden directory of [testSlug] for files the current run did not
 /// produce, given the [expectedPaths] it did produce.
@@ -23,7 +24,7 @@ Future<List<String>> scanStaleGoldens({
     // Nothing ran, so nothing can be judged orphaned. Reporting every file on
     // disk here would invite deleting a directory over a filtering mistake —
     // rules or scenarioTags that matched nothing.
-    _warn(
+    warnGoldenMatrix(
       'no combinations were produced for "$testSlug", so stale-golden '
       'detection is skipped — check the rules and scenarioTags for this run',
     );
@@ -46,19 +47,10 @@ Future<List<String>> scanStaleGoldens({
     // broken symlink, a path deleted mid-scan. Reporting "nothing is stale"
     // for that is a lie — stale detection is simply off for this run, and the
     // user needs to know.
-    _warn('cannot scan ${testSubdir.path} for stale goldens: ${e.osError ?? e.message}');
+    warnGoldenMatrix('cannot scan ${testSubdir.path} for stale goldens: ${e.osError ?? e.message}');
     return const [];
   } catch (e) {
-    _warn('unexpected error while scanning ${testSubdir.path} for stale goldens: $e');
+    warnGoldenMatrix('unexpected error while scanning ${testSubdir.path} for stale goldens: $e');
     return const [];
   }
-}
-
-void _warn(String message) => debugPrint('golden_matrix: $message');
-
-/// Joins [base] and [leaf] with the platform path separator.
-String joinPath(String base, String leaf) {
-  final sep = Platform.pathSeparator;
-  final trimmed = base.endsWith(sep) ? base.substring(0, base.length - sep.length) : base;
-  return '$trimmed$sep$leaf';
 }

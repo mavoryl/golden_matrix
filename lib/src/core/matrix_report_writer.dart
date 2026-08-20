@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:golden_matrix/src/core/html_template.dart';
+import 'package:golden_matrix/src/core/join_path.dart';
 import 'package:golden_matrix/src/core/junit_template.dart';
 import 'package:golden_matrix/src/core/markdown_template.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
 import 'package:golden_matrix/src/core/slug.dart';
+import 'package:golden_matrix/src/core/warn.dart';
 import 'package:golden_matrix/src/models/matrix_result.dart';
 
 /// Writes [MatrixResult] as JSON and HTML report files.
@@ -40,11 +42,62 @@ class MatrixReportWriter {
     }
   }
 
+  /// The file name a report of [format] gets for a run called [runName].
+  ///
+  /// One place, so the extension per format is not spelled out in four
+  /// near-identical writers. The base name is `slugify(runName)`, which
+  /// collapses every non-alphanumeric run to `_` — see [claimReportName] for
+  /// what that means when two runs share a slug.
+  static String reportFileName(String runName, MatrixReportFormat format) =>
+      '${_slug(runName)}_report${_extension(format)}';
+
+  static String _extension(MatrixReportFormat format) => switch (format) {
+        MatrixReportFormat.json => '.json',
+        MatrixReportFormat.html => '.html',
+        MatrixReportFormat.markdown => '.md',
+        MatrixReportFormat.junit => '.xml',
+      };
+
+  static final Map<String, List<String>> _reportNameClaims = {};
+
+  /// Registers [runName] as the owner of its report file names, warning when a
+  /// differently-named run has already claimed the same ones.
+  ///
+  /// `slugify` maps every non-alphanumeric character to `_`, so
+  /// `matrixGolden: A/B` and `matrixGolden: A B` produce one set of report
+  /// files. Nothing used to notice: whichever run's teardown ran last silently
+  /// overwrote the other's report, and the missing one looked like a run that
+  /// had never happened.
+  ///
+  /// Called at declaration time by the report pipeline so the warning lands
+  /// next to the offending call site rather than after the whole suite. Warning
+  /// rather than throwing, because a name collision is not a reason to fail a
+  /// suite that is otherwise passing — the strict version belongs in a major.
+  static void claimReportName(String runName) {
+    final base = _slug(runName);
+    final claimed = _reportNameClaims.putIfAbsent(base, () => <String>[]);
+    if (claimed.contains(runName)) return;
+    final first = claimed.isEmpty ? null : claimed.first;
+    claimed.add(runName);
+    if (first == null) return;
+    warnGoldenMatrix(
+      'report files ${base}_report.* are claimed by two different runs: '
+      '"$first" and "$runName". Whichever finishes last overwrites the other — '
+      'rename one of them, or give it its own reportDir.',
+    );
+  }
+
+  /// Forgets every claim made through [claimReportName].
+  ///
+  /// The registry is process-wide, which is what makes cross-file collisions
+  /// visible at all; tests that assert on the warning need to reset it.
+  static void resetReportNameClaims() => _reportNameClaims.clear();
+
   /// Writes the report as a JSON file.
   static Future<void> write(MatrixResult result, {String? outputDir}) async {
     final dir = outputDir ?? _findGoldensDir(result);
     final json = const JsonEncoder.withIndent('  ').convert(result.toJson());
-    final file = File('$dir/${_slug(result.name)}_report.json');
+    final file = File(joinPath(dir, reportFileName(result.name, MatrixReportFormat.json)));
     await file.parent.create(recursive: true);
     await file.writeAsString(json);
   }
@@ -53,7 +106,7 @@ class MatrixReportWriter {
   static Future<void> writeHtml(MatrixResult result, {String? outputDir}) async {
     final dir = outputDir ?? _findGoldensDir(result);
     final html = HtmlTemplate.render(result);
-    final file = File('$dir/${_slug(result.name)}_report.html');
+    final file = File(joinPath(dir, reportFileName(result.name, MatrixReportFormat.html)));
     await file.parent.create(recursive: true);
     await file.writeAsString(html);
   }
@@ -68,7 +121,7 @@ class MatrixReportWriter {
   }) async {
     final dir = outputDir ?? _findGoldensDir(result);
     final md = MarkdownTemplate.render(result, formats: formats);
-    final file = File('$dir/${_slug(result.name)}_report.md');
+    final file = File(joinPath(dir, reportFileName(result.name, MatrixReportFormat.markdown)));
     await file.parent.create(recursive: true);
     await file.writeAsString(md);
   }
@@ -79,7 +132,7 @@ class MatrixReportWriter {
   static Future<void> writeJunit(MatrixResult result, {String? outputDir}) async {
     final dir = outputDir ?? _findGoldensDir(result);
     final xml = JunitTemplate.render(result);
-    final file = File('$dir/${_slug(result.name)}_report.xml');
+    final file = File(joinPath(dir, reportFileName(result.name, MatrixReportFormat.junit)));
     await file.parent.create(recursive: true);
     await file.writeAsString(xml);
   }

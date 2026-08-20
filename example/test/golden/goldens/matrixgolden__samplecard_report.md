@@ -4,6 +4,6 @@
 
 - **Total:** 4
 - **Passed:** 4
-- **Duration:** 1s
+- **Duration:** 96ms
 
 [View HTML report](matrixgolden__samplecard_report.html)

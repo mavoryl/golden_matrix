@@ -1,3 +1,127 @@
+## 1.6.0
+
+Eight fixes to things the package reported or resolved incorrectly, plus three
+new public symbols. Nothing is removed and no signature changes. One fix can
+rename goldens: `ku` is now inferred LTR (see Fixed), so a matrix that tests it
+needs `--update-goldens` once.
+
+### Added
+
+- **`MatrixAxes.directionResolver`** — replaces the built-in direction inference
+  outright, for the custom subtags and app-flag-driven mirroring no table over
+  locales can cover:
+
+  ```dart
+  TextDirection myDirection(Locale locale) =>
+      locale.languageCode == 'xx' ? TextDirection.rtl : TextDirection.ltr;
+
+  matrixGolden(
+    'Button',
+    scenarios: [...],
+    axes: const MatrixAxes(
+      locales: [Locale('en'), Locale('xx')],
+      directionResolver: myDirection,   // a top-level fn keeps the axes const
+    ),
+  );
+  ```
+
+  An explicit `directions` list still wins: that axis enumerates both directions
+  regardless of locale, which is a different question from "which way does this
+  locale read".
+
+- **`MatrixCombinationResult.duration`** — wall-clock time of one combination
+  across build, pump, setup and comparison. Surfaces as `durationMs` in the JSON
+  report and as the JUnit `<testcase time>`; `<testsuite time>` is the sum of its
+  cases. Skipped combinations report zero, because they never ran.
+
+- **`MatrixReportWriter.reportFileName`** — the report file name for a run name
+  and format, in one place instead of an extension spelled out in four
+  near-identical writers.
+
+### Fixed
+
+- **Run timings were fiction.** The stopwatch was opened in the runner body,
+  which executes at test *declaration* time — before a single test has run, and
+  before every group declared below it. A run's reported duration therefore
+  included the execution of unrelated groups in the same file. `timestamp` had
+  the mirror problem: stamped with `DateTime.now()` in `tearDownAll`, i.e. when
+  the run *ended*, while its dartdoc promised "when the run started". Both now
+  read one clock the run itself starts, from a `setUpAll` inside its own group.
+  A run whose clock never started — no tests registered, or all of them skipped
+  — reports no start rather than a fabricated one.
+
+- **JUnit reported `time="0"` on every `<testcase>`.** No CI dashboard could
+  rank slow combinations and no per-suite total added up. Timings are measured
+  now (see `MatrixCombinationResult.duration` above).
+
+- **Direction inference ignored `scriptCode` and knew seven languages.** Sindhi,
+  Uyghur, Divehi, Sorani Kurdish, Syriac, N'Ko, Dari, Kashmiri and the rest of
+  CLDR's right-to-left languages were laid out left to right — a mirrored
+  screenshot that passed as correct, which is worse than a missing test. The
+  script subtag is now checked first, so `az-Arab` is RTL because of its script
+  and `ar-Latn` is LTR for the same reason.
+
+  **`ku` changed direction.** It was hardcoded RTL, but Kurmanji Kurdish — what
+  `ku` means in CLDR — is written in the Latin alphabet; the Arabic-script
+  variant is `ckb`. If you test `ku`, its goldens are renamed from `_rtl_` to
+  `_ltr_` and need `--update-goldens` once.
+
+- **`loadAppFonts` could not find the SDK on Windows.** It shelled out to
+  `which flutter`, which is not a command there, and derived the root by
+  splitting on the literal `'/bin/flutter'` — POSIX separators and the POSIX
+  launcher name both baked in. `PATH` is now walked directly: no subprocess,
+  launcher names per platform (`flutter.bat` included), and the root taken as
+  the parent of `bin/`. The failure was silent, because a missing font falls
+  back to Ahem.
+
+- **One odd `FontManifest.json` entry took down a whole test file.** The manifest
+  was decoded straight into `Iterable<dynamic>` and each entry cast without
+  isolation, so an unexpected shape threw out of `flutter_test_config.dart` — the
+  exact failure mode the per-family registration isolation was written to
+  prevent. Each entry is now isolated and a bad one is named and skipped; a
+  manifest that is not a list at all is reported instead of thrown.
+
+- **Two runs could silently overwrite each other's report.** Report file names
+  come from `slugify(runName)`, which collapses every non-alphanumeric run to
+  `_`, so `A/B` and `A B` claim the same files. The second run now says so at
+  declaration time, naming both runs and the files they are fighting over. A
+  warning rather than an error — the strict version belongs in a major.
+
+- **Report paths used two conventions.** The writer glued output paths with a
+  literal `'$dir/…'` while the runner used `Platform.pathSeparator`, so a
+  Windows directory came out as `C:\project\goldens/report.json` and a
+  `reportDir` ending in a separator produced `goldens//report.json`.
+
+- **Font bytes were the whole buffer, not the bytes.** `ByteData.view(bytes.buffer)`
+  ignores the list's offset and length, so a `Uint8List` that is a view into a
+  larger buffer reached `FontLoader` with garbage glued to both ends.
+  `readAsBytes` returns offset-0 lists today, which is why nothing caught fire.
+
+### Internal
+
+- `MatrixRunClock` replaces the raw `Stopwatch` in all three runners.
+- `joinPath`, `warnGoldenMatrix` and the markup escapers each collapse two or
+  three hand-written copies into one; the escapers stay one function per context
+  (text content, HTML attribute, XML attribute) because the contexts genuinely
+  differ and a single function with flags would be worse.
+- `findFlutterRoot` takes its filesystem touches as parameters, all defaulting to
+  the real thing, so the SDK lookup walk is coverable.
+
+### Coming in 2.0
+
+Advance notice, not a deprecation — these change behaviour rather than remove
+symbols, so there is nothing to mark `@Deprecated`:
+
+- **Golden file names change.** Locale segments will use
+  `Locale.toLanguageTag()` and slugs will get a canonical escaping, which
+  renames every existing golden. Colliding paths, warned about since 1.5.0, will
+  be refused outright — as will colliding report names, warned about since
+  1.6.0.
+- **Model equality changes.** `MatrixDevice` and friends compare by name today;
+  they will compare by identity or by full value.
+- **The barrel narrows.** Test seams currently reachable through
+  `package:golden_matrix/golden_matrix.dart` move to files it does not export.
+
 ## 1.5.0
 
 Internal restructuring plus one behaviour fix and one new public class. No

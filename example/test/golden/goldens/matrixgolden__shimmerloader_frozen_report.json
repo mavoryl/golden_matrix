@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: ShimmerLoader_Frozen",
-  "timestamp": "2026-05-18T15:54:01.297032",
-  "durationMs": 2894,
+  "timestamp": "2026-08-20T14:44:40.820143",
+  "durationMs": 41,
   "total": 2,
   "passed": 2,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/shimmerloader_frozen/loading/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/shimmerloader_frozen/loading/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 20
     },
     {
       "scenario": "loading",
@@ -26,7 +27,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/shimmerloader_frozen/loading/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/shimmerloader_frozen/loading/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 12
     }
   ]
 }

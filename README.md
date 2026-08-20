@@ -22,7 +22,7 @@ HTML + JUnit reports for CI.
 ```yaml
 # pubspec.yaml
 dev_dependencies:
-  golden_matrix: ^1.5.0
+  golden_matrix: ^1.6.0
 ```
 
 ```dart
@@ -71,9 +71,9 @@ flutter test                   # run regression tests
 - **Three entry points** — `matrixGolden` (components), `screenMatrixGolden` (full screens), `componentMatrixGolden` (intrinsic-size primitives)
 - **Typed scenarios** — `MatrixScenario.typed<T>` attaches a compile-time-checked state payload, so one builder covers loading/loaded/error/empty
 - **Sampling** — `full`, `smoke`, `pairwise` (constraint-aware, so exclusion rules never silently drop pair coverage), `priorityBased` to keep CI fast
-- **HTML / JSON / Markdown / JUnit XML reports** (opt-in via `reportFormats`) — inline pixel-diff thumbnails on failure, and the phase a failure came from (build / pump / setup / comparison)
+- **HTML / JSON / Markdown / JUnit XML reports** (opt-in via `reportFormats`) — inline pixel-diff thumbnails on failure, the phase a failure came from (build / pump / setup / comparison), and measured per-combination timings
 - **Stale + overflow detection** — orphan goldens and `RenderFlex overflow` surface automatically
-- **RTL auto-inference** for Arabic / Hebrew / Farsi
+- **RTL auto-inference** across CLDR's right-to-left languages and scripts (`ar`, `he`, `fa`, `ur`, `ps`, `sd`, `ug`, `ckb`, … and `az-Arab` by script); replace it wholesale with `MatrixAxes.directionResolver`
 - **20+ device presets** — modern iPhones, Android, foldables, full iPad lineup, plus custom devices
 - **Capture resolution** — `captureScale` for supersampled goldens (2×/3× rasters); device `pixelRatio` stays layout-only
 - **DI-friendly** — `wrapApp` / `wrapChild` hooks for Riverpod / Bloc / Provider

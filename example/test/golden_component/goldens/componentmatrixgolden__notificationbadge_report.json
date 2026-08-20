@@ -1,7 +1,7 @@
 {
   "name": "componentMatrixGolden: NotificationBadge",
-  "timestamp": "2026-08-05T14:23:57.221337",
-  "durationMs": 697,
+  "timestamp": "2026-08-20T14:44:36.952377",
+  "durationMs": 352,
   "total": 6,
   "passed": 6,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_1x.png"
+      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_1x.png",
+      "durationMs": 180
     },
     {
       "scenario": "info",
@@ -26,7 +27,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_1x.png",
+      "durationMs": 14
     },
     {
       "scenario": "warning",
@@ -36,7 +38,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_1x.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_1x.png",
+      "durationMs": 10
     },
     {
       "scenario": "warning",
@@ -46,7 +49,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_1x.png",
+      "durationMs": 8
     },
     {
       "scenario": "error",
@@ -56,7 +60,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_1x.png"
+      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_1x.png",
+      "durationMs": 7
     },
     {
       "scenario": "error",
@@ -66,7 +71,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_1x.png",
+      "durationMs": 9
     }
   ]
 }

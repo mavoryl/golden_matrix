@@ -1,7 +1,7 @@
 {
   "name": "componentMatrixGolden: SampleButton",
-  "timestamp": "2026-08-05T14:23:57.477718",
-  "durationMs": 948,
+  "timestamp": "2026-08-20T14:44:37.321874",
+  "durationMs": 100,
   "total": 6,
   "passed": 6,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_en_ltr_1x.png"
+      "goldenPath": "goldens/samplebutton/default/light_en_ltr_1x.png",
+      "durationMs": 25
     },
     {
       "scenario": "default",
@@ -26,7 +27,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_1x.png",
+      "durationMs": 10
     },
     {
       "scenario": "disabled",
@@ -36,7 +38,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_1x.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_1x.png",
+      "durationMs": 12
     },
     {
       "scenario": "disabled",
@@ -46,7 +49,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_1x.png",
+      "durationMs": 7
     },
     {
       "scenario": "loading",
@@ -56,7 +60,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/loading/light_en_ltr_1x.png"
+      "goldenPath": "goldens/samplebutton/loading/light_en_ltr_1x.png",
+      "durationMs": 12
     },
     {
       "scenario": "loading",
@@ -66,7 +71,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/loading/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/samplebutton/loading/dark_en_ltr_1x.png",
+      "durationMs": 7
     }
   ]
 }

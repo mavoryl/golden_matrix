@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: NotificationBadge",
-  "timestamp": "2026-05-12T12:42:47.945843",
-  "durationMs": 2123,
+  "timestamp": "2026-08-20T14:44:38.748436",
+  "durationMs": 1218,
   "total": 48,
   "passed": 48,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 21
     },
     {
       "scenario": "info",
@@ -26,7 +27,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_1x_tablet.png",
+      "durationMs": 25
     },
     {
       "scenario": "info",
@@ -36,7 +38,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_2x_phonesmall.png",
+      "durationMs": 18
     },
     {
       "scenario": "info",
@@ -46,7 +49,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/light_en_ltr_2x_tablet.png",
+      "durationMs": 35
     },
     {
       "scenario": "info",
@@ -56,7 +60,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_1x_phonesmall.png",
+      "durationMs": 14
     },
     {
       "scenario": "info",
@@ -66,7 +71,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_1x_tablet.png",
+      "durationMs": 26
     },
     {
       "scenario": "info",
@@ -76,7 +82,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_2x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "info",
@@ -86,7 +93,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/light_ar_rtl_2x_tablet.png",
+      "durationMs": 24
     },
     {
       "scenario": "info",
@@ -96,7 +104,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "info",
@@ -106,7 +115,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_1x_tablet.png",
+      "durationMs": 26
     },
     {
       "scenario": "info",
@@ -116,7 +126,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_2x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "info",
@@ -126,7 +137,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_en_ltr_2x_tablet.png",
+      "durationMs": 26
     },
     {
       "scenario": "info",
@@ -136,7 +148,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_1x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "info",
@@ -146,7 +159,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_1x_tablet.png",
+      "durationMs": 28
     },
     {
       "scenario": "info",
@@ -156,7 +170,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_2x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "info",
@@ -166,7 +181,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/info/dark_ar_rtl_2x_tablet.png",
+      "durationMs": 25
     },
     {
       "scenario": "warning",
@@ -176,7 +192,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "warning",
@@ -186,7 +203,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_1x_tablet.png",
+      "durationMs": 28
     },
     {
       "scenario": "warning",
@@ -196,7 +214,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_2x_phonesmall.png",
+      "durationMs": 13
     },
     {
       "scenario": "warning",
@@ -206,7 +225,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_en_ltr_2x_tablet.png",
+      "durationMs": 28
     },
     {
       "scenario": "warning",
@@ -216,7 +236,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_1x_phonesmall.png",
+      "durationMs": 13
     },
     {
       "scenario": "warning",
@@ -226,7 +247,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_1x_tablet.png",
+      "durationMs": 29
     },
     {
       "scenario": "warning",
@@ -236,7 +258,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_2x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "warning",
@@ -246,7 +269,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/light_ar_rtl_2x_tablet.png",
+      "durationMs": 28
     },
     {
       "scenario": "warning",
@@ -256,7 +280,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "warning",
@@ -266,7 +291,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_1x_tablet.png",
+      "durationMs": 25
     },
     {
       "scenario": "warning",
@@ -276,7 +302,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_2x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "warning",
@@ -286,7 +313,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_en_ltr_2x_tablet.png",
+      "durationMs": 28
     },
     {
       "scenario": "warning",
@@ -296,7 +324,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_1x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "warning",
@@ -306,7 +335,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_1x_tablet.png",
+      "durationMs": 33
     },
     {
       "scenario": "warning",
@@ -316,7 +346,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_2x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "warning",
@@ -326,7 +357,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/warning/dark_ar_rtl_2x_tablet.png",
+      "durationMs": 28
     },
     {
       "scenario": "error",
@@ -336,7 +368,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "error",
@@ -346,7 +379,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_1x_tablet.png",
+      "durationMs": 27
     },
     {
       "scenario": "error",
@@ -356,7 +390,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_2x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "error",
@@ -366,7 +401,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/light_en_ltr_2x_tablet.png",
+      "durationMs": 28
     },
     {
       "scenario": "error",
@@ -376,7 +412,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_1x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "error",
@@ -386,7 +423,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_1x_tablet.png",
+      "durationMs": 30
     },
     {
       "scenario": "error",
@@ -396,7 +434,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_2x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "error",
@@ -406,7 +445,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/light_ar_rtl_2x_tablet.png",
+      "durationMs": 30
     },
     {
       "scenario": "error",
@@ -416,7 +456,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "error",
@@ -426,7 +467,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_1x_tablet.png",
+      "durationMs": 23
     },
     {
       "scenario": "error",
@@ -436,7 +478,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_2x_phonesmall.png",
+      "durationMs": 13
     },
     {
       "scenario": "error",
@@ -446,7 +489,8 @@
       "device": "tablet",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_en_ltr_2x_tablet.png",
+      "durationMs": 34
     },
     {
       "scenario": "error",
@@ -456,7 +500,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_1x_phonesmall.png",
+      "durationMs": 14
     },
     {
       "scenario": "error",
@@ -466,7 +511,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_1x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_1x_tablet.png",
+      "durationMs": 27
     },
     {
       "scenario": "error",
@@ -476,7 +522,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_2x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "error",
@@ -486,7 +533,8 @@
       "device": "tablet",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_2x_tablet.png"
+      "goldenPath": "goldens/notificationbadge/error/dark_ar_rtl_2x_tablet.png",
+      "durationMs": 23
     }
   ]
 }

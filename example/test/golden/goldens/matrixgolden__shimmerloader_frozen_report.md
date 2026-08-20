@@ -4,6 +4,6 @@
 
 - **Total:** 2
 - **Passed:** 2
-- **Duration:** 3s
+- **Duration:** 41ms
 
 [View HTML report](matrixgolden__shimmerloader_frozen_report.html)

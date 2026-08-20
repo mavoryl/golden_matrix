@@ -4,6 +4,6 @@
 
 - **Total:** 6
 - **Passed:** 6
-- **Duration:** 948ms
+- **Duration:** 100ms
 
 [View HTML report](componentmatrixgolden__samplebutton_report.html)

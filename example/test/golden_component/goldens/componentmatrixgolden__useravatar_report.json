@@ -1,7 +1,7 @@
 {
   "name": "componentMatrixGolden: UserAvatar",
-  "timestamp": "2026-08-05T14:23:57.629936",
-  "durationMs": 1100,
+  "timestamp": "2026-08-20T14:44:37.425068",
+  "durationMs": 81,
   "total": 6,
   "passed": 6,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x.png"
+      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x.png",
+      "durationMs": 12
     },
     {
       "scenario": "small_offline",
@@ -26,7 +27,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x.png",
+      "durationMs": 7
     },
     {
       "scenario": "medium_online",
@@ -36,7 +38,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x.png"
+      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x.png",
+      "durationMs": 14
     },
     {
       "scenario": "medium_online",
@@ -46,7 +49,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x.png",
+      "durationMs": 6
     },
     {
       "scenario": "large_online",
@@ -56,7 +60,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x.png"
+      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x.png",
+      "durationMs": 7
     },
     {
       "scenario": "large_online",
@@ -66,7 +71,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x.png"
+      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x.png",
+      "durationMs": 6
     }
   ]
 }

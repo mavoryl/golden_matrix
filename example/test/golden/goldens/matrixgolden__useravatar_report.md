@@ -4,6 +4,6 @@
 
 - **Total:** 12
 - **Passed:** 12
-- **Duration:** 1s
+- **Duration:** 258ms
 
 [View HTML report](matrixgolden__useravatar_report.html)

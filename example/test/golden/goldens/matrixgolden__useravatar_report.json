@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: UserAvatar",
-  "timestamp": "2026-05-12T12:42:47.154280",
-  "durationMs": 1331,
+  "timestamp": "2026-08-20T14:44:38.487468",
+  "durationMs": 258,
   "total": 12,
   "passed": 12,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 24
     },
     {
       "scenario": "small_offline",
@@ -26,7 +27,8 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/small_offline/light_en_ltr_1x_androidmedium.png",
+      "durationMs": 16
     },
     {
       "scenario": "small_offline",
@@ -36,7 +38,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "small_offline",
@@ -46,7 +49,8 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/small_offline/dark_en_ltr_1x_androidmedium.png",
+      "durationMs": 15
     },
     {
       "scenario": "medium_online",
@@ -56,7 +60,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 14
     },
     {
       "scenario": "medium_online",
@@ -66,7 +71,8 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/medium_online/light_en_ltr_1x_androidmedium.png",
+      "durationMs": 18
     },
     {
       "scenario": "medium_online",
@@ -76,7 +82,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 18
     },
     {
       "scenario": "medium_online",
@@ -86,7 +93,8 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/medium_online/dark_en_ltr_1x_androidmedium.png",
+      "durationMs": 21
     },
     {
       "scenario": "large_online",
@@ -96,7 +104,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "large_online",
@@ -106,7 +115,8 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/large_online/light_en_ltr_1x_androidmedium.png",
+      "durationMs": 19
     },
     {
       "scenario": "large_online",
@@ -116,7 +126,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "large_online",
@@ -126,7 +137,8 @@
       "device": "androidMedium",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x_androidmedium.png"
+      "goldenPath": "goldens/useravatar/large_online/dark_en_ltr_1x_androidmedium.png",
+      "durationMs": 18
     }
   ]
 }

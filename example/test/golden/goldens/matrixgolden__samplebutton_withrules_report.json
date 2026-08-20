@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: SampleButton_WithRules",
-  "timestamp": "2026-05-12T12:42:48.511133",
-  "durationMs": 2685,
+  "timestamp": "2026-08-20T14:44:40.555180",
+  "durationMs": 117,
   "total": 6,
   "passed": 6,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton_withrules/default/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withrules/default/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 13
     },
     {
       "scenario": "default",
@@ -26,7 +27,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton_withrules/default/light_ar_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withrules/default/light_ar_ltr_1x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "default",
@@ -36,7 +38,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton_withrules/default/light_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withrules/default/light_ar_rtl_1x_phonesmall.png",
+      "durationMs": 14
     },
     {
       "scenario": "default",
@@ -46,7 +49,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton_withrules/default/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withrules/default/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 18
     },
     {
       "scenario": "default",
@@ -56,7 +60,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton_withrules/default/dark_ar_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withrules/default/dark_ar_ltr_1x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "default",
@@ -66,7 +71,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton_withrules/default/dark_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton_withrules/default/dark_ar_rtl_1x_phonesmall.png",
+      "durationMs": 17
     }
   ]
 }

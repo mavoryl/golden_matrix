@@ -1,7 +1,7 @@
 {
   "name": "matrixGolden: SampleButton",
-  "timestamp": "2026-05-12T12:42:46.883327",
-  "durationMs": 1069,
+  "timestamp": "2026-08-20T14:44:36.988901",
+  "durationMs": 1376,
   "total": 48,
   "passed": 48,
   "failed": 0,
@@ -16,7 +16,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 221
     },
     {
       "scenario": "default",
@@ -26,7 +27,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_en_ltr_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/light_en_ltr_1x_phonelarge.png",
+      "durationMs": 29
     },
     {
       "scenario": "default",
@@ -36,7 +38,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/light_en_ltr_2x_phonesmall.png",
+      "durationMs": 18
     },
     {
       "scenario": "default",
@@ -46,7 +49,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_en_ltr_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/light_en_ltr_2x_phonelarge.png",
+      "durationMs": 24
     },
     {
       "scenario": "default",
@@ -56,7 +60,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_1x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "default",
@@ -66,7 +71,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_1x_phonelarge.png",
+      "durationMs": 19
     },
     {
       "scenario": "default",
@@ -76,7 +82,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_2x_phonesmall.png",
+      "durationMs": 20
     },
     {
       "scenario": "default",
@@ -86,7 +93,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/light_ar_rtl_2x_phonelarge.png",
+      "durationMs": 22
     },
     {
       "scenario": "default",
@@ -96,7 +104,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 14
     },
     {
       "scenario": "default",
@@ -106,7 +115,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_1x_phonelarge.png",
+      "durationMs": 21
     },
     {
       "scenario": "default",
@@ -116,7 +126,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_2x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "default",
@@ -126,7 +137,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/dark_en_ltr_2x_phonelarge.png",
+      "durationMs": 20
     },
     {
       "scenario": "default",
@@ -136,7 +148,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_1x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "default",
@@ -146,7 +159,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_1x_phonelarge.png",
+      "durationMs": 16
     },
     {
       "scenario": "default",
@@ -156,7 +170,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_2x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "default",
@@ -166,7 +181,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/default/dark_ar_rtl_2x_phonelarge.png",
+      "durationMs": 20
     },
     {
       "scenario": "disabled",
@@ -176,7 +192,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 13
     },
     {
       "scenario": "disabled",
@@ -186,7 +203,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_1x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "disabled",
@@ -196,7 +214,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_2x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "disabled",
@@ -206,7 +225,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_en_ltr_2x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "disabled",
@@ -216,7 +236,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_1x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "disabled",
@@ -226,7 +247,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_1x_phonelarge.png",
+      "durationMs": 19
     },
     {
       "scenario": "disabled",
@@ -236,7 +258,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_2x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "disabled",
@@ -246,7 +269,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/light_ar_rtl_2x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "disabled",
@@ -256,7 +280,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 13
     },
     {
       "scenario": "disabled",
@@ -266,7 +291,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_1x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "disabled",
@@ -276,7 +302,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_2x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "disabled",
@@ -286,7 +313,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_en_ltr_2x_phonelarge.png",
+      "durationMs": 19
     },
     {
       "scenario": "disabled",
@@ -296,7 +324,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_1x_phonesmall.png",
+      "durationMs": 18
     },
     {
       "scenario": "disabled",
@@ -306,7 +335,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_1x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "disabled",
@@ -316,7 +346,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_2x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "disabled",
@@ -326,7 +357,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/disabled/dark_ar_rtl_2x_phonelarge.png",
+      "durationMs": 20
     },
     {
       "scenario": "long_text",
@@ -336,7 +368,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_1x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "long_text",
@@ -346,7 +379,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_1x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "long_text",
@@ -356,7 +390,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_2x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "long_text",
@@ -366,7 +401,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_en_ltr_2x_phonelarge.png",
+      "durationMs": 20
     },
     {
       "scenario": "long_text",
@@ -376,7 +412,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_1x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "long_text",
@@ -386,7 +423,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_1x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "long_text",
@@ -396,7 +434,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_2x_phonesmall.png",
+      "durationMs": 12
     },
     {
       "scenario": "long_text",
@@ -406,7 +445,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/light_ar_rtl_2x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "long_text",
@@ -416,7 +456,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_1x_phonesmall.png",
+      "durationMs": 16
     },
     {
       "scenario": "long_text",
@@ -426,7 +467,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_1x_phonelarge.png",
+      "durationMs": 19
     },
     {
       "scenario": "long_text",
@@ -436,7 +478,8 @@
       "device": "phoneSmall",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_2x_phonesmall.png",
+      "durationMs": 17
     },
     {
       "scenario": "long_text",
@@ -446,7 +489,8 @@
       "device": "phoneLarge",
       "direction": "ltr",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_en_ltr_2x_phonelarge.png",
+      "durationMs": 20
     },
     {
       "scenario": "long_text",
@@ -456,7 +500,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_1x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_1x_phonesmall.png",
+      "durationMs": 15
     },
     {
       "scenario": "long_text",
@@ -466,7 +511,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_1x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_1x_phonelarge.png",
+      "durationMs": 18
     },
     {
       "scenario": "long_text",
@@ -476,7 +522,8 @@
       "device": "phoneSmall",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_2x_phonesmall.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_2x_phonesmall.png",
+      "durationMs": 13
     },
     {
       "scenario": "long_text",
@@ -486,7 +533,8 @@
       "device": "phoneLarge",
       "direction": "rtl",
       "status": "passed",
-      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_2x_phonelarge.png"
+      "goldenPath": "goldens/samplebutton/long_text/dark_ar_rtl_2x_phonelarge.png",
+      "durationMs": 19
     }
   ]
 }

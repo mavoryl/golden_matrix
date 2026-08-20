@@ -58,6 +58,35 @@ The `<failure type>` says which phase broke, so a dashboard does not blame the p
 
 The same value appears as `"phase"` in the JSON report for failed combinations, and as `MatrixCombinationResult.failurePhase` if you consume results programmatically.
 
+### Timings
+
+Every report carries three numbers, and as of 1.6.0 all three are measured:
+
+| Field | Where | What it is |
+| --- | --- | --- |
+| `timestamp` | JSON, JUnit `<testsuites timestamp>`, HTML header | When the run's first test started |
+| `durationMs` / `time` | JSON, JUnit `<testsuites time>` | Wall-clock from the first test to the last teardown |
+| `durationMs` per result / `<testcase time>` | JSON results, JUnit | Wall-clock of one combination: build, pump, setup, comparison |
+
+Before 1.6.0 the run clock started when the runner was *declared*, so it
+included the execution of every group declared above it in the same file;
+`timestamp` was stamped at the end of the run despite being documented as its
+start; and every `<testcase>` reported `time="0"`. Skipped combinations report
+`0`, because they never ran.
+
+### One report per run name
+
+Report file names come from `slugify(runName)`, which collapses every
+non-alphanumeric run to `_`. Two runs called `A/B` and `A B` therefore claim the
+same files, and whichever finishes last overwrites the other. Since 1.6.0 the
+second one says so at declaration time:
+
+```
+golden_matrix: report files matrixgolden__a_b_report.* are claimed by two
+different runs: "matrixGolden: A/B" and "matrixGolden: A B". Whichever finishes
+last overwrites the other — rename one of them, or give it its own reportDir.
+```
+
 ## Choosing formats per run
 
 Use `reportFormats` to write only what your pipeline needs:

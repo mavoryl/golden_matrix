@@ -5,6 +5,7 @@ import 'package:golden_matrix/src/api/matrix_run_config.dart';
 import 'package:golden_matrix/src/api/matrix_test_runner.dart';
 import 'package:golden_matrix/src/core/matrix_run_plan.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
+import 'package:golden_matrix/src/core/run_clock.dart';
 import 'package:golden_matrix/src/flutter/capture_strategy.dart';
 import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
 import 'package:golden_matrix/src/flutter/report_pipeline.dart';
@@ -173,7 +174,9 @@ void componentMatrixGolden(
   final recordResults = formats.isNotEmpty || wantStaleDetection;
 
   final results = <MatrixCombinationResult>[];
-  final stopwatch = Stopwatch()..start();
+  // Not started here: this body runs at declaration time. The report
+  // pipeline opens the clock from a `setUpAll` inside the group below.
+  final clock = MatrixRunClock();
   final groupName = 'componentMatrixGolden: $name';
 
   group(groupName, () {
@@ -216,7 +219,7 @@ void componentMatrixGolden(
         reportName: groupName,
         testSlug: plan.name,
         results: results,
-        stopwatch: stopwatch,
+        clock: clock,
         reportDir: effective.reportDir,
         printSummary: effective.resolvedPrintSummary,
         formats: formats,

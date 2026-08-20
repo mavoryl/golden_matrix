@@ -5,13 +5,19 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:golden_matrix/src/core/matrix_report_writer.dart';
 import 'package:golden_matrix/src/core/report_format.dart';
+import 'package:golden_matrix/src/core/run_clock.dart';
 import 'package:golden_matrix/src/core/slug.dart';
 import 'package:golden_matrix/src/flutter/stale_scan.dart';
 import 'package:golden_matrix/src/models/matrix_result.dart';
 
-/// Registers the `tearDownAll` that closes out a run: stops the clock, scans
-/// for stale goldens, assembles the [MatrixResult], writes every requested
-/// report format and prints the console summary.
+/// Registers the `setUpAll` that opens a run's clock and the `tearDownAll` that
+/// closes the run out: stops the clock, scans for stale goldens, assembles the
+/// [MatrixResult], writes every requested report format and prints the console
+/// summary.
+///
+/// The clock is started from `setUpAll` rather than by the caller, because a
+/// runner body executes at *declaration* time — starting it there timed the
+/// declaration of every group below it as part of this run.
 ///
 /// Shared by all three runners. Each used to carry its own copy of this
 /// teardown, and the copies had already drifted — the component one resolved
@@ -26,18 +32,19 @@ void installReportPipeline({
   required String reportName,
   required String testSlug,
   required List<MatrixCombinationResult> results,
-  required Stopwatch stopwatch,
+  required MatrixRunClock clock,
   required String? reportDir,
   required bool printSummary,
   required Set<MatrixReportFormat> formats,
   required bool detectStaleGoldens,
 }) {
+  setUpAll(clock.start);
   tearDownAll(
     () => finishRun(
       reportName: reportName,
       testSlug: testSlug,
       results: results,
-      stopwatch: stopwatch,
+      clock: clock,
       reportDir: reportDir,
       printSummary: printSummary,
       formats: formats,
@@ -54,13 +61,13 @@ Future<void> finishRun({
   required String reportName,
   required String testSlug,
   required List<MatrixCombinationResult> results,
-  required Stopwatch stopwatch,
+  required MatrixRunClock clock,
   required String? reportDir,
   required bool printSummary,
   required Set<MatrixReportFormat> formats,
   required bool detectStaleGoldens,
 }) async {
-  stopwatch.stop();
+  clock.stop();
   final stale = detectStaleGoldens
       ? await scanStaleGoldens(
           testSlug: slugify(testSlug),
@@ -71,7 +78,10 @@ Future<void> finishRun({
   final result = MatrixResult(
     name: reportName,
     results: results,
-    duration: stopwatch.elapsed,
+    // A run whose clock never started registered no tests, or had all of them
+    // skipped; there is no start time to report, so `MatrixResult` stamps now.
+    timestamp: clock.startedAt,
+    duration: clock.elapsed,
     staleGoldens: stale,
   );
 

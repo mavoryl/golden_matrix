@@ -51,6 +51,7 @@ class MatrixCombinationResult {
     this.errorMessage,
     this.warnings = const [],
     this.failurePhase,
+    this.duration = Duration.zero,
   });
 
   /// The combination that produced this result.
@@ -67,6 +68,15 @@ class MatrixCombinationResult {
 
   /// Non-fatal warnings captured during the test (e.g. RenderFlex overflows).
   final List<String> warnings;
+
+  /// Wall-clock time this combination took: build, pump, optional setup and the
+  /// golden comparison.
+  ///
+  /// [Duration.zero] for skipped combinations and for results assembled by
+  /// callers that do not time them. Reported as `durationMs` in JSON and as the
+  /// JUnit `<testcase time>`, which used to be a hardcoded `0` for every case —
+  /// so no CI dashboard could tell a 40 ms button from a 4 s screen.
+  final Duration duration;
 
   /// Which lifecycle phase failed, when [status] is [MatrixResultStatus.failed].
   ///
@@ -101,6 +111,7 @@ class MatrixCombinationResult {
         'direction': combination.direction == TextDirection.ltr ? 'ltr' : 'rtl',
         'status': status.name,
         'goldenPath': goldenPath,
+        'durationMs': duration.inMilliseconds,
         if (errorMessage != null) 'error': errorMessage,
         if (failurePhase != null) 'phase': failurePhase!.name,
         if (warnings.isNotEmpty) 'warnings': warnings,

@@ -56,6 +56,10 @@ Future<void> runGoldenLifecycle({
   void Function()? onFinally,
 }) async {
   final capture = ErrorCapture()..start();
+  // Real wall-clock: `Stopwatch` is not faked inside `testWidgets`, so this
+  // measures the time the combination actually cost, not the fake time its
+  // pumps advanced.
+  final elapsed = Stopwatch()..start();
   var recorded = false;
 
   void recordOnce(
@@ -73,6 +77,7 @@ Future<void> runGoldenLifecycle({
         errorMessage: errorMessage,
         warnings: List.unmodifiable(capture.warnings),
         failurePhase: phase,
+        duration: elapsed.elapsed,
       ),
     );
   }
@@ -162,6 +167,7 @@ Future<void> runGoldenLifecycle({
     Error.throwWithStackTrace(e, st);
   } finally {
     capture.stop();
+    elapsed.stop();
     onFinally?.call();
   }
 }

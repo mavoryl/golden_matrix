@@ -52,6 +52,7 @@ class JunitTemplate {
     _attr(buf, 'failures', failures.toString());
     _attr(buf, 'errors', '0');
     _attr(buf, 'skipped', skipped.toString());
+    _attr(buf, 'time', _seconds(results.fold(Duration.zero, (sum, r) => sum + r.duration)));
     buf.writeln('>');
 
     for (final r in results) {
@@ -76,7 +77,7 @@ class JunitTemplate {
     buf.write('    <testcase');
     _attr(buf, 'classname', className);
     _attr(buf, 'name', caseName);
-    _attr(buf, 'time', '0');
+    _attr(buf, 'time', _seconds(r.duration));
 
     switch (r.status) {
       case MatrixResultStatus.passed:

@@ -127,4 +127,51 @@ void main() {
       expect(json.containsKey('phase'), isFalse);
     });
   });
+
+  group('every combination carries its own time', () {
+    // JUnit hardcoded `time="0"` on every `<testcase>`, so no CI dashboard could
+    // rank slow combinations and no per-suite total ever added up. The number
+    // was not merely rounded — it was never measured.
+    MatrixCombinationResult timed(Duration duration) => MatrixCombinationResult(
+          combination: _combo(),
+          status: MatrixResultStatus.passed,
+          goldenPath: 'goldens/widget/s/light_en_ltr_1x_phonesmall.png',
+          duration: duration,
+        );
+
+    test('a result nobody timed reports zero rather than a fabricated number', () {
+      expect(timed(Duration.zero).duration, Duration.zero);
+      expect(
+        MatrixCombinationResult(
+          combination: _combo(),
+          status: MatrixResultStatus.skipped,
+          goldenPath: 'goldens/widget/s/light.png',
+        ).duration,
+        Duration.zero,
+      );
+    });
+
+    test('JSON carries the per-combination duration', () {
+      expect(timed(const Duration(milliseconds: 12)).toJson()['durationMs'], 12);
+    });
+
+    test('JUnit renders the per-case duration in seconds', () {
+      final xml = JunitTemplate.render(_result([timed(const Duration(milliseconds: 1234))]));
+
+      expect(xml, contains('time="1.234"'));
+      expect(xml, isNot(contains('time="0"')));
+    });
+
+    test('a testsuite reports the sum of its cases', () {
+      final xml = JunitTemplate.render(
+        _result([
+          timed(const Duration(milliseconds: 500)),
+          timed(const Duration(milliseconds: 250)),
+        ]),
+      );
+      final suite = xml.split('\n').firstWhere((line) => line.contains('<testsuite '));
+
+      expect(suite, contains('time="0.750"'));
+    });
+  });
 }

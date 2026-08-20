@@ -184,4 +184,33 @@ void main() {
       expect(results, isEmpty);
     });
   });
+
+  group('the lifecycle times what it ran', () {
+    // Reports had no per-combination time at all: JUnit hardcoded `time="0"`,
+    // so the only measurement anywhere was the whole-run total.
+    testWidgets('a passing combination records how long it took', (tester) async {
+      final results = <MatrixCombinationResult>[];
+
+      await run(tester, results: results);
+
+      expect(results.single.duration, greaterThan(Duration.zero));
+    });
+
+    testWidgets('a failing combination is timed too', (tester) async {
+      final results = <MatrixCombinationResult>[];
+
+      await run(tester, results: results, compare: throwFromCompare);
+
+      expect(results.single.status, MatrixResultStatus.failed);
+      expect(results.single.duration, greaterThan(Duration.zero));
+    });
+
+    testWidgets('a skipped combination reports no time, because it never ran', (tester) async {
+      final results = <MatrixCombinationResult>[];
+
+      recordSkipped(results, _combo(), path);
+
+      expect(results.single.duration, Duration.zero);
+    });
+  });
 }

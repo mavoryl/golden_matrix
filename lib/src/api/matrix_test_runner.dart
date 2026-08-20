@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import 'package:golden_matrix/src/api/matrix_run_config.dart';
 import 'package:golden_matrix/src/core/matrix_run_plan.dart';
+import 'package:golden_matrix/src/core/run_clock.dart';
 import 'package:golden_matrix/src/flutter/capture_strategy.dart';
 import 'package:golden_matrix/src/flutter/golden_lifecycle.dart';
 import 'package:golden_matrix/src/flutter/report_pipeline.dart';
@@ -49,7 +50,9 @@ void runMatrixTests(
   final recordResults = formats.isNotEmpty || wantStaleDetection;
 
   final List<MatrixCombinationResult> results = [];
-  final stopwatch = Stopwatch()..start();
+  // Not started here: this body runs at declaration time. The report
+  // pipeline opens the clock from a `setUpAll` inside the group below.
+  final clock = MatrixRunClock();
 
   group(name, () {
     installToleranceComparator(config.tolerance);
@@ -90,7 +93,7 @@ void runMatrixTests(
         reportName: name,
         testSlug: plan.name,
         results: results,
-        stopwatch: stopwatch,
+        clock: clock,
         reportDir: config.reportDir,
         printSummary: config.resolvedPrintSummary,
         formats: formats,

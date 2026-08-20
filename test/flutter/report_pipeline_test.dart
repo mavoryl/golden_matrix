@@ -1,9 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/widgets.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:golden_matrix/golden_matrix.dart';
+import 'package:golden_matrix/src/core/run_clock.dart';
 import 'package:golden_matrix/src/flutter/report_pipeline.dart';
 
 import '../_helpers/no_op_comparator.dart';
@@ -61,7 +63,7 @@ void main() {
         reportName: 'matrixGolden: Quiet',
         testSlug: 'quiet',
         results: [_passed('goldens/quiet/s/light.png')],
-        stopwatch: Stopwatch()..start(),
+        clock: MatrixRunClock()..start(),
         reportDir: dir.path,
         printSummary: false,
         formats: const {},
@@ -76,7 +78,7 @@ void main() {
         reportName: 'matrixGolden: Loud',
         testSlug: 'loud',
         results: [_passed('goldens/loud/s/light.png')],
-        stopwatch: Stopwatch()..start(),
+        clock: MatrixRunClock()..start(),
         reportDir: dir.path,
         printSummary: false,
         formats: const {
@@ -106,7 +108,7 @@ void main() {
         reportName: 'matrixGolden: stale_json',
         testSlug: 'stale_json',
         results: [_passed('goldens/stale_json/light.png')],
-        stopwatch: Stopwatch()..start(),
+        clock: MatrixRunClock()..start(),
         reportDir: dir.path,
         printSummary: false,
         formats: const {MatrixReportFormat.json},
@@ -131,7 +133,7 @@ void main() {
           reportName: 'matrixGolden: stale_echo',
           testSlug: 'stale_echo',
           results: [_passed('goldens/stale_echo/light.png')],
-          stopwatch: Stopwatch()..start(),
+          clock: MatrixRunClock()..start(),
           reportDir: dir.path,
           printSummary: false,
           formats: const {},
@@ -155,7 +157,7 @@ void main() {
           reportName: 'matrixGolden: Summary',
           testSlug: 'summary',
           results: [_passed('goldens/summary/s/light.png')],
-          stopwatch: Stopwatch()..start(),
+          clock: MatrixRunClock()..start(),
           reportDir: dir.path,
           printSummary: true,
           formats: const {},
@@ -166,6 +168,62 @@ void main() {
       }
 
       expect(lines.single, contains('1 total | 1 passed'));
+    });
+  });
+
+  group('finishRun reports the clock honestly', () {
+    // `timestamp` was `DateTime.now()` evaluated inside the teardown while its
+    // dartdoc said "when the run started", and `duration` came from a stopwatch
+    // opened at declaration time. Both now read one clock the run itself started.
+    Future<Map<String, dynamic>> reportFor(MatrixRunClock clock) async {
+      await finishRun(
+        reportName: 'matrixGolden: Clock',
+        testSlug: 'clock',
+        results: [_passed('goldens/clock/s/light.png')],
+        clock: clock,
+        reportDir: dir.path,
+        printSummary: false,
+        formats: const {MatrixReportFormat.json},
+        detectStaleGoldens: false,
+      );
+      return jsonDecode(File('${dir.path}/matrixgolden__clock_report.json').readAsStringSync())
+          as Map<String, dynamic>;
+    }
+
+    test('timestamp is the start of the run and duration is its length', () async {
+      var now = DateTime.utc(2026, 8, 20, 9);
+      final clock = MatrixRunClock(now: () => now);
+      now = now.add(const Duration(minutes: 7)); // other groups in the file
+      clock.start();
+      now = now.add(const Duration(milliseconds: 1500));
+
+      final json = await reportFor(clock);
+
+      expect(json['timestamp'], '2026-08-20T09:07:00.000Z');
+      expect(json['durationMs'], 1500);
+    });
+
+    test('finishRun stops the clock, so a slow teardown does not inflate it', () async {
+      var now = DateTime.utc(2026);
+      final clock = MatrixRunClock(now: () => now)..start();
+      now = now.add(const Duration(seconds: 2));
+
+      final json = await reportFor(clock);
+      now = now.add(const Duration(hours: 1));
+
+      expect(json['durationMs'], 2000);
+      expect(clock.isRunning, isFalse);
+      expect(clock.elapsed, const Duration(seconds: 2));
+    });
+
+    test('a run whose clock never started falls back to the finish time', () async {
+      // Every test skipped means `setUpAll` never fired. There is no start to
+      // report, so the report is stamped now rather than with a fabricated one.
+      final before = DateTime.now().subtract(const Duration(seconds: 5));
+      final json = await reportFor(MatrixRunClock());
+
+      expect(json['durationMs'], 0);
+      expect(DateTime.parse(json['timestamp'] as String).isAfter(before), isTrue);
     });
   });
 
